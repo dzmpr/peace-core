@@ -1,2 +1,2 @@
-##PYthon gpSS translator
+## PYthon gpSS translator
 

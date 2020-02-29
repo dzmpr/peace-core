@@ -2,3 +2,34 @@
 # main {        -> SIMULATE
 #       ...     -> *contents*
 # }             -> END
+
+
+# Program body token
+
+main { 		-> SIMULATE
+    ...		-> *contents*
+}		-> END
+
+# Delay token
+
+delay(*value*)	-> ADVANCE *value*
+
+# Device token
+
+block {		-> SEIZE *block*
+    ...		-> *contents*
+}		-> RELEASE *block*
+
+# Queue start token
+
+q *name*	-> QUEUE *name*
+
+# Queue exit token
+
+dq *name*	-> DEPART *name*
+
+# Generate token
+
+# Start token
+
+# Terminate token
