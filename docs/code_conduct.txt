@@ -16,17 +16,23 @@ delay(*value*)	-> ADVANCE *value*
 
 # Device token
 
-block {		-> SEIZE *block*
+block {		-> SEIZE block
     ...		-> *contents*
-}		-> RELEASE *block*
+}		-> RELEASE block
 
 # Queue start token
 
-q *name*	-> QUEUE *name*
+q name		-> QUEUE name
 
 # Queue exit token
 
-dq *name*	-> DEPART *name*
+dq name		-> DEPART name
+
+# Expression (high-level macro)
+
+exprName = {
+    ...
+}
 
 # Generate token
 
