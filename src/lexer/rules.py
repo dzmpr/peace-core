@@ -1,69 +1,65 @@
-from src.lexer import lexer
+from src.lexer.StateMachine import State
 
-signList = ["+","-","/","*","=","#","$","[","]","{","}"]
+signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]", "{", "}"]
 
 
 def char(char):
     if char.isalnum():
-        return lexer.states.char
-    return lexer.states.undefined
+        return State.char
+    return State.undefined
 
 
 def charStart(char):
     if char.isalpha():
-        return lexer.states.char
-    return lexer.states.undefined
+        return State.char
+    return State.undefined
 
 
 def open(char):
     if char == "(":
-        return lexer.states.openBrace
-    return lexer.states.undefined
+        return State.openBrace
+    return State.undefined
 
 
 def opened(char):
     if char == " ":
-        return lexer.states.openBrace
+        return State.openBrace
     elif char.isalnum():
-        return lexer.states.openBrace
+        return State.openBrace
     elif char == ",":
-        return lexer.states.openBrace
+        return State.openBrace
     elif char == ")":
-        return lexer.states.closeBrace
-    return lexer.states.undefined
+        return State.closeBrace
+    return State.undefined
 
 
 def closed(char):
-    return lexer.states.undefined
-
-
-def block(char):
-    if char == "{":
-        return lexer.states.openBlock
-    elif char.isalpha() or char.isdigit():
-        return lexer.states.openBlock
-    elif char == "}":
-        return lexer.states.closeBlock
-    return lexer.states.undefined
+    return State.undefined
 
 
 def space(char):
     if char == " ":
-        return lexer.states.space
-    return lexer.states.undefined
+        return State.space
+    return State.undefined
 
 
 def num(char):
     if char.isdigit():
-        return lexer.states.num
-    return lexer.states.undefined
+        return State.num
+    return State.undefined
 
 
 def undefined(char):
-    return lexer.states.undefined
+    return State.undefined
 
 
 def sign(char):
     if char in signList:
-        return lexer.states.sign
-    return lexer.states.undefined
+        return State.sign
+    return State.undefined
+
+
+def newline(char):
+    if char == "\n":
+        return State.newline
+    return State.undefined

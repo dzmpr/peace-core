@@ -1,45 +1,51 @@
-import enum
-from src.lexer import state_machine
+from enum import Enum
+from src.lexer.StateMachine import State
+from src.lexer.StateMachine import StateMachine
 from src.lexer import rules
 
 
-class states(enum.Enum):
-    undefined = 0,
-    begin = 1,
-    char = 2,
-    openBrace = 3,
-    closeBrace = 4,
-    openBlock = 5,
-    closeBlock = 6,
-    space = 7,
-    num = 8,
-    sign = 9
+class Token(Enum):
+    def __repr__(self):
+        return self.name
+
+    word = 0
+    parameter = 1
+    space = 2
+    num = 3
+    sign = 4
+    newline = 5
+    undefined = 6
 
 
-wordMachine = state_machine.StateMachine("word", {
-    states.begin: rules.charStart,
-    states.char: rules.char
+wordMachine = StateMachine(Token.word, {
+    State.begin: rules.charStart,
+    State.char: rules.char
 })
 
-paramMachine = state_machine.StateMachine("param", {
-    states.begin: rules.open,
-    states.openBrace: rules.opened,
-    states.closeBrace: rules.closed
+paramMachine = StateMachine(Token.parameter, {
+    State.begin: rules.open,
+    State.openBrace: rules.opened,
+    State.closeBrace: rules.closed
 })
 
-spaceMachine = state_machine.StateMachine("space", {
-    states.begin: rules.space,
-    states.space: rules.space
+spaceMachine = StateMachine(Token.space, {
+    State.begin: rules.space,
+    State.space: rules.space
 })
 
-numberMachine = state_machine.StateMachine("num", {
-    states.begin: rules.num,
-    states.num: rules.num
+numberMachine = StateMachine(Token.num, {
+    State.begin: rules.num,
+    State.num: rules.num
 })
 
-signMachine = state_machine.StateMachine("sign", {
-    states.begin: rules.sign,
-    states.sign: rules.undefined
+signMachine = StateMachine(Token.sign, {
+    State.begin: rules.sign,
+    State.sign: rules.undefined
+})
+
+newlineMachine = StateMachine(Token.newline, {
+    State.begin: rules.newline,
+    State.newline: rules.newline
 })
 
 machines = {
@@ -47,39 +53,39 @@ machines = {
     paramMachine,
     spaceMachine,
     numberMachine,
-    signMachine
+    signMachine,
+    newlineMachine
 }
 
 
 # lexer
 def processLine(machines, str):
     tokens = []
-    activeMachines = False
     index = 0
-    machineFound = False
     i = 0
-    while i < len(str) + 1:
-        if i >= len(str):
-            char = '\n'
-        else:
-            char = str[i]
-
+    activeMachines = False
+    machineFound = False
+    while i < len(str):
+        char = str[i]
         for machine in machines:
             machine.processObject(char)
-            if machine.state != states.undefined:
+            if machine.state != State.undefined:
                 activeMachines = True
 
         if not activeMachines:
-            for mach in machines:
-                if mach.prevState != states.undefined and mach.prevState != states.begin and not machineFound:
-                    tokens.append([mach.name, str[index:i]])
+            for machine in machines:
+                if machine.prevState != State.undefined and machine.prevState != State.begin and not machineFound:
+                    tokens.append([machine.name, str[index:i]])
                     machineFound = True
-                mach.resetState()
-            if char == "\n":
-                break
+                machine.resetState()
             index = i
             i = i - 1
             machineFound = False
         activeMachines = False
         i = i + 1
+
+    for machine in machines:
+        if machine.state == State.newline:
+            tokens.append([machine.name, str[-1:]])
+        machine.resetState()
     return tokens

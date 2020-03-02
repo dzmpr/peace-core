@@ -1,20 +1,2 @@
-expression = {
-  //random code
-}
-
-
-main {
-  [METKA$] {
-    expr[1]
-  }*10
-
-  generate(5,1)
-  queue[BUF]
-  block[MEM] {
-    dequeue[BUF]
-    expr[1]
-    dealy(7)
-  }
-  terminate(1)
-  start(40)
-}
+generate(5,1)
+open(2,4)
