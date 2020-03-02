@@ -3,22 +3,24 @@
 #       ...     -> *contents*
 # }             -> END
 
+# *value -- one numerical GPSS operand
+# *parameters -- tuple of GPSS operands
 
 # Program body token
 
 main { 		-> SIMULATE
     ...		-> *contents*
-}		-> END
+}		    -> END
 
 # Delay token
 
-delay(*value*)	-> ADVANCE *value*
+delay(*parameters)	-> ADVANCE *parameters
 
 # Device token
 
 block {		-> SEIZE block
     ...		-> *contents*
-}		-> RELEASE block
+}		    -> RELEASE block
 
 # Queue start token
 
@@ -35,7 +37,13 @@ exprName = {
 }
 
 # Generate token
+gen (*parameters) --> GENERATE *parameters
 
 # Start token
+init (*value) --> START *value
 
 # Terminate token
+destr (*value) --> TERMINATE *value
+
+# Transfer token
+goto (*parameters) --> TRANSFER *parameters
