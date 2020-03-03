@@ -43,7 +43,7 @@ gen (*parameters) --> GENERATE *parameters
 init (*value) --> START *value
 
 # Terminate token
-destr (*value) --> TERMINATE *value
+destroy (*value) --> TERMINATE *value
 
 # Transfer token
 goto (*parameters) --> TRANSFER *parameters

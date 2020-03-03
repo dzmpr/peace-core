@@ -1,1 +1,1 @@
-__all__ = ["lexer"]
+__all__ = ["lexer", "rules", "StateMachine"]

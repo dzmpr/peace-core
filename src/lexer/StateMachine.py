@@ -23,6 +23,10 @@ class State(Enum):
     equalSign = 104
     accoladeOpenSign = 105
     accoladeCloseSign = 106
+    comment = 107
+    body = 108
+    deviceStart = 109
+    device = 110
 
 
 class StateMachine:

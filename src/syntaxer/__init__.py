@@ -1,1 +1,1 @@
-__all__ = ["syntaxer", "rules"]
+__all__ = ["syntaxer", "rules", "SyntaxerStateMachine"]

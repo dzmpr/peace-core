@@ -9,6 +9,10 @@ class Phrase(Enum):
 
     operator = 0
     expression = 1
+    comment = 2
+    blockClose = 3
+    body = 4
+    device = 5
 
 
 class SyntaxerStateMachine(StateMachine):

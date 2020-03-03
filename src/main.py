@@ -1,18 +1,33 @@
 import sys
+import argparse
 from src.lexer import lexer
 from src.syntaxer import syntaxer
-from src.lexer.lexer import Token
+from src.codegenerator.CodeGenerator import CodeGenerator
 
-# Checking if file path was provided
-if len(sys.argv) < 2:
-    print("Too less arguments.")
-    exit()
+parser = argparse.ArgumentParser(description="Interpreter for converting .pyss files into .gpss.")
+parser.add_argument(
+    'input',
+    type=str,
+    help="File with source code to process."
+)
+parser.add_argument(
+    '-lo',
+    action='store_true',
+    help="Verbose lexer output."
+)
+parser.add_argument(
+    '-so',
+    action='store_true',
+    help="Verbose syntaxer output."
+)
+arguments = parser.parse_args()
+
 # Checking if file has correct extension
-if sys.argv[1][-4:] != "pyss":
+if arguments.input[-4:] != "pyss":
     print("Incorrect file.")
     exit()
 
-path = sys.argv[1]
+path = arguments.input
 print("Input file: {}".format(path))
 
 
@@ -26,12 +41,28 @@ for row in file:
 # Flatten lexer result
 result = [item for sublist in temp for item in sublist]
 result.append([lexer.Token.undefined, ""])
-del temp
+temp.clear()
 
-print(result)
+if arguments.lo:
+    lexeroutput = open(path+".lo","w")
+    for token in result:
+        lexeroutput.writelines(str(token) + '\n')
 
 try:
-    syntaxer.processTokens(syntaxer.machines, result)
+    temp = syntaxer.processTokens(syntaxer.machines, result)
 except syntaxer.SyntaxerError as error:
-    print("Syntax error. Expected {}, but found {}.".format(error.expectedToken, error.foundToken))
+    print("Syntax error. Expected {} at line {}.".format(error.expectedPhrase.name, error.atLine))
 
+if arguments.so:
+    syntaxeroutput = open(path+".so","w")
+    for phrase in temp:
+        syntaxeroutput.write(str(phrase) + '\n')
+
+
+output = open(path[:-4] + "gpss", "w")
+CG = CodeGenerator()
+for phrase in temp:
+    if phrase[0] == syntaxer.Phrase.comment:
+        continue
+    output.write(CG.generateLine(phrase))
+    CG.resetContent()

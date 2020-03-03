@@ -1,2 +1,10 @@
-generate(5,1)
-open(2,4)
+main {
+    gen(5,1)
+    q(BUF)
+    MEM {
+        dq(BUF)
+        delay(7)
+    }
+    destroy(1)
+    init(40)
+}
