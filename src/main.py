@@ -25,7 +25,7 @@ arguments = parser.parse_args()
 # Checking if file has correct extension
 if arguments.input[-4:] != "pyss":
     print("Incorrect file.")
-    exit()
+    exit(2)
 
 path = arguments.input
 print("Input file: {}".format(path))
@@ -50,8 +50,10 @@ if arguments.lo:
 
 try:
     temp = syntaxer.processTokens(syntaxer.machines, result)
-except syntaxer.SyntaxerError as error:
+except syntaxer.UnexpectedToken as error:
     print("Syntax error. Expected {} at line {}.".format(error.expectedPhrase.name, error.atLine))
+except syntaxer.OpenedScope as error:
+    print("Syntax error. {} not closed blocks.".format(error.bracesOpened))
 
 if arguments.so:
     syntaxeroutput = open(path+".so","w")
@@ -60,9 +62,18 @@ if arguments.so:
 
 
 output = open(path[:-4] + "gpss", "w")
-CG = CodeGenerator()
+generator = CodeGenerator()
 for phrase in temp:
     if phrase[0] == syntaxer.Phrase.comment:
         continue
-    output.write(CG.generateLine(phrase))
-    CG.resetContent()
+    elif phrase[0] == syntaxer.Phrase.label:
+        generator.addLabel(phrase)
+        continue
+    elif phrase[0] == syntaxer.Phrase.body or phrase[0] == syntaxer.Phrase.device:
+        generator.blockOpen(phrase)
+    elif phrase[0] == syntaxer.Phrase.blockClose:
+        generator.closeBlock(phrase)
+    else:
+        generator.generateLine(phrase)
+    output.write(generator.getLine())
+    generator.resetContent()

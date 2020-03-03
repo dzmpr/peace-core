@@ -13,6 +13,7 @@ class Phrase(Enum):
     blockClose = 3
     body = 4
     device = 5
+    label = 6
 
 
 class SyntaxerStateMachine(StateMachine):

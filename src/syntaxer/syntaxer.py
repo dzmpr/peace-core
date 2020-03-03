@@ -5,10 +5,15 @@ from src.syntaxer.SyntaxerStateMachine import Phrase
 from src.syntaxer import rules
 
 
-class SyntaxerError(Exception):
+class UnexpectedToken(Exception):
     def __init__(self, expectedPhrase, atLine):
         self.expectedPhrase = expectedPhrase
         self.atLine = atLine
+
+
+class OpenedScope(Exception):
+    def __init__(self, bracesOpened):
+        self.bracesOpened = bracesOpened
 
 
 operatorMachine = SyntaxerStateMachine(Phrase.operator, State.parameter, {
@@ -45,8 +50,6 @@ blockCloseMachine = SyntaxerStateMachine(Phrase.blockClose, State.accoladeCloseS
     State.accoladeCloseSign: rules.accoladeEnd
 })
 
-
-
 machines = {
     operatorMachine,
     expressionMachine,
@@ -64,6 +67,7 @@ def processTokens(machines, tokens):
     i = 0
     tempPhrase = []
     linesProcessed = 1
+    bracesOpened = 0
     while i < len(tokens):
         token = tokens[i]
 
@@ -82,13 +86,20 @@ def processTokens(machines, tokens):
                     machineFound = True
                     tempPhrase.clear()
 
+                    if machine.name == Phrase.body or machine.name == Phrase.expression or machine.name == Phrase.device:
+                        bracesOpened = bracesOpened + 1
+                    elif machine.name == Phrase.blockClose:
+                        bracesOpened = bracesOpened - 1
+
             if token[0] == Token.undefined:
+                if bracesOpened != 0:
+                    raise OpenedScope(bracesOpened)
                 return output
 
             if not machineFound:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxerError(machine.name, linesProcessed)
+                        raise UnexpectedToken(machine.name, linesProcessed)
 
             for machine in machines:
                 machine.resetState()

@@ -6,5 +6,15 @@ main {
         delay(7)
     }
     destroy(1)
+    destroy (2)
+    destroy(3)
+    destroy(4)
+    destroy (5)
+    destroy(6)
+    destroy(7)
+    destroy(8)
+    destroy(9)
+    destroy(10)
+    destroy(19)
     init(40)
 }
