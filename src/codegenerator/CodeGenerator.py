@@ -19,7 +19,7 @@ class BlockStack:
 
 class CodeGenerator:
     def __init__(self):
-        self.template = " {:7} {:9} {:<}\n"
+        self.template = " {:6} {:11} {:<}\n"
         self.keyword = ""
         self.parameters = ""
         self.label = ""

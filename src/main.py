@@ -1,7 +1,7 @@
-import sys
 import argparse
 from src.lexer import lexer
 from src.syntaxer import syntaxer
+from src.syntaxer.SemanticProcessor import SyntaxParseError
 from src.codegenerator.CodeGenerator import CodeGenerator
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pyss files into .gpss.")
@@ -30,7 +30,6 @@ if arguments.input[-4:] != "pyss":
 path = arguments.input
 print("Input file: {}".format(path))
 
-
 temp = []
 file = open(path, "r")
 for row in file:
@@ -44,22 +43,19 @@ result.append([lexer.Token.undefined, ""])
 temp.clear()
 
 if arguments.lo:
-    lexeroutput = open(path+".lo","w")
+    lexeroutput = open(path + ".lo", "w")
     for token in result:
         lexeroutput.writelines(str(token) + '\n')
 
 try:
     temp = syntaxer.processTokens(syntaxer.machines, result)
-except syntaxer.UnexpectedToken as error:
-    print("Syntax error. Expected {} at line {}.".format(error.expectedPhrase.name, error.atLine))
-except syntaxer.OpenedScope as error:
-    print("Syntax error. {} not closed blocks.".format(error.bracesOpened))
+except SyntaxParseError as error:
+    print(error.msg)
 
 if arguments.so:
-    syntaxeroutput = open(path+".so","w")
+    syntaxeroutput = open(path + ".so", "w")
     for phrase in temp:
         syntaxeroutput.write(str(phrase) + '\n')
-
 
 output = open(path[:-4] + "gpss", "w")
 generator = CodeGenerator()

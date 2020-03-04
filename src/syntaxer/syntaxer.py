@@ -2,19 +2,9 @@ from src.lexer.StateMachine import State
 from src.lexer.lexer import Token
 from src.syntaxer.SyntaxerStateMachine import SyntaxerStateMachine
 from src.syntaxer.SyntaxerStateMachine import Phrase
+from src.syntaxer.SemanticProcessor import SemanticProcessor
+from src.syntaxer.SemanticProcessor import SyntaxParseError
 from src.syntaxer import rules
-
-
-class UnexpectedToken(Exception):
-    def __init__(self, expectedPhrase, atLine):
-        self.expectedPhrase = expectedPhrase
-        self.atLine = atLine
-
-
-class OpenedScope(Exception):
-    def __init__(self, bracesOpened):
-        self.bracesOpened = bracesOpened
-
 
 operatorMachine = SyntaxerStateMachine(Phrase.operator, State.parameter, {
     State.begin: rules.keyword,
@@ -66,41 +56,43 @@ def processTokens(machines, tokens):
     machineFound = False
     i = 0
     tempPhrase = []
-    linesProcessed = 1
-    bracesOpened = 0
+    phrase = []
+    checker = SemanticProcessor()
     while i < len(tokens):
         token = tokens[i]
 
+        # New line check
         if token[0] == Token.newline:
-            linesProcessed = linesProcessed + 1
+            checker.nextLine()
 
+        # Process token
         for machine in machines:
             machine.processObject(token)
             if machine.state != State.undefined:
                 activeMachines = True
 
+        # Check machine states
         if not activeMachines:
             for machine in machines:
                 if not machineFound and machine.sequenceRecognized():
-                    output.append([machine.name, tempPhrase.copy()])
+                    phrase = [machine.name, tempPhrase.copy()]
+                    output.append(phrase)
                     machineFound = True
                     tempPhrase.clear()
-
-                    if machine.name == Phrase.body or machine.name == Phrase.expression or machine.name == Phrase.device:
-                        bracesOpened = bracesOpened + 1
-                    elif machine.name == Phrase.blockClose:
-                        bracesOpened = bracesOpened - 1
+                    checker.processPhrase(phrase)
 
             if token[0] == Token.undefined:
-                if bracesOpened != 0:
-                    raise OpenedScope(bracesOpened)
+                if not checker.isBlocksClosed():
+                    raise SyntaxParseError("Syntax error. Bad scoping.")
                 return output
 
+            # Token wasn't recognized by any machine
             if not machineFound:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise UnexpectedToken(machine.name, linesProcessed)
+                        raise SyntaxParseError("Syntax error. Expected {} at line {}.".format(machine.name, checker.procesedLines()))
 
+            # Reset machine states
             for machine in machines:
                 machine.resetState()
 

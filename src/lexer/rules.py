@@ -1,6 +1,6 @@
 from src.lexer.StateMachine import State
 
-signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]", "{", "}"]
+signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]", "{", "}", ":"]
 
 
 def char(char):
