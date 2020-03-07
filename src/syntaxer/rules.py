@@ -1,5 +1,5 @@
 from src.lexer.StateMachine import State
-from src.lexer.lexer import Token
+from src.lexer.Token import TokenGroup, Token
 
 operators = {
     "q": "QUEUE",
@@ -12,118 +12,120 @@ operators = {
 }
 
 
-def bodyStart(object):
-    if object[0] == Token.word:
-        if object[1] == "main":
+def body_start(token: Token):
+    if token.name == TokenGroup.word:
+        if token.value == "main":
             return State.body
-    elif object[0] == Token.space or object[0] == Token.newline:
+    elif token.name == TokenGroup.space or token.name == TokenGroup.newline:
         return State.begin
     return State.undefined
 
 
-def body(object):
-    if object[0] == Token.sign:
-        if object[1] == "{":
+def body(token: Token):
+    if token.name == TokenGroup.sign:
+        if token.value == "{":
             return State.body
-    elif object[0] == Token.space or object[0] == Token.newline:
+    elif token.name == TokenGroup.space or token.value == TokenGroup.newline:
         return State.body
     return State.undefined
 
 
-def commentStart(object):
-    if object[0] == Token.sign:
-        if object[1] == "#":
+def comment_start(token: Token):
+    if token.name == TokenGroup.sign:
+        if token.value == "#":
             return State.comment
-    elif object[0] == Token.space or object[0] == Token.newline:
+    elif token.name == TokenGroup.space or token.name == TokenGroup.newline:
         return State.begin
     return State.undefined
 
 
-def commentEnd(object):
-    if object[0] != Token.newline:
+def comment_end(token: Token):
+    if token.name != TokenGroup.newline:
         return State.comment
     return State.undefined
 
 
-def keyword(object):
-    if object[0] == Token.word:
-        if object[1] in operators:
+def keyword(token: Token):
+    if token.name == TokenGroup.word:
+        if token.value in operators:
             return State.keyword
-    elif object[0] == Token.space or object[0] == Token.newline:
+    elif token.name == TokenGroup.space or token.name == TokenGroup.newline:
         return State.begin
     return State.undefined
 
 
-def deviceStart(object):
-    if object[0] == Token.word:
-        if object[1] != "main":
+def device_start(token: Token):
+    if token.name == TokenGroup.word:
+        if token.value != "main":
             return State.deviceStart
-    elif object[0] == Token.space or object[0] == Token.newline:
+    elif token.name == TokenGroup.space or token.name == TokenGroup.newline:
         return State.begin
     return State.undefined
 
 
-def deviceEnd(object):
-    if object[0] == Token.sign:
-        if object[1] == "{":
+def device_end(token: Token):
+    if token.name == TokenGroup.sign:
+        if token.value == "{":
             return State.device
-    elif object[0] == Token.space or object[0] == Token.newline:
+    elif token.name == TokenGroup.space or token.name == TokenGroup.newline:
         return State.deviceStart
     return State.undefined
 
 
-def accoladeStart(object):
-    if object[0] == Token.sign:
-        if object[1] == "}":
+def accolade_start(token: Token):
+    if token.name == TokenGroup.sign:
+        if token.value == "}":
             return State.accoladeCloseSign
     return State.undefined
 
-def accoladeEnd(object):
-    if object[0] == Token.space or object[0] == Token.newline:
+
+def accolade_end(token: Token):
+    if token.name == TokenGroup.space or token.name == TokenGroup.newline:
         return State.accoladeCloseSign
     return State.undefined
 
-def device(object):
-    if object[0] == Token.space or object[0] == Token.newline:
+
+def device(token: Token):
+    if token.name == TokenGroup.space or token.name == TokenGroup.newline:
         return State.device
     return State.undefined
 
 
-def firstWord(object):
-    if object[0] == Token.word:
+def first_word(token: Token):
+    if token.name == TokenGroup.word:
         return State.firstWord
-    elif object[0] == Token.space or object[0] == Token.newline:
+    elif token.name == TokenGroup.space or token.name == TokenGroup.newline:
         return State.begin
     return State.undefined
 
 
-def parameter(object):
-    if object[0] == Token.parameter:
+def parameter(token: Token):
+    if token.name == TokenGroup.parameter:
         return State.parameter
-    elif object[0] == Token.space:
+    elif token.name == TokenGroup.space:
         return State.parameter
-    elif object[0] == Token.newline:
+    elif token.name == TokenGroup.newline:
         return State.parameter
     return State.undefined
 
 
-def undefined(object):
+def undefined(token: Token):
     return State.undefined
 
 
-def equalSign(object):
-    if object[0] == Token.sign:
-        if object[1] == "=":
+def equal_sign(token: Token):
+    if token.name == TokenGroup.sign:
+        if token.value == "=":
             return State.equalSign
-    elif object[0] == Token.space:
+    elif token.name == TokenGroup.space:
         return State.firstWord
     return State.undefined
 
 
-def accoladeOpenSign(object):
-    if object[0] == Token.sign:
-        if object[1] == "{":
+def accolade_open_sign(token: Token):
+    if token.name == TokenGroup.sign:
+        if token.value == "{":
             return State.accoladeOpenSign
-    elif object[0] == Token.space:
+    elif token.name == TokenGroup.space:
         return State.equalSign
     return State.undefined

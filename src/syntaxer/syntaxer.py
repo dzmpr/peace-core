@@ -1,43 +1,43 @@
 from src.lexer.StateMachine import State
-from src.lexer.lexer import Token
+from src.lexer.Token import TokenGroup, Token
 from src.syntaxer.SyntaxerStateMachine import SyntaxerStateMachine
-from src.syntaxer.SyntaxerStateMachine import Phrase
+from src.syntaxer.SyntaxerStateMachine import PhraseGroup
 from src.syntaxer.SemanticProcessor import SemanticProcessor
 from src.syntaxer.SemanticProcessor import SyntaxParseError
 from src.syntaxer import rules
 
-operatorMachine = SyntaxerStateMachine(Phrase.operator, State.parameter, {
+operatorMachine = SyntaxerStateMachine(PhraseGroup.operator, State.parameter, {
     State.begin: rules.keyword,
     State.keyword: rules.parameter,
     State.parameter: rules.parameter
 })
 
-expressionMachine = SyntaxerStateMachine(Phrase.expression, State.accoladeOpenSign, {
-    State.begin: rules.firstWord,
-    State.firstWord: rules.equalSign,
-    State.equalSign: rules.accoladeOpenSign,
-    State.accoladeOpenSign: rules.accoladeOpenSign
+expressionMachine = SyntaxerStateMachine(PhraseGroup.expression, State.accoladeOpenSign, {
+    State.begin: rules.first_word,
+    State.firstWord: rules.equal_sign,
+    State.equalSign: rules.accolade_open_sign,
+    State.accoladeOpenSign: rules.accolade_open_sign
 })
 
-commentMachine = SyntaxerStateMachine(Phrase.comment, State.comment, {
-    State.begin: rules.commentStart,
-    State.comment: rules.commentEnd,
+commentMachine = SyntaxerStateMachine(PhraseGroup.comment, State.comment, {
+    State.begin: rules.comment_start,
+    State.comment: rules.comment_end,
 })
 
-bodyMachine = SyntaxerStateMachine(Phrase.body, State.body, {
-    State.begin: rules.bodyStart,
+bodyMachine = SyntaxerStateMachine(PhraseGroup.body, State.body, {
+    State.begin: rules.body_start,
     State.body: rules.body
 })
 
-deviceMachine = SyntaxerStateMachine(Phrase.device, State.device, {
-    State.begin: rules.deviceStart,
-    State.deviceStart: rules.deviceEnd,
+deviceMachine = SyntaxerStateMachine(PhraseGroup.device, State.device, {
+    State.begin: rules.device_start,
+    State.deviceStart: rules.device_end,
     State.device: rules.device
 })
 
-blockCloseMachine = SyntaxerStateMachine(Phrase.blockClose, State.accoladeCloseSign, {
-    State.begin: rules.accoladeStart,
-    State.accoladeCloseSign: rules.accoladeEnd
+blockCloseMachine = SyntaxerStateMachine(PhraseGroup.blockClose, State.accoladeCloseSign, {
+    State.begin: rules.accolade_start,
+    State.accoladeCloseSign: rules.accolade_end
 })
 
 machines = {
@@ -50,62 +50,62 @@ machines = {
 }
 
 
-def processTokens(machines, tokens):
+def process_tokens(machines, tokens):
     output = []
-    activeMachines = False
-    machineFound = False
+    active_machines = False
+    machine_found = False
     i = 0
-    tempPhrase = []
+    temp_phrase = []
     phrase = []
     checker = SemanticProcessor()
     while i < len(tokens):
-        token = tokens[i]
+        token: Token = tokens[i]
 
         # New line check
-        if token[0] == Token.newline:
-            checker.nextLine()
+        if token.name == TokenGroup.newline:
+            checker.next_line()
 
         # Process token
         for machine in machines:
             machine.processObject(token)
             if machine.state != State.undefined:
-                activeMachines = True
+                active_machines = True
 
         # Check machine states
-        if not activeMachines:
+        if not active_machines:
             for machine in machines:
-                if not machineFound and machine.sequenceRecognized():
-                    phrase = [machine.name, tempPhrase.copy()]
+                if not machine_found and machine.is_sequence_recognized():
+                    phrase = [machine.name, temp_phrase.copy()]
                     output.append(phrase)
-                    machineFound = True
-                    tempPhrase.clear()
-                    checker.processPhrase(phrase)
+                    machine_found = True
+                    temp_phrase.clear()
+                    checker.process_phrase(phrase)
 
-            if token[0] == Token.undefined:
-                if not checker.isBlocksClosed():
+            if token.name == TokenGroup.undefined:
+                if not checker.is_block_closed():
                     raise SyntaxParseError("Syntax error. Bad scoping.")
                 return output
 
             # Token wasn't recognized by any machine
-            if not machineFound:
+            if not machine_found:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxParseError("Syntax error. Expected {} at line {}.".format(machine.name, checker.procesedLines()))
+                        raise SyntaxParseError("Syntax error. Expected {} at line {}.".format(machine.name, checker.processed_lines()))
 
             # Reset machine states
             for machine in machines:
                 machine.resetState()
 
             i = i - 1
-            machineFound = False
+            machine_found = False
         else:
-            if token[0] != Token.space and \
-                    token[0] != Token.newline and \
-                    token[0] != Token.undefined and \
-                    token[0] != Token.sign:
-                tempPhrase.append(token)
+            if token.name != TokenGroup.space and \
+                    token.name != TokenGroup.newline and \
+                    token.name != TokenGroup.undefined and \
+                    token.name != TokenGroup.sign:
+                temp_phrase.append(token)
 
         i = i + 1
-        activeMachines = False
+        active_machines = False
 
     return output

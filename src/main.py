@@ -1,5 +1,6 @@
 import argparse
 from src.lexer import lexer
+from src.lexer.Token import Token, TokenGroup
 from src.syntaxer import syntaxer
 from src.syntaxer.SemanticProcessor import SyntaxParseError
 from src.codegenerator.CodeGenerator import CodeGenerator
@@ -35,20 +36,20 @@ file = open(path, "r")
 for row in file:
     if not row.endswith("\n"):
         row = row + "\n"
-    temp.append(lexer.processLine(lexer.machines, row))
+    temp.append(lexer.process_line(lexer.machines, row))
 
 # Flatten lexer result
 result = [item for sublist in temp for item in sublist]
-result.append([lexer.Token.undefined, ""])
+result.append(Token(TokenGroup.undefined, ""))
 temp.clear()
 
 if arguments.lo:
     lexeroutput = open(path + ".lo", "w")
     for token in result:
-        lexeroutput.writelines(str(token) + '\n')
+        lexeroutput.write(str(token)+ "\n")
 
 try:
-    temp = syntaxer.processTokens(syntaxer.machines, result)
+    temp = syntaxer.process_tokens(syntaxer.machines, result)
 except SyntaxParseError as error:
     print(error.msg)
 
@@ -60,16 +61,16 @@ if arguments.so:
 output = open(path[:-4] + "gpss", "w")
 generator = CodeGenerator()
 for phrase in temp:
-    if phrase[0] == syntaxer.Phrase.comment:
+    if phrase[0] == syntaxer.PhraseGroup.comment:
         continue
-    elif phrase[0] == syntaxer.Phrase.label:
-        generator.addLabel(phrase)
+    elif phrase[0] == syntaxer.PhraseGroup.label:
+        generator.add_label(phrase)
         continue
-    elif phrase[0] == syntaxer.Phrase.body or phrase[0] == syntaxer.Phrase.device:
-        generator.blockOpen(phrase)
-    elif phrase[0] == syntaxer.Phrase.blockClose:
-        generator.closeBlock(phrase)
+    elif phrase[0] == syntaxer.PhraseGroup.body or phrase[0] == syntaxer.PhraseGroup.device:
+        generator.block_open(phrase)
+    elif phrase[0] == syntaxer.PhraseGroup.blockClose:
+        generator.close_block(phrase)
     else:
-        generator.generateLine(phrase)
-    output.write(generator.getLine())
-    generator.resetContent()
+        generator.generate_line(phrase)
+    output.write(generator.get_line())
+    generator.reset_content()

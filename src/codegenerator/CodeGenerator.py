@@ -1,5 +1,5 @@
 from src.syntaxer.rules import operators
-from src.syntaxer.SyntaxerStateMachine import Phrase
+from src.syntaxer.SyntaxerStateMachine import PhraseGroup
 
 
 class BlockStack:
@@ -12,9 +12,8 @@ class BlockStack:
     def pop(self):
         return self.blocks.pop()
 
-    def isempty(self):
+    def is_empty(self):
         return self.blocks == []
-
 
 
 class CodeGenerator:
@@ -26,27 +25,27 @@ class CodeGenerator:
         self.stack = BlockStack()
         self.line = ""
 
-    def getLine(self):
+    def get_line(self):
         return self.line
 
-    def generateLine(self, phrase):
+    def generate_line(self, phrase):
         line = self.template
-        self.keyword = operators[phrase[1][0][1]]
-        self.parameters = phrase[1][1][1][1:-1]
+        self.keyword = operators[phrase[1][0].value]
+        self.parameters = phrase[1][1].value[1:-1]
         self.line = line.format(self.label, self.keyword, self.parameters)
 
-    def resetContent(self):
+    def reset_content(self):
         self.keyword = ""
         self.parameters = ""
         self.label = ""
 
-    def addLabel(self, phrase):
-        self.label = phrase[1][0][1]
+    def add_label(self, phrase):
+        self.label = phrase[1][0].value
 
-    def blockOpen(self, phrase):
+    def block_open(self, phrase):
         open = self.template
         close = self.template
-        if phrase[0] == Phrase.body:
+        if phrase[0] == PhraseGroup.body:
             self.keyword = "SIMULATE"
             open = open.format(self.label, self.keyword, self.parameters)
             self.keyword = "END"
@@ -54,12 +53,12 @@ class CodeGenerator:
             self.stack.push(close)
         else:
             self.keyword = "SEIZE"
-            self.parameters = phrase[1][0][1]
+            self.parameters = phrase[1][0].value
             open = open.format(self.label, self.keyword, self.parameters)
             self.keyword = "RELEASE"
             close = close.format(self.label, self.keyword, self.parameters)
             self.stack.push(close)
         self.line = open
 
-    def closeBlock(self, phrase):
+    def close_block(self, phrase):
         self.line = self.stack.pop()

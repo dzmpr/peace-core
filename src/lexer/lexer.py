@@ -1,49 +1,35 @@
-from enum import Enum
-from src.lexer.StateMachine import State
-from src.lexer.StateMachine import StateMachine
+from src.lexer.StateMachine import State, StateMachine
+from src.lexer.Token import Token, TokenGroup
 from src.lexer import rules
 
 
-class Token(Enum):
-    def __repr__(self):
-        return self.name
-
-    word = 0
-    parameter = 1
-    space = 2
-    num = 3
-    sign = 4
-    newline = 5
-    undefined = 6
-
-
-wordMachine = StateMachine(Token.word, {
+wordMachine = StateMachine(TokenGroup.word, {
     State.begin: rules.charStart,
     State.char: rules.char
 })
 
-paramMachine = StateMachine(Token.parameter, {
+paramMachine = StateMachine(TokenGroup.parameter, {
     State.begin: rules.open,
     State.openBrace: rules.opened,
     State.closeBrace: rules.closed
 })
 
-spaceMachine = StateMachine(Token.space, {
+spaceMachine = StateMachine(TokenGroup.space, {
     State.begin: rules.space,
     State.space: rules.space
 })
 
-numberMachine = StateMachine(Token.num, {
+numberMachine = StateMachine(TokenGroup.num, {
     State.begin: rules.num,
     State.num: rules.num
 })
 
-signMachine = StateMachine(Token.sign, {
+signMachine = StateMachine(TokenGroup.sign, {
     State.begin: rules.sign,
     State.sign: rules.undefined
 })
 
-newlineMachine = StateMachine(Token.newline, {
+newlineMachine = StateMachine(TokenGroup.newline, {
     State.begin: rules.newline,
     State.newline: rules.newline
 })
@@ -59,33 +45,34 @@ machines = {
 
 
 # lexer
-def processLine(machines, str):
+def process_line(machines, string):
     tokens = []
     index = 0
     i = 0
-    activeMachines = False
-    machineFound = False
-    while i < len(str):
-        char = str[i]
+    active_machines = False
+    machine_found = False
+    while i < len(string):
+        char = string[i]
         for machine in machines:
             machine.processObject(char)
             if machine.state != State.undefined:
-                activeMachines = True
+                active_machines = True
 
-        if not activeMachines:
+        if not active_machines:
             for machine in machines:
-                if machine.prevState != State.undefined and machine.prevState != State.begin and not machineFound:
-                    tokens.append([machine.name, str[index:i]])
-                    machineFound = True
+                if machine.prevState != State.undefined and machine.prevState != State.begin and not machine_found:
+                    token = Token(machine.name, string[index:i])
+                    tokens.append(token)
+                    machine_found = True
                 machine.resetState()
             index = i
             i = i - 1
-            machineFound = False
-        activeMachines = False
+            machine_found = False
+        active_machines = False
         i = i + 1
 
     for machine in machines:
         if machine.state == State.newline:
-            tokens.append([machine.name, str[-1:]])
+            tokens.append(Token(machine.name, string[-1:]))
         machine.resetState()
     return tokens

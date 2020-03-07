@@ -3,7 +3,7 @@ from src.lexer.StateMachine import StateMachine
 from src.lexer.StateMachine import State
 
 
-class Phrase(Enum):
+class PhraseGroup(Enum):
     def __repr__(self):
         return self.name
 
@@ -17,16 +17,16 @@ class Phrase(Enum):
 
 
 class SyntaxerStateMachine(StateMachine):
-    def __init__(self, name, successState, rules):
+    def __init__(self, name, success_state, rules):
         super(SyntaxerStateMachine, self).__init__(name, rules)
-        self.successState = successState
+        self.successState = success_state
 
     def processObject(self, obj):
         self.prevState = self.state
         if self.state != State.undefined:
             self.state = self.rules[self.prevState](obj)
 
-    def sequenceRecognized(self):
+    def is_sequence_recognized(self):
         if self.prevState == self.successState:
             return True
         return False
