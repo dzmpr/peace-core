@@ -43,21 +43,27 @@ result = [item for sublist in temp for item in sublist]
 result.append(Token(TokenGroup.undefined, ""))
 temp.clear()
 
+# Print processed tokens to file
 if arguments.lo:
-    lexeroutput = open(path + ".lo", "w")
+    lexer_output = open(path + ".lo", "w")
     for token in result:
-        lexeroutput.write(str(token)+ "\n")
+        lexer_output.write(str(token) + "\n")
+    lexer_output.close()
 
+# Process tokens with syntax analyzer
 try:
     temp = syntaxer.process_tokens(syntaxer.machines, result)
 except SyntaxParseError as error:
     print(error.msg)
 
+# Print processed phrases to file
 if arguments.so:
-    syntaxeroutput = open(path + ".so", "w")
+    syntaxer_output = open(path + ".so", "w")
     for phrase in temp:
-        syntaxeroutput.write(str(phrase) + '\n')
+        syntaxer_output.write(str(phrase) + '\n')
+    syntaxer_output.close()
 
+# Code generator part FIXME: will be moved out of there
 output = open(path[:-4] + "gpss", "w")
 generator = CodeGenerator()
 for phrase in temp:

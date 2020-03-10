@@ -129,3 +129,18 @@ def accolade_open_sign(token: Token):
     elif token.name == TokenGroup.space:
         return State.equalSign
     return State.undefined
+
+
+def label_start(token: Token):
+    if token.name == TokenGroup.word:
+        return State.label
+    elif token.name == TokenGroup.space or token.name == TokenGroup.newline:
+        return State.begin
+    return State.undefined
+
+
+def label(token: Token):
+    if token.name == TokenGroup.sign:
+        if token.value == ":":
+            return State.label
+    return State.undefined

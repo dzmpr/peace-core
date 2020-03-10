@@ -21,7 +21,7 @@ class SyntaxerStateMachine(StateMachine):
         super(SyntaxerStateMachine, self).__init__(name, rules)
         self.successState = success_state
 
-    def processObject(self, obj):
+    def process_object(self, obj):
         self.prevState = self.state
         if self.state != State.undefined:
             self.state = self.rules[self.prevState](obj)

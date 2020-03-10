@@ -40,13 +40,19 @@ blockCloseMachine = SyntaxerStateMachine(PhraseGroup.blockClose, State.accoladeC
     State.accoladeCloseSign: rules.accolade_end
 })
 
+labelMachine = SyntaxerStateMachine(PhraseGroup.label, State.label, {
+    State.begin: rules.label_start,
+    State.label: rules.label
+})
+
 machines = {
     operatorMachine,
     expressionMachine,
     commentMachine,
     bodyMachine,
     deviceMachine,
-    blockCloseMachine
+    blockCloseMachine,
+    labelMachine
 }
 
 
@@ -67,7 +73,7 @@ def process_tokens(machines, tokens):
 
         # Process token
         for machine in machines:
-            machine.processObject(token)
+            machine.process_object(token)
             if machine.state != State.undefined:
                 active_machines = True
 
@@ -94,7 +100,7 @@ def process_tokens(machines, tokens):
 
             # Reset machine states
             for machine in machines:
-                machine.resetState()
+                machine.reset_state()
 
             i = i - 1
             machine_found = False

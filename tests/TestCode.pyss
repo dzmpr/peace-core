@@ -1,4 +1,6 @@
 main {
+    label:
+    gen(5,1)
     gen(5,1)
     q(BUF)
     MEM {

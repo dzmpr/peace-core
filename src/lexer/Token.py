@@ -19,8 +19,9 @@ class Token:
         self.name = name
         self.value = value
 
-    def __str__(self):
-        return f'Token: {self.name}, Value: {self.value}"'
-
     def __repr__(self):
-        return f'Token: {self.name}'
+        return f'Token: {self.name.name}'
+
+    def __str__(self):
+        return f'Token: {self.name.name}, value: {repr(self.value)}'
+

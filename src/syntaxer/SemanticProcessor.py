@@ -27,15 +27,18 @@ class SemanticProcessor:
         # Scope block opens
         if phrase[0] == PhraseGroup.body or phrase[0] == PhraseGroup.expression or phrase[0] == PhraseGroup.device:
             self.braceCount = self.braceCount + 1
+
         # Scope block closes
         elif phrase[0] == PhraseGroup.blockClose:
             self.braceCount = self.braceCount - 1
+
         # Check label name
         elif phrase[0] == PhraseGroup.label:
-            if phrase[1][0][1] not in self.entries:
-                self.entries[phrase[1][0][1]] = phrase[0]
-            elif self.entries[phrase[1][0][1]] != phrase[0]:
-                raise SyntaxParseError("Name {} already taken by {}.".format(phrase[1][0][1], self.entries[phrase[1][0][1]]))
+            if phrase[1][0].value not in self.entries:
+                self.entries[phrase[1][0].value] = phrase[0]
+            else:
+                raise SyntaxParseError("Name \"{}\" already taken by {}.".format(phrase[1][0].value, self.entries[phrase[1][0].value]))
+
         # Check name
         elif phrase[0] == PhraseGroup.operator:
             pass

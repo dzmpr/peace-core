@@ -54,7 +54,7 @@ def process_line(machines, string):
     while i < len(string):
         char = string[i]
         for machine in machines:
-            machine.processObject(char)
+            machine.process_object(char)
             if machine.state != State.undefined:
                 active_machines = True
 
@@ -64,7 +64,7 @@ def process_line(machines, string):
                     token = Token(machine.name, string[index:i])
                     tokens.append(token)
                     machine_found = True
-                machine.resetState()
+                machine.reset_state()
             index = i
             i = i - 1
             machine_found = False
@@ -74,5 +74,5 @@ def process_line(machines, string):
     for machine in machines:
         if machine.state == State.newline:
             tokens.append(Token(machine.name, string[-1:]))
-        machine.resetState()
+        machine.reset_state()
     return tokens

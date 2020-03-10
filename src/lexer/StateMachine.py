@@ -27,22 +27,23 @@ class State(Enum):
     body = 108
     deviceStart = 109
     device = 110
+    label = 111
 
 
 class StateMachine:
     def __init__(self, name, rules):
         self.rules = rules
         self.name = name
-        self.resetState()
+        self.reset_state()
 
     def __repr__(self):
         return self.name.name
 
-    def processObject(self, obj):
+    def process_object(self, obj):
         self.prevState = self.state
         if self.state != State.undefined:
             self.state = self.rules[self.prevState](obj)
 
-    def resetState(self):
+    def reset_state(self):
         self.prevState = State.begin
         self.state = State.begin
