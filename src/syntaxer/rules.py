@@ -8,7 +8,10 @@ operators = {
     "init": "START",
     "delay": "ADVANCE",
     "destroy": "TERMINATE",
-    "goto": "TRANSFER"
+    "goto": "TRANSFER",
+    "compare": "TEST",
+    "var": "SAVEVALUE",
+    "varinit": "INITIAL"
 }
 
 

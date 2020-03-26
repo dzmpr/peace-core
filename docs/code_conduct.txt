@@ -1,49 +1,64 @@
-# Token example:
+# Statement example:
 # main {        -> SIMULATE
 #       ...     -> *contents*
 # }             -> END
-
+#
 # *value -- one numerical GPSS operand
 # *parameters -- tuple of GPSS operands
 
-# Program body token
 
-main { 		-> SIMULATE
-    ...		-> *contents*
-}		    -> END
+# Program body statement
+main { 		            -> SIMULATE
+    ...		            -> *contents*
+}		                -> END
 
-# Delay token
 
-delay(*parameters)	-> ADVANCE *parameters
+# Device statement
+block {		            -> SEIZE block
+    ...		            -> *contents*
+}		                -> RELEASE block
 
-# Device token
-
-block {		-> SEIZE block
-    ...		-> *contents*
-}		    -> RELEASE block
-
-# Queue start token
-
-q name		-> QUEUE name
-
-# Queue exit token
-
-dq name		-> DEPART name
 
 # Expression (high-level macro)
-
-exprName = {
+exprName {
     ...
 }
 
-# Generate token
-gen (*parameters) --> GENERATE *parameters
+# Delay statement
+delay(*parameters)	    -> ADVANCE *parameters
 
-# Start token
-init (*value) --> START *value
 
-# Terminate token
-destroy (*value) --> TERMINATE *value
+# Queue start statement
+q (name)	            -> QUEUE name
 
-# Transfer token
-goto (*parameters) --> TRANSFER *parameters
+
+# Queue exit statement
+dq (name)	            -> DEPART name
+
+
+# Generate statement
+gen (*parameters)       -> GENERATE *parameters
+
+
+# Start statement
+init (*value)           -> START *value
+
+
+# Terminate statement
+destroy (*value)        -> TERMINATE *value
+
+
+# Transfer statement
+goto (*parameters)      -> TRANSFER *parameters
+
+
+# Test statement
+compare (*parameters)   -> TEST *parameters
+
+
+# Savevalue statement
+var (*parameters)       -> SAVEVALUE *parameters
+
+
+# Initial statement
+varinit (*parameters)   -> INITIAL *parameters
