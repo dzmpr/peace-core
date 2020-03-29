@@ -1,35 +1,35 @@
 from src.lexer.StateMachine import State, StateMachine
-from src.lexer.Token import Token, TokenGroup
+from src.lexer.Token import Token, TokenClass
 from src.lexer import rules
 
 
-wordMachine = StateMachine(TokenGroup.word, {
+wordMachine = StateMachine(TokenClass.word, {
     State.begin: rules.charStart,
     State.char: rules.char
 })
 
-paramMachine = StateMachine(TokenGroup.parameter, {
+paramMachine = StateMachine(TokenClass.parameter, {
     State.begin: rules.open,
     State.openBrace: rules.opened,
     State.closeBrace: rules.closed
 })
 
-spaceMachine = StateMachine(TokenGroup.space, {
+spaceMachine = StateMachine(TokenClass.space, {
     State.begin: rules.space,
     State.space: rules.space
 })
 
-numberMachine = StateMachine(TokenGroup.num, {
+numberMachine = StateMachine(TokenClass.num, {
     State.begin: rules.num,
     State.num: rules.num
 })
 
-signMachine = StateMachine(TokenGroup.sign, {
+signMachine = StateMachine(TokenClass.sign, {
     State.begin: rules.sign,
     State.sign: rules.undefined
 })
 
-newlineMachine = StateMachine(TokenGroup.newline, {
+newlineMachine = StateMachine(TokenClass.newline, {
     State.begin: rules.newline,
     State.newline: rules.newline
 })

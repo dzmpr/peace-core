@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class TokenGroup(Enum):
+class TokenClass(Enum):
     def __repr__(self):
         return self.name
 
@@ -15,7 +15,7 @@ class TokenGroup(Enum):
 
 
 class Token:
-    def __init__(self, name: TokenGroup, value: str):
+    def __init__(self, name: TokenClass, value: str):
         self.name = name
         self.value = value
 

@@ -1,19 +1,5 @@
-from enum import Enum
 from src.lexer.StateMachine import StateMachine
 from src.lexer.StateMachine import State
-
-
-class PhraseGroup(Enum):
-    def __repr__(self):
-        return self.name
-
-    operator = 0
-    expression = 1
-    comment = 2
-    blockClose = 3
-    body = 4
-    device = 5
-    label = 6
 
 
 class SyntaxerStateMachine(StateMachine):

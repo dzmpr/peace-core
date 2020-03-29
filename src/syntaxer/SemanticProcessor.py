@@ -1,4 +1,4 @@
-from src.syntaxer.SyntaxerStateMachine import PhraseGroup
+from src.syntaxer.Construction import ConstructionClass
 
 
 class SyntaxParseError(Exception):
@@ -25,21 +25,21 @@ class SemanticProcessor:
 
     def process_phrase(self, phrase):
         # Scope block opens
-        if phrase[0] == PhraseGroup.body or phrase[0] == PhraseGroup.expression or phrase[0] == PhraseGroup.device:
+        if phrase[0] == ConstructionClass.body or phrase[0] == ConstructionClass.expression or phrase[0] == ConstructionClass.device:
             self.braceCount = self.braceCount + 1
 
         # Scope block closes
-        elif phrase[0] == PhraseGroup.blockClose:
+        elif phrase[0] == ConstructionClass.blockClose:
             self.braceCount = self.braceCount - 1
 
         # Check label name
-        elif phrase[0] == PhraseGroup.label:
+        elif phrase[0] == ConstructionClass.label:
             if phrase[1][0].value not in self.entries:
                 self.entries[phrase[1][0].value] = phrase[0]
             else:
                 raise SyntaxParseError("Name \"{}\" already taken by {}.".format(phrase[1][0].value, self.entries[phrase[1][0].value]))
 
         # Check name
-        elif phrase[0] == PhraseGroup.operator:
+        elif phrase[0] == ConstructionClass.operator:
             pass
         # TODO: process operator

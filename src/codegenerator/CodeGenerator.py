@@ -1,5 +1,5 @@
 from src.syntaxer.rules import operators
-from src.syntaxer.SyntaxerStateMachine import PhraseGroup
+from src.syntaxer.Construction import ConstructionClass
 
 
 class BlockStack:
@@ -45,7 +45,7 @@ class CodeGenerator:
     def block_open(self, phrase):
         open = self.template
         close = self.template
-        if phrase[0] == PhraseGroup.body:
+        if phrase[0] == ConstructionClass.body:
             self.keyword = "SIMULATE"
             open = open.format(self.label, self.keyword, self.parameters)
             self.keyword = "END"
