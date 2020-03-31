@@ -1,6 +1,7 @@
 from src.lexer.StateMachine import State, StateMachine
 from src.lexer.Token import Token, TokenClass
 from src.lexer import rules
+from typing import List
 
 
 wordMachine = StateMachine(TokenClass.word, {
@@ -45,8 +46,8 @@ machines = {
 
 
 # lexer
-def process_line(string):
-    tokens = []
+def process_line(string: str) -> List[Token]:
+    tokens: List[Token] = []
     index = 0
     i = 0
     active_machines = False

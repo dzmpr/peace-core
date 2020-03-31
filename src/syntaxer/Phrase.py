@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import List
+from src.lexer.Token import Token
 
 
 class PhraseClass(Enum):
@@ -15,7 +17,7 @@ class PhraseClass(Enum):
 
 
 class Phrase:
-    def __init__(self, phrase_class: PhraseClass, params: list):
+    def __init__(self, phrase_class: PhraseClass, params: List[Token]):
         self.phrase_class = phrase_class
         self.params = params
 

@@ -2,8 +2,9 @@ from src.lexer.StateMachine import State
 from src.lexer.Token import TokenClass, Token
 from src.syntaxer.SyntaxerStateMachine import SyntaxerStateMachine
 from src.syntaxer.Phrase import PhraseClass, Phrase
-from src.syntaxer.SemanticProcessor import SemanticProcessor, SyntaxParseError
+from src.syntaxer.SemanticAnalyzer import SemanticProcessor, SyntaxParseError
 from src.syntaxer import rules
+from typing import List
 
 operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.parameter, {
     State.begin: rules.keyword,
@@ -55,18 +56,18 @@ machines = {
 }
 
 
-def process_tokens(tokens):
-    output = []
+def process_tokens(tokens) -> List[Phrase]:
+    output: List[Phrase] = []
     active_machines = False
     machine_found = False
     i = 0
-    temp_phrase = []
+    temp_phrase: List[Token] = []
     semantic_processor = SemanticProcessor()
     while i < len(tokens):
         token: Token = tokens[i]
 
         # New line check
-        if token.name == TokenClass.newline:
+        if token.token_class == TokenClass.newline:
             semantic_processor.next_line()
 
         # Process token
@@ -85,7 +86,7 @@ def process_tokens(tokens):
                     temp_phrase.clear()
                     semantic_processor.process_phrase(processed_phrase)
 
-            if token.name == TokenClass.undefined:
+            if token.token_class == TokenClass.undefined:
                 if not semantic_processor.is_block_closed():
                     raise SyntaxParseError("Syntax error. Bad scoping.")
                 return output
@@ -103,10 +104,10 @@ def process_tokens(tokens):
             i = i - 1
             machine_found = False
         else:
-            if token.name != TokenClass.space and \
-                    token.name != TokenClass.newline and \
-                    token.name != TokenClass.undefined and \
-                    token.name != TokenClass.sign:
+            if token.token_class != TokenClass.space and \
+                    token.token_class != TokenClass.newline and \
+                    token.token_class != TokenClass.undefined and \
+                    token.token_class != TokenClass.sign:
                 temp_phrase.append(token)
 
         i = i + 1

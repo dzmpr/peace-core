@@ -25,7 +25,7 @@ class CodeGenerator:
         self.stack = BlockStack()
         self.line = ""
 
-    def get_line(self):
+    def get_line(self) -> str:
         return self.line
 
     def generate_line(self, phrase: Phrase):

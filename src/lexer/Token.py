@@ -15,13 +15,13 @@ class TokenClass(Enum):
 
 
 class Token:
-    def __init__(self, name: TokenClass, value: str):
-        self.name = name
+    def __init__(self, token_class: TokenClass, value: str):
+        self.token_class = token_class
         self.value = value
 
     def __repr__(self):
-        return f'Token: {self.name.name}'
+        return f'Token: {self.token_class.name}'
 
     def __str__(self):
-        return f'Token: {self.name.name}, value: {repr(self.value)}'
+        return f'Token: {self.token_class.name}, value: {repr(self.value)}'
 

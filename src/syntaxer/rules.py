@@ -16,98 +16,98 @@ operators = {
 
 
 def body_start(token: Token):
-    if token.name == TokenClass.word:
+    if token.token_class == TokenClass.word:
         if token.value == "main":
             return State.body
-    elif token.name == TokenClass.space or token.name == TokenClass.newline:
+    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
 
 
 def body(token: Token):
-    if token.name == TokenClass.sign:
+    if token.token_class == TokenClass.sign:
         if token.value == "{":
             return State.body
-    elif token.name == TokenClass.space or token.value == TokenClass.newline:
+    elif token.token_class == TokenClass.space or token.value == TokenClass.newline:
         return State.body
     return State.undefined
 
 
 def comment_start(token: Token):
-    if token.name == TokenClass.sign:
+    if token.token_class == TokenClass.sign:
         if token.value == "#":
             return State.comment
-    elif token.name == TokenClass.space or token.name == TokenClass.newline:
+    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
 
 
 def comment_end(token: Token):
-    if token.name != TokenClass.newline:
+    if token.token_class != TokenClass.newline:
         return State.comment
     return State.undefined
 
 
 def keyword(token: Token):
-    if token.name == TokenClass.word:
+    if token.token_class == TokenClass.word:
         if token.value in operators:
             return State.keyword
-    elif token.name == TokenClass.space or token.name == TokenClass.newline:
+    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
 
 
 def device_start(token: Token):
-    if token.name == TokenClass.word:
+    if token.token_class == TokenClass.word:
         if token.value != "main":
             return State.deviceStart
-    elif token.name == TokenClass.space or token.name == TokenClass.newline:
+    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
 
 
 def device_end(token: Token):
-    if token.name == TokenClass.sign:
+    if token.token_class == TokenClass.sign:
         if token.value == "{":
             return State.device
-    elif token.name == TokenClass.space or token.name == TokenClass.newline:
+    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.deviceStart
     return State.undefined
 
 
 def accolade_start(token: Token):
-    if token.name == TokenClass.sign:
+    if token.token_class == TokenClass.sign:
         if token.value == "}":
             return State.accoladeCloseSign
     return State.undefined
 
 
 def accolade_end(token: Token):
-    if token.name == TokenClass.space or token.name == TokenClass.newline:
+    if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.accoladeCloseSign
     return State.undefined
 
 
 def device(token: Token):
-    if token.name == TokenClass.space or token.name == TokenClass.newline:
+    if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.device
     return State.undefined
 
 
 def first_word(token: Token):
-    if token.name == TokenClass.word:
+    if token.token_class == TokenClass.word:
         return State.firstWord
-    elif token.name == TokenClass.space or token.name == TokenClass.newline:
+    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
 
 
 def parameter(token: Token):
-    if token.name == TokenClass.parameter:
+    if token.token_class == TokenClass.parameter:
         return State.parameter
-    elif token.name == TokenClass.space:
+    elif token.token_class == TokenClass.space:
         return State.parameter
-    elif token.name == TokenClass.newline:
+    elif token.token_class == TokenClass.newline:
         return State.parameter
     return State.undefined
 
@@ -117,33 +117,33 @@ def undefined(token: Token):
 
 
 def equal_sign(token: Token):
-    if token.name == TokenClass.sign:
+    if token.token_class == TokenClass.sign:
         if token.value == "=":
             return State.equalSign
-    elif token.name == TokenClass.space:
+    elif token.token_class == TokenClass.space:
         return State.firstWord
     return State.undefined
 
 
 def accolade_open_sign(token: Token):
-    if token.name == TokenClass.sign:
+    if token.token_class == TokenClass.sign:
         if token.value == "{":
             return State.accoladeOpenSign
-    elif token.name == TokenClass.space:
+    elif token.token_class == TokenClass.space:
         return State.equalSign
     return State.undefined
 
 
 def label_start(token: Token):
-    if token.name == TokenClass.word:
+    if token.token_class == TokenClass.word:
         return State.label
-    elif token.name == TokenClass.space or token.name == TokenClass.newline:
+    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
 
 
 def label(token: Token):
-    if token.name == TokenClass.sign:
+    if token.token_class == TokenClass.sign:
         if token.value == ":":
             return State.label
     return State.undefined

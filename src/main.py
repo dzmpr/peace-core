@@ -3,7 +3,7 @@ from src.lexer import lexer
 from src.lexer.Token import Token, TokenClass
 from src.syntaxer import syntaxer
 from src.syntaxer.Phrase import PhraseClass
-from src.syntaxer.SemanticProcessor import SyntaxParseError
+from src.syntaxer.SemanticAnalyzer import SyntaxParseError
 from src.codegenerator.CodeGenerator import CodeGenerator
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pyss files into .gpss.")
