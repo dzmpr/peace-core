@@ -2,7 +2,7 @@ import argparse
 from src.lexer import lexer
 from src.lexer.Token import Token, TokenClass
 from src.syntaxer import syntaxer
-from src.syntaxer.Construction import ConstructionClass
+from src.syntaxer.Phrase import PhraseClass
 from src.syntaxer.SemanticProcessor import SyntaxParseError
 from src.codegenerator.CodeGenerator import CodeGenerator
 
@@ -37,7 +37,7 @@ file = open(path, "r")
 for row in file:
     if not row.endswith("\n"):
         row = row + "\n"
-    temp.append(lexer.process_line(lexer.machines, row))
+    temp.append(lexer.process_line(row))
 
 # Flatten lexer result
 result = [item for sublist in temp for item in sublist]
@@ -53,7 +53,7 @@ if arguments.lo:
 
 # Process tokens with syntax analyzer
 try:
-    temp = syntaxer.process_tokens(syntaxer.machines, result)
+    temp = syntaxer.process_tokens(result)
 except SyntaxParseError as error:
     print(error.msg)
 
@@ -68,14 +68,14 @@ if arguments.so:
 output = open(path[:-4] + "gpss", "w")
 generator = CodeGenerator()
 for construction in temp:
-    if construction[0] == ConstructionClass.comment:
+    if construction[0] == PhraseClass.comment:
         continue
-    elif construction[0] == ConstructionClass.label:
+    elif construction[0] == PhraseClass.label:
         generator.add_label(construction)
         continue
-    elif construction[0] == ConstructionClass.body or construction[0] == ConstructionClass.device:
+    elif construction[0] == PhraseClass.body or construction[0] == PhraseClass.device:
         generator.block_open(construction)
-    elif construction[0] == ConstructionClass.blockClose:
+    elif construction[0] == PhraseClass.blockClose:
         generator.close_block(construction)
     else:
         generator.generate_line(construction)

@@ -3,6 +3,9 @@ main {
     gen(5,1)
     gen(5,1)
     q(BUF)
+    var(1)
+    varinit(2)
+    compare(3)
     MEM {
         dq(BUF)
         delay(7)

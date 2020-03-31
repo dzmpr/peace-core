@@ -1,45 +1,45 @@
 from src.lexer.StateMachine import State
 from src.lexer.Token import TokenClass, Token
 from src.syntaxer.SyntaxerStateMachine import SyntaxerStateMachine
-from src.syntaxer.Construction import ConstructionClass
+from src.syntaxer.Phrase import PhraseClass
 from src.syntaxer.SemanticProcessor import SemanticProcessor, SyntaxParseError
 from src.syntaxer import rules
 
-operatorMachine = SyntaxerStateMachine(ConstructionClass.operator, State.parameter, {
+operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.parameter, {
     State.begin: rules.keyword,
     State.keyword: rules.parameter,
     State.parameter: rules.parameter
 })
 
-expressionMachine = SyntaxerStateMachine(ConstructionClass.expression, State.accoladeOpenSign, {
+expressionMachine = SyntaxerStateMachine(PhraseClass.expression, State.accoladeOpenSign, {
     State.begin: rules.first_word,
     State.firstWord: rules.equal_sign,
     State.equalSign: rules.accolade_open_sign,
     State.accoladeOpenSign: rules.accolade_open_sign
 })
 
-commentMachine = SyntaxerStateMachine(ConstructionClass.comment, State.comment, {
+commentMachine = SyntaxerStateMachine(PhraseClass.comment, State.comment, {
     State.begin: rules.comment_start,
     State.comment: rules.comment_end,
 })
 
-bodyMachine = SyntaxerStateMachine(ConstructionClass.body, State.body, {
+bodyMachine = SyntaxerStateMachine(PhraseClass.body, State.body, {
     State.begin: rules.body_start,
     State.body: rules.body
 })
 
-deviceMachine = SyntaxerStateMachine(ConstructionClass.device, State.device, {
+deviceMachine = SyntaxerStateMachine(PhraseClass.device, State.device, {
     State.begin: rules.device_start,
     State.deviceStart: rules.device_end,
     State.device: rules.device
 })
 
-blockCloseMachine = SyntaxerStateMachine(ConstructionClass.blockClose, State.accoladeCloseSign, {
+blockCloseMachine = SyntaxerStateMachine(PhraseClass.blockClose, State.accoladeCloseSign, {
     State.begin: rules.accolade_start,
     State.accoladeCloseSign: rules.accolade_end
 })
 
-labelMachine = SyntaxerStateMachine(ConstructionClass.label, State.label, {
+labelMachine = SyntaxerStateMachine(PhraseClass.label, State.label, {
     State.begin: rules.label_start,
     State.label: rules.label
 })
@@ -55,20 +55,19 @@ machines = {
 }
 
 
-def process_tokens(machines, tokens):
+def process_tokens(tokens):
     output = []
     active_machines = False
     machine_found = False
     i = 0
     temp_phrase = []
-    phrase = []
-    checker = SemanticProcessor()
+    semantic_processor = SemanticProcessor()
     while i < len(tokens):
         token: Token = tokens[i]
 
         # New line check
         if token.name == TokenClass.newline:
-            checker.next_line()
+            semantic_processor.next_line()
 
         # Process token
         for machine in machines:
@@ -84,10 +83,10 @@ def process_tokens(machines, tokens):
                     output.append(phrase)
                     machine_found = True
                     temp_phrase.clear()
-                    checker.process_phrase(phrase)
+                    semantic_processor.process_phrase(phrase)
 
             if token.name == TokenClass.undefined:
-                if not checker.is_block_closed():
+                if not semantic_processor.is_block_closed():
                     raise SyntaxParseError("Syntax error. Bad scoping.")
                 return output
 
@@ -95,7 +94,7 @@ def process_tokens(machines, tokens):
             if not machine_found:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxParseError("Syntax error. Expected {} at line {}.".format(machine.name, checker.processed_lines()))
+                        raise SyntaxParseError("Syntax error. Expected {} at line {}.".format(machine.name, semantic_processor.processed_lines()))
 
             # Reset machine states
             for machine in machines:

@@ -45,7 +45,7 @@ machines = {
 
 
 # lexer
-def process_line(machines, string):
+def process_line(string):
     tokens = []
     index = 0
     i = 0
