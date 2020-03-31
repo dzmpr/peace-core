@@ -60,24 +60,24 @@ except SyntaxParseError as error:
 # Print processed phrases to file
 if arguments.so:
     syntaxer_output = open(path + ".so", "w")
-    for construction in temp:
-        syntaxer_output.write(str(construction) + '\n')
+    for phrase in temp:
+        syntaxer_output.write(str(phrase) + '\n')
     syntaxer_output.close()
 
 # Code generator part FIXME: will be moved out of there
 output = open(path[:-4] + "gpss", "w")
 generator = CodeGenerator()
-for construction in temp:
-    if construction[0] == PhraseClass.comment:
+for phrase in temp:
+    if phrase.phrase_class == PhraseClass.comment:
         continue
-    elif construction[0] == PhraseClass.label:
-        generator.add_label(construction)
+    elif phrase.phrase_class == PhraseClass.label:
+        generator.add_label(phrase)
         continue
-    elif construction[0] == PhraseClass.body or construction[0] == PhraseClass.device:
-        generator.block_open(construction)
-    elif construction[0] == PhraseClass.blockClose:
-        generator.close_block(construction)
+    elif phrase.phrase_class == PhraseClass.body or phrase.phrase_class == PhraseClass.device:
+        generator.block_open(phrase)
+    elif phrase.phrase_class == PhraseClass.blockClose:
+        generator.close_block(phrase)
     else:
-        generator.generate_line(construction)
+        generator.generate_line(phrase)
     output.write(generator.get_line())
     generator.reset_content()

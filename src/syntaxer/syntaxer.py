@@ -1,7 +1,7 @@
 from src.lexer.StateMachine import State
 from src.lexer.Token import TokenClass, Token
 from src.syntaxer.SyntaxerStateMachine import SyntaxerStateMachine
-from src.syntaxer.Phrase import PhraseClass
+from src.syntaxer.Phrase import PhraseClass, Phrase
 from src.syntaxer.SemanticProcessor import SemanticProcessor, SyntaxParseError
 from src.syntaxer import rules
 
@@ -79,11 +79,11 @@ def process_tokens(tokens):
         if not active_machines:
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
-                    phrase = [machine.name, temp_phrase.copy()]
-                    output.append(phrase)
+                    processed_phrase = Phrase(machine.name, temp_phrase.copy())
+                    output.append(processed_phrase)
                     machine_found = True
                     temp_phrase.clear()
-                    semantic_processor.process_phrase(phrase)
+                    semantic_processor.process_phrase(processed_phrase)
 
             if token.name == TokenClass.undefined:
                 if not semantic_processor.is_block_closed():

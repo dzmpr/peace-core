@@ -1,4 +1,4 @@
-from src.syntaxer.Phrase import PhraseClass
+from src.syntaxer.Phrase import Phrase, PhraseClass
 
 
 class SyntaxParseError(Exception):
@@ -23,23 +23,24 @@ class SemanticProcessor:
             return True
         return False
 
-    def process_phrase(self, phrase):
+    def process_phrase(self, phrase: Phrase):
         # Scope block opens
-        if phrase[0] == PhraseClass.body or phrase[0] == PhraseClass.expression or phrase[0] == PhraseClass.device:
+        if phrase.phrase_class == PhraseClass.body or phrase.phrase_class == PhraseClass.expression or phrase.phrase_class == PhraseClass.device:
             self.braceCount = self.braceCount + 1
 
         # Scope block closes
-        elif phrase[0] == PhraseClass.blockClose:
+        elif phrase.phrase_class == PhraseClass.blockClose:
             self.braceCount = self.braceCount - 1
 
         # Check label name
-        elif phrase[0] == PhraseClass.label:
-            if phrase[1][0].value not in self.entries:
-                self.entries[phrase[1][0].value] = phrase[0]
+        elif phrase.phrase_class == PhraseClass.label:
+            if phrase.params[0].value not in self.entries:
+                self.entries[phrase.params[0].value] = phrase.phrase_class
             else:
-                raise SyntaxParseError("Name \"{}\" already taken by {}.".format(phrase[1][0].value, self.entries[phrase[1][0].value]))
+                raise SyntaxParseError("Name \"{}\" already taken by {}.".format(phrase.params[0].value,
+                                                                                 self.entries[phrase.params[0].value]))
 
         # Check name
-        elif phrase[0] == PhraseClass.operator:
+        elif phrase.phrase_class == PhraseClass.operator:
             pass
         # TODO: process operator
