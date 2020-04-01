@@ -3,8 +3,9 @@ from src.lexer import lexer
 from src.lexer.Token import Token, TokenClass
 from src.syntaxer import syntaxer
 from src.syntaxer.Phrase import PhraseClass
-from src.syntaxer.SemanticAnalyzer import SyntaxParseError
+from src.syntaxer.syntaxer import SyntaxParseError
 from src.codegenerator.CodeGenerator import CodeGenerator
+from src.parsetree.ParseTree import ParseTree
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pyss files into .gpss.")
 parser.add_argument(
@@ -51,9 +52,12 @@ if arguments.lo:
         lexer_output.write(str(token) + "\n")
     lexer_output.close()
 
+# Parse tree
+parse_tree = ParseTree()
+
 # Process tokens with syntax analyzer
 try:
-    temp = syntaxer.process_tokens(result)
+    syntaxer.process_tokens(parse_tree, result)
 except SyntaxParseError as error:
     print(error.msg)
 

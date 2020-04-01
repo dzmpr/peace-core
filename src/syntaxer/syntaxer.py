@@ -2,9 +2,16 @@ from src.lexer.StateMachine import State
 from src.lexer.Token import TokenClass, Token
 from src.syntaxer.SyntaxerStateMachine import SyntaxerStateMachine
 from src.syntaxer.Phrase import PhraseClass, Phrase
-from src.syntaxer.SemanticAnalyzer import SemanticProcessor, SyntaxParseError
 from src.syntaxer import rules
+from src.parsetree.ParseTree import ParseTree
+from src.parsetree.TreeComposer import TreeComposer
 from typing import List
+
+
+class SyntaxParseError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
 
 operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.parameter, {
     State.begin: rules.keyword,
@@ -56,14 +63,13 @@ machines = {
 }
 
 
-def process_tokens(tokens: List[Token]) -> List[Phrase]:
-    output: List[Phrase] = []
+def process_tokens(tree: ParseTree, tokens: List[Token]):
     active_machines: bool = False
     machine_found: bool = False
     token_index: int = 0
     line_counter: int = 0
     temp_phrase: List[Token] = []
-    semantic_processor = SemanticProcessor()
+    tree_composer = TreeComposer(tree)
     while token_index < len(tokens):
         token: Token = tokens[token_index]
 
@@ -82,21 +88,20 @@ def process_tokens(tokens: List[Token]) -> List[Phrase]:
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
                     processed_phrase = Phrase(machine.name, temp_phrase.copy())
-                    output.append(processed_phrase)
+                    tree_composer.add_phrase(processed_phrase)
                     machine_found = True
                     temp_phrase.clear()
-                    semantic_processor.process_phrase(processed_phrase)
 
             if token.token_class == TokenClass.undefined:
-                if not semantic_processor.is_block_closed():
+                if not tree_composer.is_tree_valid():
                     raise SyntaxParseError("Syntax error. Bad scoping.")
-                return output
+                return
 
             # Token wasn't recognized by any machine
             if not machine_found:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxParseError(f"Syntax error. Expected {machine.name} at line {line_counter}.")
+                        raise SyntaxParseError(f"Syntax error. Expected {machine.name.name} at line {line_counter}.")
 
             # Reset machine states
             for machine in machines:
@@ -114,4 +119,4 @@ def process_tokens(tokens: List[Token]) -> List[Phrase]:
         token_index += 1
         active_machines = False
 
-    return output
+    return
