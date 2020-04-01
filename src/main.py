@@ -25,12 +25,12 @@ parser.add_argument(
 arguments = parser.parse_args()
 
 # Checking if file has correct extension
-if arguments.input[-4:] != "pyss":
+if arguments.input[-5:] != ".pyss":
     print("Incorrect file.")
     exit(2)
 
 path = arguments.input
-print("Input file: {}".format(path))
+print(f"Input file: {path}")
 
 temp = []
 file = open(path, "r")
