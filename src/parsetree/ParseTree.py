@@ -1,5 +1,5 @@
-from src.syntaxer.Phrase import Phrase
-from typing import List
+from src.syntaxer.Phrase import Phrase, PhraseClass
+from typing import List, Callable
 
 
 class Node:
@@ -31,13 +31,45 @@ class ParseTree:
     def submerge(self, index=-1):
         self.head = self.head.nodes[index]
 
-    def get_head_class(self):
+    def get_head_class(self) -> PhraseClass or None:
         if self.head.phrase is not None:
             return self.head.phrase.phrase_class
         return None
 
-    def get_head(self):
+    def get_head(self) -> Node:
         return self.head
 
     def reset_head(self):
         self.head = self.root
+
+
+class TreeTraverse:
+    def __init__(self, tree: Node, node_processor: Callable[[Phrase], None], ascent: Callable[[], None]):
+        self._tree: Node = tree
+        self._ascent: Callable[[], None] = ascent
+        self._node_processor: Callable[[Phrase], None] = node_processor
+        self._stack: list = list()
+        self._index: int = 0
+        self._temp: Node = tree
+
+    def traverse(self):
+        self._node_processor(self._tree.phrase)
+        while True:
+            try:
+                self._temp = self._tree[self._index]
+
+            except IndexError:
+                self._ascent()
+                if len(self._stack):
+                    self._tree, self._index = self._stack.pop()
+                else:
+                    break
+
+            else:
+                self._index += 1
+                if len(self._temp.nodes):
+                    self._stack.append([self._tree, self._index])
+                    self._tree = self._temp
+                    self._index = 0
+                else:
+                    self._node_processor(self._temp.phrase)
