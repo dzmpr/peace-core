@@ -1,8 +1,9 @@
 import argparse
 from src.lexer import lexer
-from src.lexer.Token import Token, TokenGroup
+from src.lexer.Token import Token, TokenClass
 from src.syntaxer import syntaxer
-from src.syntaxer.SemanticProcessor import SyntaxParseError
+from src.syntaxer.Phrase import PhraseClass
+from src.syntaxer.SemanticAnalyzer import SyntaxParseError
 from src.codegenerator.CodeGenerator import CodeGenerator
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pyss files into .gpss.")
@@ -24,23 +25,23 @@ parser.add_argument(
 arguments = parser.parse_args()
 
 # Checking if file has correct extension
-if arguments.input[-4:] != "pyss":
+if arguments.input[-5:] != ".pyss":
     print("Incorrect file.")
     exit(2)
 
 path = arguments.input
-print("Input file: {}".format(path))
+print(f"Input file: {path}")
 
 temp = []
 file = open(path, "r")
 for row in file:
     if not row.endswith("\n"):
         row = row + "\n"
-    temp.append(lexer.process_line(lexer.machines, row))
+    temp.append(lexer.process_line(row))
 
 # Flatten lexer result
 result = [item for sublist in temp for item in sublist]
-result.append(Token(TokenGroup.undefined, ""))
+result.append(Token(TokenClass.undefined, ""))
 temp.clear()
 
 # Print processed tokens to file
@@ -52,7 +53,7 @@ if arguments.lo:
 
 # Process tokens with syntax analyzer
 try:
-    temp = syntaxer.process_tokens(syntaxer.machines, result)
+    temp = syntaxer.process_tokens(result)
 except SyntaxParseError as error:
     print(error.msg)
 
@@ -67,14 +68,14 @@ if arguments.so:
 output = open(path[:-4] + "gpss", "w")
 generator = CodeGenerator()
 for phrase in temp:
-    if phrase[0] == syntaxer.PhraseGroup.comment:
+    if phrase.phrase_class == PhraseClass.comment:
         continue
-    elif phrase[0] == syntaxer.PhraseGroup.label:
+    elif phrase.phrase_class == PhraseClass.label:
         generator.add_label(phrase)
         continue
-    elif phrase[0] == syntaxer.PhraseGroup.body or phrase[0] == syntaxer.PhraseGroup.device:
+    elif phrase.phrase_class == PhraseClass.body or phrase.phrase_class == PhraseClass.device:
         generator.block_open(phrase)
-    elif phrase[0] == syntaxer.PhraseGroup.blockClose:
+    elif phrase.phrase_class == PhraseClass.blockClose:
         generator.close_block(phrase)
     else:
         generator.generate_line(phrase)
