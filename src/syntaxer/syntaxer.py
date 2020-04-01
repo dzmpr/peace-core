@@ -56,19 +56,20 @@ machines = {
 }
 
 
-def process_tokens(tokens) -> List[Phrase]:
+def process_tokens(tokens: List[Token]) -> List[Phrase]:
     output: List[Phrase] = []
-    active_machines = False
-    machine_found = False
-    i = 0
+    active_machines: bool = False
+    machine_found: bool = False
+    token_index: int = 0
+    line_counter: int = 0
     temp_phrase: List[Token] = []
     semantic_processor = SemanticProcessor()
-    while i < len(tokens):
-        token: Token = tokens[i]
+    while token_index < len(tokens):
+        token: Token = tokens[token_index]
 
         # New line check
         if token.token_class == TokenClass.newline:
-            semantic_processor.next_line()
+            line_counter += 1
 
         # Process token
         for machine in machines:
@@ -95,13 +96,13 @@ def process_tokens(tokens) -> List[Phrase]:
             if not machine_found:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxParseError("Syntax error. Expected {} at line {}.".format(machine.name, semantic_processor.processed_lines()))
+                        raise SyntaxParseError(f"Syntax error. Expected {machine.name} at line {line_counter}.")
 
             # Reset machine states
             for machine in machines:
                 machine.reset_state()
 
-            i = i - 1
+            token_index = token_index - 1
             machine_found = False
         else:
             if token.token_class != TokenClass.space and \
@@ -110,7 +111,7 @@ def process_tokens(tokens) -> List[Phrase]:
                     token.token_class != TokenClass.sign:
                 temp_phrase.append(token)
 
-        i = i + 1
+        token_index += 1
         active_machines = False
 
     return output
