@@ -10,7 +10,7 @@ class TreeComposer:
         return self._tree
 
     def is_tree_valid(self):
-        if self._tree.root.parent is None:
+        if self._tree.head.parent is None:
             return True
         return False
 
