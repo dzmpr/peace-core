@@ -61,14 +61,15 @@ class TreeTraverse:
             except IndexError:
                 self._ascent()
                 if len(self._stack):
-                    self._tree, self._index = self._stack.pop()
+                    self._index = self._stack.pop()
+                    self._tree = self._tree.parent
                 else:
                     break
 
             else:
                 self._index += 1
                 if len(self._temp.nodes):
-                    self._stack.append([self._tree, self._index])
+                    self._stack.append(self._index)
                     self._tree = self._temp
                     self._index = 0
                 else:
