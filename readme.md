@@ -87,7 +87,8 @@ Comments specifying with **#** symbol. Comment lasts to the end of line. They ha
 ```
 
 ## Goals
+- [x] Make a tree-based intermediate representation
+- [ ] Make scope dependent naming
 - [ ] Implement expressions
 - [ ] Implement expressions with substitutions
-- [ ] Make scope dependent naming
 - [ ] Limit naming according GPSS rules
