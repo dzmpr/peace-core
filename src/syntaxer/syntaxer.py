@@ -5,6 +5,8 @@ from src.syntaxer.Phrase import PhraseClass, Phrase
 from src.syntaxer import rules
 from src.parsetree.ParseTree import ParseTree
 from src.parsetree.TreeComposer import TreeComposer
+from src.SemanticAnalyzer.SymbolTable import SymbolTable
+from src.SemanticAnalyzer.SemanticAnalyzer import SemanticAnalyzer
 from typing import List
 
 
@@ -63,13 +65,15 @@ machines = {
 }
 
 
-def process_tokens(tree: ParseTree, tokens: List[Token]):
+def process_tokens(tree: ParseTree, table: SymbolTable, tokens: List[Token]):
     active_machines: bool = False
     machine_found: bool = False
     token_index: int = 0
     line_counter: int = 0
     temp_phrase: List[Token] = []
     tree_composer = TreeComposer(tree)
+    sem_analyzer = SemanticAnalyzer(tree, table)
+
     while token_index < len(tokens):
         token: Token = tokens[token_index]
 
@@ -87,8 +91,9 @@ def process_tokens(tree: ParseTree, tokens: List[Token]):
         if not active_machines:
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
-                    processed_phrase = Phrase(machine.name, temp_phrase.copy())
-                    tree_composer.add_phrase(processed_phrase)
+                    recognized_phrase = Phrase(machine.name, temp_phrase.copy())
+                    sem_analyzer.process_phrase(recognized_phrase)
+                    tree_composer.add_phrase(recognized_phrase)
                     machine_found = True
                     temp_phrase.clear()
 
