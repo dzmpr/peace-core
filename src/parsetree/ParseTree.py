@@ -1,20 +1,18 @@
 from src.syntaxer.Phrase import Phrase, PhraseClass
-from typing import List, Callable
+from typing import List, Callable, Any
 
 
 class Node:
-    def __init__(self, parent: 'Node' or None, phrase: Phrase or None):
+    def __init__(self, parent: 'Node' or None, data: Any):
         self.parent: Node or None = parent
-        self.phrase: Phrase or None = phrase
+        self.data: Any = data
         self.nodes: List[Node] = list()
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> 'Node':
         return self.nodes[item]
 
     def __repr__(self):
-        if self.phrase is None:
-            return f"Node ({len(self.nodes)})"
-        return f"Node {self.phrase.phrase_class.name} ({len(self.nodes)})"
+        return f"Node {repr(self.data)} ({len(self.nodes)})"
 
 
 class ParseTree:
@@ -32,8 +30,8 @@ class ParseTree:
         self.head = self.head.nodes[index]
 
     def get_head_class(self) -> PhraseClass or None:
-        if self.head.phrase is not None:
-            return self.head.phrase.phrase_class
+        if self.head.data is not None:
+            return self.head.data.phrase_class
         return None
 
     def get_head(self) -> Node:
@@ -53,7 +51,7 @@ class TreeTraverse:
         self._temp: Node = tree
 
     def traverse(self):
-        self._node_processor(self._tree.phrase)
+        self._node_processor(self._tree.data)
         while True:
             try:
                 self._temp = self._tree[self._index]
@@ -61,15 +59,16 @@ class TreeTraverse:
             except IndexError:
                 self._ascent()
                 if len(self._stack):
-                    self._tree, self._index = self._stack.pop()
+                    self._index = self._stack.pop()
+                    self._tree = self._tree.parent
                 else:
                     break
 
             else:
                 self._index += 1
                 if len(self._temp.nodes):
-                    self._stack.append([self._tree, self._index])
+                    self._stack.append(self._index)
                     self._tree = self._temp
                     self._index = 0
                 else:
-                    self._node_processor(self._temp.phrase)
+                    self._node_processor(self._temp.data)
