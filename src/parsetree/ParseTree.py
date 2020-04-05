@@ -42,33 +42,33 @@ class ParseTree:
 
 
 class TreeTraverse:
-    def __init__(self, tree: Node, node_processor: Callable[[Phrase], None], ascent: Callable[[], None]):
-        self._tree: Node = tree
+    def __init__(self, branch_head: Node, node_processor: Callable[[Phrase], None], ascent: Callable[[], None]):
+        self._branch_head: Node = branch_head
         self._ascent: Callable[[], None] = ascent
         self._node_processor: Callable[[Phrase], None] = node_processor
         self._stack: list = list()
         self._index: int = 0
-        self._temp: Node = tree
+        self._temp: Node = branch_head
 
     def traverse(self):
-        self._node_processor(self._tree.data)
+        self._node_processor(self._branch_head.data)
         while True:
             try:
-                self._temp = self._tree[self._index]
+                self._temp = self._branch_head[self._index]
 
             except IndexError:
                 self._ascent()
                 if len(self._stack):
                     self._index = self._stack.pop()
-                    self._tree = self._tree.parent
+                    self._branch_head = self._branch_head.parent
                 else:
                     break
 
             else:
                 self._index += 1
+                self._node_processor(self._temp.data)
                 if len(self._temp.nodes):
                     self._stack.append(self._index)
-                    self._tree = self._temp
+                    self._branch_head = self._temp
                     self._index = 0
-                else:
-                    self._node_processor(self._temp.data)
+
