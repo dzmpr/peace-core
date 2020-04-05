@@ -1,1 +1,1 @@
-__all__ = ["CodeGenerator"]
+__all__ = ["LineComposer"]

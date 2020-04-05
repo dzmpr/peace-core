@@ -4,7 +4,7 @@ from src.lexer.Token import Token, TokenClass
 from src.syntaxer import syntaxer
 from src.syntaxer.Phrase import PhraseClass
 from src.syntaxer.syntaxer import SyntaxParseError
-from src.codegenerator.CodeGenerator import CodeGenerator
+from src.codegenerator.LineComposer import LineComposer
 from src.parsetree.ParseTree import ParseTree
 from src.SemanticAnalyzer.SymbolTable import SymbolTable
 from src.SemanticAnalyzer.SemanticAnalyzer import SemanticError
@@ -78,7 +78,7 @@ if arguments.so:
 
 # Code generator part FIXME: will be moved out of there
 output = open(path[:-4] + "gpss", "w")
-generator = CodeGenerator()
+generator = LineComposer()
 for phrase in temp:
     if phrase.phrase_class == PhraseClass.comment:
         continue
@@ -90,6 +90,6 @@ for phrase in temp:
     elif phrase.phrase_class == PhraseClass.blockClose:
         generator.close_block(phrase)
     else:
-        generator.generate_line(phrase)
+        generator.compose_line(phrase)
     output.write(generator.get_line())
     generator.reset_content()
