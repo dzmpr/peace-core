@@ -46,5 +46,5 @@ class LineComposer:
             self.stack.append(block_close)
         self.line = block_open
 
-    def close_block(self, phrase: Phrase):
+    def close_block(self):
         self.line = self.stack.pop()
