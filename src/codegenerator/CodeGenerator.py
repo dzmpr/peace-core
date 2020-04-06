@@ -1,64 +1,45 @@
-from src.syntaxer.rules import operators
+from src.codegenerator.LineComposer import LineComposer
 from src.syntaxer.Phrase import Phrase, PhraseClass
-
-
-class BlockStack:
-    def __init__(self):
-        self.blocks = []
-
-    def push(self, item):
-        self.blocks.append(item)
-
-    def pop(self):
-        return self.blocks.pop()
-
-    def is_empty(self):
-        return self.blocks == []
+from src.parsetree.ParseTree import ParseTree, TreeTraverse
+from typing import TextIO, Callable
 
 
 class CodeGenerator:
-    def __init__(self):
-        self.template = " {:6} {:11} {:<}\n"
-        self.keyword = ""
-        self.parameters = ""
-        self.label = ""
-        self.stack = BlockStack()
-        self.line = ""
+    def __init__(self, tree: ParseTree, file: TextIO):
+        self._tree: ParseTree = tree
+        self.lc = LineComposer()
+        self._output: TextIO = file
+        self._temp_expression: str = ""
+        self._write: Callable[[str], None] = self.write_to_file
 
-    def get_line(self) -> str:
-        return self.line
+    def write_to_file(self, line: str):
+        self._output.write(line)
 
-    def generate_line(self, phrase: Phrase):
-        line = self.template
-        self.keyword = operators[phrase.params[0].value]
-        self.parameters = phrase.params[1].value[1:-1]
-        self.line = line.format(self.label, self.keyword, self.parameters)
+    def write_to_str(self, line: str):
+        self._temp_expression += line
 
-    def reset_content(self):
-        self.keyword = ""
-        self.parameters = ""
-        self.label = ""
-
-    def add_label(self, phrase: Phrase):
-        self.label = phrase.params[0].value
-
-    def block_open(self, phrase: Phrase):
-        block_open = self.template
-        block_close = self.template
-        if phrase.phrase_class == PhraseClass.body:
-            self.keyword = "SIMULATE"
-            block_open = block_open.format(self.label, self.keyword, self.parameters)
-            self.keyword = "END"
-            block_close = block_close.format(self.label, self.keyword, self.parameters)
-            self.stack.push(block_close)
+    def phrase_processor(self, phrase: Phrase):
+        if phrase.phrase_class == PhraseClass.label:
+            self.lc.add_label(phrase)
         else:
-            self.keyword = "SEIZE"
-            self.parameters = phrase.params[0].value
-            block_open = block_open.format(self.label, self.keyword, self.parameters)
-            self.keyword = "RELEASE"
-            block_close = block_close.format(self.label, self.keyword, self.parameters)
-            self.stack.push(block_close)
-        self.line = block_open
+            if phrase.phrase_class == PhraseClass.body or phrase.phrase_class == PhraseClass.device:
+                self.lc.block_open(phrase)
+            elif phrase.phrase_class == PhraseClass.operator:
+                self.lc.compose_line(phrase)
+            self._write(self.lc.get_line())
+            self.lc.reset_content()
 
-    def close_block(self, phrase: Phrase):
-        self.line = self.stack.pop()
+    def ascent(self):
+        self.lc.close_block()
+        self._write(self.lc.get_line())
+
+    def generate_expression(self) -> str:
+        self._write = self.write_to_str
+        tree_traverse = TreeTraverse(self._tree.get_head(), self.phrase_processor, self.ascent)
+        tree_traverse.traverse()
+        return self._temp_expression
+
+    def generate(self):
+        self._tree.submerge()
+        tree_traverse = TreeTraverse(self._tree.get_head(), self.phrase_processor, self.ascent)
+        tree_traverse.traverse()

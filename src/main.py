@@ -72,10 +72,9 @@ except SemanticError as error:
 # Print processed phrases to file FIXME: TreePrint
 if arguments.so:
     syntaxer_output: TextIO = open(path + ".so", "w")
-    for phrase in temp:
-        syntaxer_output.write(str(phrase) + '\n')
     syntaxer_output.close()
 
 # Code generator
 output_file: TextIO = open(path[:-4] + "gpss", "w")
-cg = CodeGenerator(tree=parse_tree, file=output_file)
+cg = CodeGenerator(parse_tree, output_file)
+cg.generate()
