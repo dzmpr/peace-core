@@ -1,5 +1,5 @@
-from src.lexer.StateMachine import State
-from src.lexer.Token import TokenClass, Token
+from lexer.StateMachine import State
+from lexer.Token import TokenClass, Token
 
 operators = {
     "q": "QUEUE",

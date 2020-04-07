@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import List
-from src.lexer.Token import Token
+from lexer.Token import Token
 
 
 class PhraseClass(Enum):

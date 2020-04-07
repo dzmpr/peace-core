@@ -1,5 +1,5 @@
 from typing import Dict
-from src.syntaxer.Phrase import PhraseClass
+from syntaxer.Phrase import PhraseClass
 
 
 class Symbol:

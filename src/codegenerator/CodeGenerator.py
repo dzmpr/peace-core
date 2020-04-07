@@ -1,6 +1,6 @@
-from src.codegenerator.LineComposer import LineComposer
-from src.syntaxer.Phrase import Phrase, PhraseClass
-from src.parsetree.ParseTree import ParseTree, TreeTraverse
+from codegenerator.LineComposer import LineComposer
+from syntaxer.Phrase import Phrase, PhraseClass
+from parsetree.ParseTree import ParseTree, TreeTraverse
 from typing import TextIO, Callable
 
 

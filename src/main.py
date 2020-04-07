@@ -1,12 +1,12 @@
 import argparse
-from src.lexer import lexer
-from src.lexer.Token import Token, TokenClass
-from src.syntaxer import syntaxer
-from src.syntaxer.syntaxer import SyntaxParseError
-from src.codegenerator.CodeGenerator import CodeGenerator
-from src.parsetree.ParseTree import ParseTree
-from src.SemanticAnalyzer.SymbolTable import SymbolTable
-from src.SemanticAnalyzer.SemanticAnalyzer import SemanticError
+from lexer import lexer
+from lexer.Token import Token, TokenClass
+from syntaxer import syntaxer
+from syntaxer.syntaxer import SyntaxParseError
+from codegenerator.CodeGenerator import CodeGenerator
+from parsetree.ParseTree import ParseTree
+from SemanticAnalyzer.SymbolTable import SymbolTable
+from SemanticAnalyzer.SemanticAnalyzer import SemanticError
 from typing import TextIO
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pyss files into .gpss.")

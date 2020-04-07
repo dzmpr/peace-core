@@ -1,6 +1,6 @@
-from src.parsetree.ParseTree import ParseTree
-from src.syntaxer.Phrase import Phrase, PhraseClass
-from src.syntaxer import syntaxer
+from parsetree.ParseTree import ParseTree
+from syntaxer.Phrase import Phrase, PhraseClass
+from syntaxer import syntaxer
 
 
 class TreeComposer:

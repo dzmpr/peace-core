@@ -1,6 +1,6 @@
-from src.lexer.StateMachine import State, StateMachine
-from src.lexer.Token import Token, TokenClass
-from src.lexer import rules
+from lexer.StateMachine import State, StateMachine
+from lexer.Token import Token, TokenClass
+from lexer import rules
 from typing import List
 
 

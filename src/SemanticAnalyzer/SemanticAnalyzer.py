@@ -1,6 +1,6 @@
-from src.parsetree.ParseTree import ParseTree
-from src.SemanticAnalyzer.SymbolTable import SymbolTable, Symbol
-from src.syntaxer.Phrase import Phrase, PhraseClass
+from parsetree.ParseTree import ParseTree
+from SemanticAnalyzer.SymbolTable import SymbolTable, Symbol
+from syntaxer.Phrase import Phrase, PhraseClass
 
 
 class SemanticError(Exception):

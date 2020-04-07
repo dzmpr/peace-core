@@ -1,5 +1,4 @@
-from src.lexer.StateMachine import StateMachine
-from src.lexer.StateMachine import State
+from lexer.StateMachine import State, StateMachine
 
 
 class SyntaxerStateMachine(StateMachine):

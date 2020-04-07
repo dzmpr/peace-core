@@ -1,4 +1,4 @@
-from src.syntaxer.Phrase import Phrase, PhraseClass
+from syntaxer.Phrase import Phrase, PhraseClass
 from typing import List, Callable, Any
 
 

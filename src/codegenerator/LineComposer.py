@@ -1,5 +1,5 @@
-from src.syntaxer.rules import operators
-from src.syntaxer.Phrase import Phrase, PhraseClass
+from syntaxer.rules import operators
+from syntaxer.Phrase import Phrase, PhraseClass
 
 
 class LineComposer:
