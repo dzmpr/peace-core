@@ -1,7 +1,7 @@
 # Python to GPSS source-to-source translator
 
 ## How to use? Syntax.
-Source code not indentation dependent. Each line should contain one statement. PYSS not cheching validity of GPSS code i.e. program from PYSS can be translated to GPSS without SIMULATE and END blocks if *main* statement isn't used. PYSS checking validity of used names for device blocks, operators and expressions (now across whole code, in future - scope dependent).
+Source code not indentation dependent. Each line should contain one statement. Peace not cheching validity of GPSS code i.e. program from Peace can be translated to GPSS without SIMULATE and END blocks if *main* statement isn't used. Peace checking validity of used names for device blocks, operators and expressions (now across whole code, in future - scope dependent).
 ### Blocks
 * Main block
   ```
