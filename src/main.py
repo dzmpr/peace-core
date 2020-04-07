@@ -9,7 +9,7 @@ from SemanticAnalyzer.SymbolTable import SymbolTable
 from SemanticAnalyzer.SemanticAnalyzer import SemanticError
 from typing import TextIO
 
-parser = argparse.ArgumentParser(description="Interpreter for converting .pyss files into .gpss.")
+parser = argparse.ArgumentParser(description="Interpreter for converting .pce files into .gpss.")
 parser.add_argument(
     'input',
     type=str,
@@ -28,7 +28,7 @@ parser.add_argument(
 arguments = parser.parse_args()
 
 # Checking if file has correct extension
-if arguments.input[-5:] != ".pyss":
+if arguments.input[-4:] != ".pce":
     print("Incorrect file.")
     exit(2)
 
@@ -75,6 +75,6 @@ if arguments.so:
     syntaxer_output.close()
 
 # Code generator
-output_file: TextIO = open(path[:-4] + "gpss", "w")
+output_file: TextIO = open(path[:-3] + "gpss", "w")
 cg = CodeGenerator(parse_tree, output_file)
 cg.generate()
