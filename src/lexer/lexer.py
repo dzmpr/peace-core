@@ -19,6 +19,11 @@ spaceMachine = StateMachine(TokenClass.space, {
     State.begin: rules.space,
     State.space: rules.space
 })
+# TODO: add tab token class
+tabMachine = StateMachine(TokenClass.space, {
+    State.begin: rules.tab,
+    State.tab: rules.tab
+})
 
 numberMachine = StateMachine(TokenClass.num, {
     State.begin: rules.num,
@@ -39,6 +44,7 @@ machines = {
     wordMachine,
     paramMachine,
     spaceMachine,
+    tabMachine,
     numberMachine,
     signMachine,
     newlineMachine

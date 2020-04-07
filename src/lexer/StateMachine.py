@@ -16,6 +16,7 @@ class State(Enum):
     num = 8
     sign = 9
     newline = 10
+    tab = 11
     keyword = 100
     firstWord = 101
     secondWord = 102

@@ -43,6 +43,12 @@ def space(char):
     return State.undefined
 
 
+def tab(char):
+    if char == "\t":
+        return State.tab
+    return State.undefined
+
+
 def num(char):
     if char.isdigit():
         return State.num
