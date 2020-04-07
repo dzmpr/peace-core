@@ -76,7 +76,9 @@ def device_end(token: Token):
 
 
 def accolade_start(token: Token):
-    if token.token_class == TokenClass.sign:
+    if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
+        return State.begin
+    elif token.token_class == TokenClass.sign:
         if token.value == "}":
             return State.accoladeCloseSign
     return State.undefined
