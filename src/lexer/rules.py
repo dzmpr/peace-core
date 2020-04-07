@@ -1,4 +1,4 @@
-from lexer.StateMachine import State
+from lexer.state_machine import State
 
 signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]", "{", "}", ":"]
 

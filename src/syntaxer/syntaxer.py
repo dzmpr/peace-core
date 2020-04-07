@@ -1,12 +1,12 @@
-from lexer.StateMachine import State
-from lexer.Token import TokenClass, Token
-from syntaxer.SyntaxerStateMachine import SyntaxerStateMachine
-from syntaxer.Phrase import PhraseClass, Phrase
+from lexer.state_machine import State
+from lexer.token import TokenClass, Token
+from syntaxer.syntaxer_state_machine import SyntaxerStateMachine
+from syntaxer.phrase import PhraseClass, Phrase
 from syntaxer import rules
-from parsetree.ParseTree import ParseTree
-from parsetree.TreeComposer import TreeComposer
-from SemanticAnalyzer.SymbolTable import SymbolTable
-from SemanticAnalyzer.SemanticAnalyzer import SemanticAnalyzer
+from parsetree.parse_tree import ParseTree
+from parsetree.tree_composer import TreeComposer
+from semanticanalyzer.symbol_table import SymbolTable
+from semanticanalyzer.semantic_analyzer import SemanticAnalyzer
 from typing import List
 
 

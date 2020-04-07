@@ -1,5 +1,5 @@
-from parsetree.ParseTree import ParseTree
-from syntaxer.Phrase import Phrase, PhraseClass
+from parsetree.parse_tree import ParseTree
+from syntaxer.phrase import Phrase, PhraseClass
 from syntaxer import syntaxer
 
 

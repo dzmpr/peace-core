@@ -1,12 +1,12 @@
 import argparse
 from lexer import lexer
-from lexer.Token import Token, TokenClass
+from lexer.token import Token, TokenClass
 from syntaxer import syntaxer
 from syntaxer.syntaxer import SyntaxParseError
-from codegenerator.CodeGenerator import CodeGenerator
-from parsetree.ParseTree import ParseTree
-from SemanticAnalyzer.SymbolTable import SymbolTable
-from SemanticAnalyzer.SemanticAnalyzer import SemanticError
+from codegenerator.code_generator import CodeGenerator
+from parsetree.parse_tree import ParseTree
+from semanticanalyzer.symbol_table import SymbolTable
+from semanticanalyzer.semantic_analyzer import SemanticError
 from typing import TextIO
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pce files into .gpss.")

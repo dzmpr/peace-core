@@ -1,1 +1,1 @@
-__all__ = ["ParseTree", "TreeComposer"]
+__all__ = ["parse_tree", "tree_composer"]

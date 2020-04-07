@@ -1,5 +1,5 @@
-from lexer.StateMachine import State, StateMachine
-from lexer.Token import Token, TokenClass
+from lexer.state_machine import State, StateMachine
+from lexer.token import Token, TokenClass
 from lexer import rules
 from typing import List
 
