@@ -7,18 +7,32 @@ class PhraseClass(Enum):
     def __repr__(self):
         return self.name
 
-    operator = 0
-    expression = 1
+    block = 0
+    operator = 1
     comment = 2
-    blockClose = 3
-    body = 4
-    device = 5
-    label = 6
+    label = 3
+    blockClose = 4
+    # Deprecated
+    expression = 5
+    body = 6
+    device = 7
+
+
+class PhraseSubclass(Enum):
+    def __repr__(self):
+        return self.name
+
+    program = 0
+    body = 1
+    expression = 2
+    device = 3
 
 
 class Phrase:
-    def __init__(self, phrase_class: PhraseClass, params: List[Token]):
+    def __init__(self, phrase_class: PhraseClass, phrase_subclass: PhraseSubclass or None = None, keyword: Token or None = None, params: List[Token] or None = None):
         self.phrase_class = phrase_class
+        self.phrase_subclass = phrase_subclass
+        self.keyword = keyword
         self.params = params
 
     def __repr__(self):
