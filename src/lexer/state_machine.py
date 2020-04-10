@@ -26,8 +26,8 @@ class State(Enum):
     accoladeCloseSign = 106
     comment = 107
     body = 108
-    deviceStart = 109
-    device = 110
+    blockStart = 109
+    block = 110
     label = 111
 
 

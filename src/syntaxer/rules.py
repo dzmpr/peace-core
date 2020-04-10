@@ -57,21 +57,20 @@ def keyword(token: Token):
     return State.undefined
 
 
-def device_start(token: Token):
+def block_start(token: Token):
     if token.token_class == TokenClass.word:
-        if token.value != "main":
-            return State.deviceStart
+        return State.blockStart
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
 
 
-def device_end(token: Token):
+def block_end(token: Token):
     if token.token_class == TokenClass.sign:
         if token.value == "{":
-            return State.device
+            return State.block
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
-        return State.deviceStart
+        return State.blockStart
     return State.undefined
 
 
@@ -90,9 +89,9 @@ def accolade_end(token: Token):
     return State.undefined
 
 
-def device(token: Token):
+def block(token: Token):
     if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
-        return State.device
+        return State.block
     return State.undefined
 
 

@@ -7,6 +7,7 @@ from parsetree.parse_tree import ParseTree
 from parsetree.tree_composer import TreeComposer
 from semanticanalyzer.symbol_table import SymbolTable
 from semanticanalyzer.semantic_analyzer import SemanticAnalyzer
+from syntaxer.phrase_builder import phrase_builder
 from typing import List
 
 
@@ -21,27 +22,15 @@ operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.parameter, {
     State.parameter: rules.parameter
 })
 
-expressionMachine = SyntaxerStateMachine(PhraseClass.expression, State.accoladeOpenSign, {
-    State.begin: rules.first_word,
-    State.firstWord: rules.equal_sign,
-    State.equalSign: rules.accolade_open_sign,
-    State.accoladeOpenSign: rules.accolade_open_sign
-})
-
 commentMachine = SyntaxerStateMachine(PhraseClass.comment, State.comment, {
     State.begin: rules.comment_start,
     State.comment: rules.comment_end,
 })
 
-bodyMachine = SyntaxerStateMachine(PhraseClass.body, State.body, {
-    State.begin: rules.body_start,
-    State.body: rules.body
-})
-
-deviceMachine = SyntaxerStateMachine(PhraseClass.device, State.device, {
-    State.begin: rules.device_start,
-    State.deviceStart: rules.device_end,
-    State.device: rules.device
+blockMachine = SyntaxerStateMachine(PhraseClass.block, State.block, {
+    State.begin: rules.block_start,
+    State.blockStart: rules.block_end,
+    State.block: rules.block
 })
 
 blockCloseMachine = SyntaxerStateMachine(PhraseClass.blockClose, State.accoladeCloseSign, {
@@ -56,10 +45,8 @@ labelMachine = SyntaxerStateMachine(PhraseClass.label, State.label, {
 
 machines = {
     operatorMachine,
-    expressionMachine,
     commentMachine,
-    bodyMachine,
-    deviceMachine,
+    blockMachine,
     blockCloseMachine,
     labelMachine
 }
@@ -91,7 +78,7 @@ def process_tokens(tree: ParseTree, table: SymbolTable, tokens: List[Token]):
         if not active_machines:
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
-                    recognized_phrase = Phrase(phrase_class=machine.name, params=temp_phrase.copy())
+                    recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase)
                     sem_analyzer.process_phrase(recognized_phrase)
                     tree_composer.add_phrase(recognized_phrase)
                     machine_found = True
