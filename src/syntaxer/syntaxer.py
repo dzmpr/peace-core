@@ -91,7 +91,7 @@ def process_tokens(tree: ParseTree, table: SymbolTable, tokens: List[Token]):
         if not active_machines:
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
-                    recognized_phrase = Phrase(machine.name, temp_phrase.copy())
+                    recognized_phrase = Phrase(phrase_class=machine.name, params=temp_phrase.copy())
                     sem_analyzer.process_phrase(recognized_phrase)
                     tree_composer.add_phrase(recognized_phrase)
                     machine_found = True
