@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Union
 from lexer.token import Token
 
 
@@ -12,10 +12,6 @@ class PhraseClass(Enum):
     comment = 2
     label = 3
     blockClose = 4
-    # Deprecated
-    expression = 5
-    body = 6
-    device = 7
 
 
 class PhraseSubclass(Enum):
@@ -29,7 +25,11 @@ class PhraseSubclass(Enum):
 
 
 class Phrase:
-    def __init__(self, phrase_class: PhraseClass, phrase_subclass: PhraseSubclass or None = None, keyword: Token or None = None, params: List[Token] or None = None):
+    def __init__(self,
+                 phrase_class: PhraseClass,
+                 phrase_subclass: Union[PhraseSubclass, None] = None,
+                 keyword: Union[Token, None] = None,
+                 params: Union[List[Token], None] = None):
         self.phrase_class = phrase_class
         self.phrase_subclass = phrase_subclass
         self.keyword = keyword
