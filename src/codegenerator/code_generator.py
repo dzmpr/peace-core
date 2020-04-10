@@ -1,5 +1,5 @@
 from codegenerator.line_composer import LineComposer
-from syntaxer.phrase import Phrase, PhraseClass
+from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from parsetree.parse_tree import ParseTree, TreeTraverse
 from typing import TextIO, Callable
 
@@ -22,7 +22,7 @@ class CodeGenerator:
         if phrase.phrase_class == PhraseClass.label:
             self.lc.add_label(phrase)
         else:
-            if phrase.phrase_class == PhraseClass.body or phrase.phrase_class == PhraseClass.device:
+            if phrase.phrase_subclass == PhraseSubclass.body or phrase.phrase_subclass == PhraseSubclass.device:
                 self.lc.block_open(phrase)
             elif phrase.phrase_class == PhraseClass.operator:
                 self.lc.compose_line(phrase)

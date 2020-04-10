@@ -1,4 +1,4 @@
-from syntaxer.phrase import Phrase, PhraseClass
+from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from typing import List, Callable, Any
 
 
@@ -17,7 +17,7 @@ class Node:
 
 class ParseTree:
     def __init__(self):
-        self.root: Node = Node(None, None)
+        self.root: Node = Node(None, Phrase(PhraseClass.block, PhraseSubclass.program))
         self.head: Node = self.root
 
     def add_leaf(self, phrase: Phrase):
@@ -29,10 +29,13 @@ class ParseTree:
     def submerge(self, index=-1):
         self.head = self.head.nodes[index]
 
-    def get_head_class(self) -> PhraseClass or None:
-        if self.head.data is not None:
-            return self.head.data.phrase_class
-        return None
+    def get_context(self) -> PhraseSubclass:
+        current = self.head
+        while (current.data.phrase_subclass != PhraseSubclass.program and
+               current.data.phrase_subclass != PhraseSubclass.body and
+               current.data.phrase_subclass != PhraseSubclass.expression):
+            current = current.parent
+        return current.data.phrase_subclass
 
     def get_head(self) -> Node:
         return self.head
@@ -71,4 +74,3 @@ class TreeTraverse:
                     self._stack.append(self._index)
                     self._branch_head = self._temp
                     self._index = 0
-
