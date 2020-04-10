@@ -31,13 +31,10 @@ class ParseTree:
 
     def get_context(self) -> PhraseSubclass:
         current = self.head
-        while current.parent is not None:
-            if (current.parent.data.phrase_subclass != PhraseSubclass.program and
-                    current.parent.data.phrase_subclass != PhraseSubclass.body and
-                    current.parent.data.phrase_subclass != PhraseSubclass.expression):
-                current = current.parent
-            else:
-                return current.parent.data.phrase_subclass
+        while (current.data.phrase_subclass != PhraseSubclass.program and
+               current.data.phrase_subclass != PhraseSubclass.body and
+               current.data.phrase_subclass != PhraseSubclass.expression):
+            current = current.parent
         return current.data.phrase_subclass
 
     def get_head(self) -> Node:
