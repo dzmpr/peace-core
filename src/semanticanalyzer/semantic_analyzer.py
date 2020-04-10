@@ -1,5 +1,5 @@
 from parsetree.parse_tree import ParseTree
-from semanticanalyzer.symbol_table import SymbolTable, Symbol
+from semanticanalyzer.symbol_table import SymbolTable
 from syntaxer.phrase import Phrase, PhraseClass
 
 
@@ -20,7 +20,7 @@ class SemanticAnalyzer:
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_subclass)
             else:
-                raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_subclass.name}.")
+                raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_class.name}.")
 
         elif phrase.phrase_class == PhraseClass.label:
             identifier: str = phrase.keyword.value
