@@ -1,15 +1,15 @@
 main {
     label:
-    gen(5,1)
-    gen(5,1)
-    q(BUF)
-    var(112)
-    varinit(22)
-    compare(33)
+    gen("5,1")
+    gen("5,1")
+    q("BUF")
+    var("112")
+    varinit("22")
+    compare("33")
     MEM {
-        dq(BUF)
-        delay(7)
+        dq("BUF")
+        delay("7")
     }
-    destroy(1)
-    init(40)
+    destroy("1")
+    init("40")
 }
