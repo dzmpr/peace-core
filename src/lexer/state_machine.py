@@ -17,6 +17,8 @@ class State(Enum):
     sign = 9
     newline = 10
     tab = 11
+    str_start = 12
+    str_end = 13
     keyword = 100
     firstWord = 101
     secondWord = 102
@@ -35,7 +37,8 @@ class StateMachine:
     def __init__(self, name, rules):
         self.rules = rules
         self.name = name
-        self.reset_state()
+        self.prevState = State.begin
+        self.state = State.begin
 
     def __repr__(self):
         return self.name.name
