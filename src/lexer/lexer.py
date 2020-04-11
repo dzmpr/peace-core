@@ -5,7 +5,7 @@ from typing import List
 
 
 wordMachine = StateMachine(TokenClass.word, {
-    State.begin: rules.charStart,
+    State.begin: rules.char_start,
     State.char: rules.char
 })
 
@@ -13,6 +13,12 @@ paramMachine = StateMachine(TokenClass.parameter, {
     State.begin: rules.open,
     State.openBrace: rules.opened,
     State.closeBrace: rules.closed
+})
+
+stringMachine = StateMachine(TokenClass.string, {
+    State.begin: rules.str_start,
+    State.str_start: rules.str_body,
+    State.str_end: rules.undefined
 })
 
 spaceMachine = StateMachine(TokenClass.space, {
@@ -47,7 +53,8 @@ machines = {
     tabMachine,
     numberMachine,
     signMachine,
-    newlineMachine
+    newlineMachine,
+    stringMachine
 }
 
 
