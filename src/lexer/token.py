@@ -5,13 +5,14 @@ class TokenClass(Enum):
     def __repr__(self):
         return self.name
 
-    word = 0
-    parameter = 1
-    space = 2
-    num = 3
-    sign = 4
-    newline = 5
-    undefined = 6
+    undefined = 0
+    word = 1
+    parameter = 2
+    space = 3
+    num = 4
+    sign = 5
+    newline = 6
+    string = 7
 
 
 class Token:

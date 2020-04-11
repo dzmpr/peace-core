@@ -1,6 +1,6 @@
 from lexer.state_machine import State
 
-signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]", "{", "}", ":"]
+signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]", "{", "}", ":", ","]
 
 
 def char(char):
@@ -9,7 +9,7 @@ def char(char):
     return State.undefined
 
 
-def charStart(char):
+def char_start(char):
     if char.isalpha():
         return State.char
     return State.undefined
@@ -68,4 +68,18 @@ def sign(char):
 def newline(char):
     if char == "\n":
         return State.newline
+    return State.undefined
+
+
+def str_start(char):
+    if char == "\"":
+        return State.str_start
+    return State.undefined
+
+
+def str_body(char):
+    if char.isalnum() or char in signList:
+        return State.str_start
+    elif char == "\"":
+        return State.str_end
     return State.undefined
