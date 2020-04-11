@@ -1,5 +1,7 @@
 import argparse
 import os
+from sys import exit
+from typing import TextIO
 from lexer import lexer
 from lexer.token import Token, TokenClass
 from syntaxer import syntaxer
@@ -8,7 +10,6 @@ from codegenerator.code_generator import CodeGenerator
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
 from semanticanalyzer.semantic_analyzer import SemanticError
-from typing import TextIO
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pce files into .gpss.")
 parser.add_argument(
