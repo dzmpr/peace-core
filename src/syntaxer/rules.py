@@ -51,7 +51,7 @@ def comment_end(token: Token):
 def keyword(token: Token):
     if token.token_class == TokenClass.word:
         if token.value in operators:
-            return State.keyword
+            return State.openBrace
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
@@ -103,13 +103,39 @@ def first_word(token: Token):
     return State.undefined
 
 
+def open_brace(token: Token):
+    if token.token_class == TokenClass.sign:
+        if token.value == "(":
+            return State.parameter
+    elif token.token_class == TokenClass.space:
+        return State.openBrace
+    return State.undefined
+
+
 def parameter(token: Token):
-    if token.token_class == TokenClass.parameter:
-        return State.parameter
+    if (token.token_class == TokenClass.word or
+            token.token_class == TokenClass.num or
+            token.token_class == TokenClass.string):
+        return State.sign
     elif token.token_class == TokenClass.space:
         return State.parameter
-    elif token.token_class == TokenClass.newline:
-        return State.parameter
+    return State.undefined
+
+
+def param_sign(token: Token):
+    if token.token_class == TokenClass.sign:
+        if token.value == ",":
+            return State.parameter
+        elif token.value == ")":
+            return State.operator_end
+    elif token.token_class == TokenClass.space:
+        return State.sign
+    return State.undefined
+
+
+def operator_end(token: Token):
+    if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
+        return State.operator_end
     return State.undefined
 
 

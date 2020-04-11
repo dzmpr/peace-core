@@ -16,10 +16,12 @@ class SyntaxParseError(Exception):
         self.msg = msg
 
 
-operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.parameter, {
+operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.operator_end, {
     State.begin: rules.keyword,
-    State.keyword: rules.parameter,
-    State.parameter: rules.parameter
+    State.openBrace: rules.open_brace,
+    State.parameter: rules.parameter,
+    State.sign: rules.param_sign,
+    State.operator_end: rules.operator_end
 })
 
 commentMachine = SyntaxerStateMachine(PhraseClass.comment, State.comment, {
