@@ -1,6 +1,7 @@
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
 from syntaxer.phrase import Phrase, PhraseClass
+from lexer.token import TokenClass
 
 
 class SemanticError(Exception):
@@ -13,8 +14,12 @@ class SemanticAnalyzer:
         self.tree: ParseTree = tree
         self.table: SymbolTable = symbol_table
 
-    # TODO: First version (without scope-dependent check), to be refactored
     def process_phrase(self, phrase: Phrase):
+        self._name_processing(phrase)
+        self._argument_check(phrase)
+
+    # TODO: First version (without scope-dependent check), to be refactored
+    def _name_processing(self, phrase: Phrase):
         if phrase.phrase_class == PhraseClass.block:
             identifier: str = phrase.keyword.value
             if not self.table.is_symbol_presence(identifier):
@@ -40,3 +45,12 @@ class SemanticAnalyzer:
             elif operator == "dq":
                 if not self.table.is_symbol_presence(identifier):
                     raise SemanticError(f"Name \"{identifier}\" was never defined.")
+
+    def _argument_check(self, phrase: Phrase):
+        if phrase.phrase_class == PhraseClass.operator:
+            if phrase.keyword.value == "q" or phrase.keyword.value == "dq":
+                if phrase.params[0].token_class != TokenClass.word:
+                    raise SemanticError(f"Wrong argument for {phrase.phrase_class.name}, expected word.")
+
+            if len(phrase.params) > 1:
+                raise SemanticError(f"Found operator with {len(phrase.params)} arguments, but expected 1.")
