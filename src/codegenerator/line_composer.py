@@ -1,5 +1,6 @@
 from syntaxer.rules import operators
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
+from lexer.token import TokenClass
 
 
 class LineComposer:
@@ -17,7 +18,10 @@ class LineComposer:
     def compose_line(self, phrase: Phrase):
         line = self.template
         self.keyword = operators[phrase.keyword.value]
-        self.parameters = phrase.params[0].value[1:-1]
+        if phrase.params[0].token_class == TokenClass.word:
+            self.parameters = phrase.params[0].value
+        else:
+            self.parameters = phrase.params[0].value[1:-1]
         self.line = line.format(self.label, self.keyword, self.parameters)
 
     def reset_content(self):
