@@ -1,5 +1,21 @@
 from syntaxer.rules import operators
-from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
+from syntaxer.phrase import Phrase, PhraseSubclass
+from lexer.token import Token, TokenClass
+from typing import List
+
+
+def parameter_composer(params: List[Token]) -> str:
+    if params[0].token_class == TokenClass.string:
+        result = params[0].value[1:-1]
+    else:
+        result = params[0].value
+    for i in range(1, len(params)):
+        result += ","
+        if params[i].token_class == TokenClass.string:
+            result += params[i].value[1:-1]
+        else:
+            result += params[i].value
+    return result
 
 
 class LineComposer:
@@ -17,7 +33,8 @@ class LineComposer:
     def compose_line(self, phrase: Phrase):
         line = self.template
         self.keyword = operators[phrase.keyword.value]
-        self.parameters = phrase.params[0].value[1:-1]
+        if len(phrase.params):
+            self.parameters = parameter_composer(phrase.params)
         self.line = line.format(self.label, self.keyword, self.parameters)
 
     def reset_content(self):

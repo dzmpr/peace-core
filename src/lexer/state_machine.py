@@ -19,6 +19,7 @@ class State(Enum):
     tab = 11
     str_start = 12
     str_end = 13
+    operator_end = 14
     keyword = 100
     firstWord = 101
     secondWord = 102

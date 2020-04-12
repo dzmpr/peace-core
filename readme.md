@@ -24,53 +24,53 @@ Source code not indentation dependent. Each line should contain one statement. P
 ### Operators
 * ADVANCE
   ```
-  delay(*params*)
-  ADVANCE *params*
+  delay(number[, number])
+  ADVANCE number[, number]
   ```
 * GENERATE
   ```
-  gen(*params*)
-  GENERATE *params*
+  gen("params")
+  GENERATE "params"
   ```
 * QUEUE
   ```
-  q(queuename)
-  QUEUE queuename
+  q(word)
+  QUEUE word
   ```
 * DEPART
   ```
-  dq(queuename)
-  DEPART queuename
+  dq(word)
+  DEPART word
   ```
 * SAVEVALUE
   ```
-  var(*params*)
-  SAVEVALUE *params*
+  var("params")
+  SAVEVALUE "params"
   ```
 * INITIAL
   ```
-  varinit(*params*)
-  INITIAL *params*
+  varinit("params")
+  INITIAL "params"
   ```
 * TERMINATE
   ```
-  destroy(*params*)
-  TERMINATE(*params*)
+  destroy([number])
+  TERMINATE [number]
   ```
 * START
   ```
-  init(*params*)
-  START *params*
+  init(number)
+  START number
   ```
 * TEST
   ```
-  compare(*params*)
-  TEST *params*
+  compare("params")
+  TEST params
   ```
 * TRANSFER
   ```
-  goto(*params*)
-  TRANSFER *params*
+  goto("params")
+  TRANSFER params
   ```
 
 ### Labels

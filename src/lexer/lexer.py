@@ -9,12 +9,6 @@ wordMachine = StateMachine(TokenClass.word, {
     State.char: rules.char
 })
 
-paramMachine = StateMachine(TokenClass.parameter, {
-    State.begin: rules.open,
-    State.openBrace: rules.opened,
-    State.closeBrace: rules.closed
-})
-
 stringMachine = StateMachine(TokenClass.string, {
     State.begin: rules.str_start,
     State.str_start: rules.str_body,
@@ -48,7 +42,6 @@ newlineMachine = StateMachine(TokenClass.newline, {
 
 machines = {
     wordMachine,
-    paramMachine,
     spaceMachine,
     tabMachine,
     numberMachine,
