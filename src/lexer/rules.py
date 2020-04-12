@@ -24,7 +24,7 @@ def open(char):
 def opened(char):
     if char == " ":
         return State.openBrace
-    elif char.isalnum():
+    elif char.isalnum() or char in signList:
         return State.openBrace
     elif char == ",":
         return State.openBrace
