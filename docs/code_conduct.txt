@@ -3,9 +3,9 @@
 #       ...     -> *contents*
 # }             -> END
 #
-# value           -- one numerical GPSS operand
+# number          -- one numerical GPSS operand
+# word            -- word
 # "parameters"    -- string with GPSS operands
-# name            -- word
 
 
 # Program body statement
@@ -26,15 +26,15 @@ exprName {
 }
 
 # Delay statement
-delay("parameters")	    -> ADVANCE parameters
+delay(number[, number])	-> ADVANCE number[, number]
 
 
 # Queue start statement
-q (name)	            -> QUEUE name
+q (word)	            -> QUEUE word
 
 
 # Queue exit statement
-dq (name)	            -> DEPART name
+dq (word)	            -> DEPART word
 
 
 # Generate statement
@@ -42,11 +42,11 @@ gen ("parameters")      -> GENERATE parameters
 
 
 # Start statement
-init (value)          -> START value
+init (number)          -> START number
 
 
 # Terminate statement
-destroy (value)       -> TERMINATE value
+destroy ([number])       -> TERMINATE [number]
 
 
 # Transfer statement
