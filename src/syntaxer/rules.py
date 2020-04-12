@@ -119,6 +119,9 @@ def parameter(token: Token):
         return State.sign
     elif token.token_class == TokenClass.space:
         return State.parameter
+    elif token.token_class == TokenClass.sign:
+        if token.value == ")":
+            return State.operator_end
     return State.undefined
 
 
