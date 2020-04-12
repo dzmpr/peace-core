@@ -48,9 +48,35 @@ class SemanticAnalyzer:
 
     def _argument_check(self, phrase: Phrase):
         if phrase.phrase_class == PhraseClass.operator:
-            if phrase.keyword.value == "q" or phrase.keyword.value == "dq":
-                if phrase.params[0].token_class != TokenClass.word:
-                    raise SemanticError(f"Wrong argument for {phrase.phrase_class.name}, expected word.")
+            keyword = phrase.keyword.value
+            if keyword == "q" or keyword == "dq":
+                if len(phrase.params):
+                    if phrase.params[0].token_class != TokenClass.word:
+                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected word.")
+                else:
+                    raise SemanticError(f"Found \"{keyword}\" operator with {len(phrase.params)} arguments, but expected 1.")
 
-            if len(phrase.params) > 1:
-                raise SemanticError(f"Found operator with {len(phrase.params)} arguments, but expected 1.")
+            elif keyword == "init":
+                if len(phrase.params):
+                    if phrase.params[0].token_class != TokenClass.num:
+                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected number.")
+                else:
+                    raise SemanticError(f"Found \"{keyword}\" operator with {len(phrase.params)} arguments, but expected 1.")
+
+            elif keyword == "destroy":
+                if len(phrase.params) < 2:
+                    if phrase.params[0].token_class != TokenClass.num:
+                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected number.")
+                else:
+                    raise SemanticError(f"Found \"{keyword}\" operator with {len(phrase.params)} arguments, but expected 0-1.")
+
+            elif keyword == "delay":
+                if len(phrase.params) and len(phrase.params) < 3:
+                    for param in phrase.params:
+                        if param.token_class != TokenClass.num:
+                            raise SemanticError(f"Wrong argument for \"{keyword}\", expected number.")
+                else:
+                    raise SemanticError(f"Found \"{keyword}\" operator with {len(phrase.params)} arguments, but expected 1-2.")
+
+            elif len(phrase.params) > 1:
+                raise SemanticError(f"Found \"{keyword}\" operator with {len(phrase.params)} arguments, but expected 1.")
