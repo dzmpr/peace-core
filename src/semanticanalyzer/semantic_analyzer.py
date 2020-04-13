@@ -2,7 +2,6 @@ from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from syntaxer.lang_dict import LangDict, SignatureType
-from lexer.token import TokenClass
 
 
 class SemanticError(Exception):
@@ -48,7 +47,8 @@ class SemanticAnalyzer:
                             if not self.table.is_symbol_presence(identifier):
                                 self.table.add_symbol(identifier, phrase.phrase_class)
                             else:
-                                raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_class.name}.")
+                                raise SemanticError(f"Naming error. Name \"{identifier}\" already used "
+                                                    f"by {self.table.get_symbol(identifier).phrase_class.name}.")
                         elif operator == "dq":
                             if not self.table.is_symbol_presence(identifier):
                                 raise SemanticError(f"Name \"{identifier}\" was never defined.")
