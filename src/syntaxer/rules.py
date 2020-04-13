@@ -50,8 +50,7 @@ def comment_end(token: Token):
 
 def keyword(token: Token):
     if token.token_class == TokenClass.word:
-        if token.value in operators:
-            return State.openBrace
+        return State.openBrace
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     return State.undefined
