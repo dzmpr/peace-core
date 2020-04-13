@@ -4,7 +4,7 @@ main {
     gen(5,1)
     q(BUF)
     var(112)
-    varinit(22)
+    changevar(22)
     compare(33)
     MEM {
         dq(BUF)
