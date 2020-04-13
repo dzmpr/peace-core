@@ -103,3 +103,4 @@ if arguments.so:
 output_file: TextIO = open(path[:-3] + "gpss", "w")
 cg = CodeGenerator(parse_tree, lang_dict, output_file)
 cg.compile()
+output_file.close()
