@@ -48,6 +48,16 @@ if os.stat(path).st_size == 0:
 
 # Language dictionary
 lang_dict = LangDict()
+lang_dict.add_word("q", SignatureType.operator, "QUEUE")
+lang_dict.add_word("dq", SignatureType.operator, "DEPART")
+lang_dict.add_word("gen", SignatureType.operator, "GENERATE")
+lang_dict.add_word("init", SignatureType.operator, "START")
+lang_dict.add_word("delay", SignatureType.operator, "ADVANCE")
+lang_dict.add_word("destroy", SignatureType.operator, "TERMINATE")
+lang_dict.add_word("goto", SignatureType.operator, "TRANSFER")
+lang_dict.add_word("compare", SignatureType.operator, "TEST")
+lang_dict.add_word("changevar", SignatureType.operator, "SAVEVALUE")
+lang_dict.add_word("var", SignatureType.operator, "INITIAL")
 
 
 temp = []
@@ -91,5 +101,5 @@ if arguments.so:
 
 # Code generator
 output_file: TextIO = open(path[:-3] + "gpss", "w")
-cg = CodeGenerator(parse_tree, output_file)
-cg.generate()
+cg = CodeGenerator(parse_tree, lang_dict, output_file)
+cg.compile()
