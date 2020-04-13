@@ -15,11 +15,11 @@ Source code not indentation dependent. Each line should contain one statement. P
   ```
   Used **inside main** block. Will be translated to SEIZE and RELEASE operators.
 
-* Expression block (*will be implemented soon*)
+* Expression block
   ```
   exprname {...}
   ```
-  Used **outside main** block. This block declares expression which be translated to inner representation which can be used across programm inside *main* block. Allowed to use inside expression block special characters which will be replaced with arguments passed to this expression in call place. Expression name should be unique across file, but can be the same with name of device or queue.
+  Used **outside main** block. This block declares expression which be translated to inner representation which can be used across programm inside *main* or another *expression* block. Expression name should be unique across file, but can be the same with name of device or queue. Allowed to use inside expression block special characters which will be replaced with arguments passed to this expression in call place (*not implemented yet*).
   
 ### Operators
 * ADVANCE
@@ -89,6 +89,6 @@ Comments specifying with **#** symbol. Comment lasts to the end of line. They ha
 ## Goals
 - [x] Make a tree-based intermediate representation
 - [ ] Make scope dependent naming
-- [ ] Implement expressions
+- [x] Implement expressions
 - [ ] Implement expressions with substitutions
 - [ ] Limit naming according GPSS rules
