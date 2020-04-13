@@ -44,12 +44,12 @@ Source code not indentation dependent. Each line should contain one statement. P
   ```
 * SAVEVALUE
   ```
-  var(*params*)
+  changevar(*params*)
   SAVEVALUE *params*
   ```
 * INITIAL
   ```
-  varinit(*params*)
+  var(*params*)
   INITIAL *params*
   ```
 * TERMINATE
