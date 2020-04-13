@@ -1,37 +1,6 @@
 from lexer.state_machine import State
 from lexer.token import TokenClass, Token
 
-operators = {
-    "q": "QUEUE",
-    "dq": "DEPART",
-    "gen": "GENERATE",
-    "init": "START",
-    "delay": "ADVANCE",
-    "destroy": "TERMINATE",
-    "goto": "TRANSFER",
-    "compare": "TEST",
-    "changevar": "SAVEVALUE",
-    "var": "INITIAL"
-}
-
-
-def body_start(token: Token):
-    if token.token_class == TokenClass.word:
-        if token.value == "main":
-            return State.body
-    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
-        return State.begin
-    return State.undefined
-
-
-def body(token: Token):
-    if token.token_class == TokenClass.sign:
-        if token.value == "{":
-            return State.body
-    elif token.token_class == TokenClass.space or token.value == TokenClass.newline:
-        return State.body
-    return State.undefined
-
 
 def comment_start(token: Token):
     if token.token_class == TokenClass.sign:
@@ -94,14 +63,6 @@ def block(token: Token):
     return State.undefined
 
 
-def first_word(token: Token):
-    if token.token_class == TokenClass.word:
-        return State.firstWord
-    elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
-        return State.begin
-    return State.undefined
-
-
 def open_brace(token: Token):
     if token.token_class == TokenClass.sign:
         if token.value == "(":
@@ -142,24 +103,6 @@ def operator_end(token: Token):
 
 
 def undefined(token: Token):
-    return State.undefined
-
-
-def equal_sign(token: Token):
-    if token.token_class == TokenClass.sign:
-        if token.value == "=":
-            return State.equalSign
-    elif token.token_class == TokenClass.space:
-        return State.firstWord
-    return State.undefined
-
-
-def accolade_open_sign(token: Token):
-    if token.token_class == TokenClass.sign:
-        if token.value == "{":
-            return State.accoladeOpenSign
-    elif token.token_class == TokenClass.space:
-        return State.equalSign
     return State.undefined
 
 
