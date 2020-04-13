@@ -6,6 +6,7 @@ from lexer import lexer
 from lexer.token import Token, TokenClass
 from syntaxer import syntaxer
 from syntaxer.syntaxer import SyntaxParseError
+from syntaxer.lang_dict import LangDict, SignatureType
 from codegenerator.code_generator import CodeGenerator
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
@@ -45,6 +46,10 @@ if os.stat(path).st_size == 0:
     print("File is empty.")
     exit(1)
 
+# Language dictionary
+lang_dict = LangDict()
+
+
 temp = []
 file: TextIO = open(path, "r")
 for row in file:
@@ -71,7 +76,7 @@ symbol_table = SymbolTable()
 
 # Process tokens with syntax analyzer
 try:
-    syntaxer.process_tokens(parse_tree, symbol_table, result)
+    syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, result)
 except SyntaxParseError as error:
     print(error.msg)
     exit(2)
