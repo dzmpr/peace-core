@@ -5,7 +5,7 @@ main {
     q(BUF)
     var("STUFF")
     varinit("STUFF")
-    compare("STUFF")
+    compare(GE,"STUFF")
     MEM {
         dq(BUF)
         delay(7,1)

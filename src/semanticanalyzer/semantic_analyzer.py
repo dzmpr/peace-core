@@ -81,5 +81,14 @@ class SemanticAnalyzer:
                 else:
                     raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 1-2.")
 
+            elif keyword == "compare":
+                if param_num == 2:
+                    if phrase.params[0].token_class != TokenClass.word:
+                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected word.")
+                    if phrase.params[1].token_class != TokenClass.string:
+                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected string.")
+                else:
+                    raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 2.")
+
             elif param_num > 1:
                 raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 1.")
