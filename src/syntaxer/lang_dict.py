@@ -9,9 +9,16 @@ class SignatureType(Enum):
 
 
 class Signature:
-    def __init__(self, signature_type: SignatureType, output: str, params: Union[List[TokenClass], None] = None):
+    def __init__(self,
+                 signature_type: SignatureType,
+                 output: str,
+                 req_params: int,
+                 max_params: int,
+                 params: List[TokenClass]):
         self.signature_type = signature_type
         self.output = output
+        self.req_params = req_params
+        self.max_params = max_params
         self.params = params
 
 
@@ -23,8 +30,11 @@ class LangDict:
                  definition: str,
                  signature_type: SignatureType,
                  output: str,
+                 req_params: int,
                  params: Union[List[TokenClass], None] = None):
-        self.ld[definition] = Signature(signature_type, output, params)
+        if params is None:
+            params = list()
+        self.ld[definition] = Signature(signature_type, output, req_params, len(params), params)
 
     def get_signature(self, definition: str) -> Signature:
         return self.ld[definition]

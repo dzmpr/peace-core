@@ -48,16 +48,38 @@ if os.stat(path).st_size == 0:
 
 # Language dictionary
 lang_dict = LangDict()
-lang_dict.add_word("q", SignatureType.operator, "QUEUE")
-lang_dict.add_word("dq", SignatureType.operator, "DEPART")
-lang_dict.add_word("gen", SignatureType.operator, "GENERATE")
-lang_dict.add_word("init", SignatureType.operator, "START")
-lang_dict.add_word("delay", SignatureType.operator, "ADVANCE")
-lang_dict.add_word("destroy", SignatureType.operator, "TERMINATE")
-lang_dict.add_word("goto", SignatureType.operator, "TRANSFER")
-lang_dict.add_word("compare", SignatureType.operator, "TEST")
-lang_dict.add_word("changevar", SignatureType.operator, "SAVEVALUE")
-lang_dict.add_word("var", SignatureType.operator, "INITIAL")
+lang_dict.add_word("q", SignatureType.operator, "QUEUE", 1, [
+    TokenClass.word
+])
+lang_dict.add_word("dq", SignatureType.operator, "DEPART", 1, [
+    TokenClass.word
+])
+lang_dict.add_word("gen", SignatureType.operator, "GENERATE", 1, [
+    TokenClass.string
+])
+lang_dict.add_word("init", SignatureType.operator, "START", 1, [
+    TokenClass.num
+])
+lang_dict.add_word("delay", SignatureType.operator, "ADVANCE", 1, [
+    TokenClass.num,
+    TokenClass.num
+])
+lang_dict.add_word("destroy", SignatureType.operator, "TERMINATE", 0, [
+    TokenClass.num
+])
+lang_dict.add_word("goto", SignatureType.operator, "TRANSFER", 1, [
+    TokenClass.string
+])
+lang_dict.add_word("compare", SignatureType.operator, "TEST", 2, [
+    TokenClass.word,
+    TokenClass.string
+])
+lang_dict.add_word("changevar", SignatureType.operator, "SAVEVALUE", 1, [
+    TokenClass.string
+])
+lang_dict.add_word("var", SignatureType.operator, "INITIAL", 1, [
+    TokenClass.string
+])
 
 
 temp = []
