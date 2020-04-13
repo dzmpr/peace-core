@@ -19,7 +19,7 @@ class SemanticAnalyzer:
     def process_phrase(self, phrase: Phrase):
         self._name_processing(phrase)
         self._signature_recorder(phrase)
-        self._argument_check(phrase)
+        self._params_check(phrase)
 
     # TODO: First version (without scope-dependent check), to be refactored
     def _name_processing(self, phrase: Phrase):
@@ -55,52 +55,21 @@ class SemanticAnalyzer:
             else:
                 raise SemanticError(f"Unknown operator \"{operator}\".")
 
-    def _argument_check(self, phrase: Phrase):
+    def _params_check(self, phrase: Phrase):
         if phrase.phrase_class == PhraseClass.operator:
             keyword = phrase.keyword.value
-            param_num = len(phrase.params)
-            if keyword == "q" or keyword == "dq":
-                if param_num:
-                    if phrase.params[0].token_class != TokenClass.word:
-                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected word.")
-                else:
-                    raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 1.")
-
-            elif keyword == "init":
-                if param_num and param_num < 2:
-                    if phrase.params[0].token_class != TokenClass.num:
-                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected number.")
-                else:
-                    raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 1.")
-
-            elif keyword == "destroy":
-                if param_num < 2:
-                    if param_num:
-                        if phrase.params[0].token_class != TokenClass.num:
-                            raise SemanticError(f"Wrong argument for \"{keyword}\", expected number.")
-                else:
-                    raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 0-1.")
-
-            elif keyword == "delay":
-                if param_num and param_num < 3:
-                    for param in phrase.params:
-                        if param.token_class != TokenClass.num:
-                            raise SemanticError(f"Wrong argument for \"{keyword}\", expected number.")
-                else:
-                    raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 1-2.")
-
-            elif keyword == "compare":
-                if param_num == 2:
-                    if phrase.params[0].token_class != TokenClass.word:
-                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected word.")
-                    if phrase.params[1].token_class != TokenClass.string:
-                        raise SemanticError(f"Wrong argument for \"{keyword}\", expected string.")
-                else:
-                    raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 2.")
-
-            elif param_num > 1:
-                raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 1.")
+            op_signature = self.lang_dict.get_signature(keyword)
+            params_num = len(phrase.params)
+            if op_signature.req_params <= params_num <= op_signature.max_params:
+                for i in range(params_num):
+                    if phrase.params[i].token_class != op_signature.params[i]:
+                        raise SemanticError(f"Wrong parameter for \"{keyword}\", "
+                                            f"expected {op_signature.params[i].name} "
+                                            f"but found {phrase.params[i].token_class.name}.")
+            else:
+                raise SemanticError(f"Found \"{keyword}\" operator with {params_num} "
+                                    f"parameters, but expected {op_signature.req_params}-{op_signature.max_params}.")
 
     def _signature_recorder(self, phrase: Phrase):
         if phrase.phrase_subclass == PhraseSubclass.expression:
-            self.lang_dict.add_word(phrase.keyword.value, SignatureType.expression, "")
+            self.lang_dict.add_word(phrase.keyword.value, SignatureType.expression, "", 0)
