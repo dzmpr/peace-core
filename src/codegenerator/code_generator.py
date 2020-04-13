@@ -1,13 +1,15 @@
 from codegenerator.line_composer import LineComposer
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
-from parsetree.parse_tree import ParseTree, TreeTraverse
+from syntaxer.lang_dict import LangDict
+from parsetree.parse_tree import ParseTree, TreeTraverse, Node
 from typing import TextIO, Callable
 
 
 class CodeGenerator:
-    def __init__(self, tree: ParseTree, file: TextIO):
+    def __init__(self, tree: ParseTree, lang_dict: LangDict, file: TextIO):
         self._tree: ParseTree = tree
-        self.lc = LineComposer()
+        self._lang_dict: LangDict = lang_dict
+        self.lc = LineComposer(lang_dict)
         self._output: TextIO = file
         self._temp_expression: str = ""
         self._write: Callable[[str], None] = self.write_to_file
@@ -26,6 +28,8 @@ class CodeGenerator:
                 self.lc.block_open(phrase)
             elif phrase.phrase_class == PhraseClass.operator:
                 self.lc.compose_line(phrase)
+            elif phrase.phrase_subclass == PhraseSubclass.expression:
+                self.lc.stack.append("")
             self._write(self.lc.get_line())
             self.lc.reset_content()
 
@@ -33,13 +37,24 @@ class CodeGenerator:
         self.lc.close_block()
         self._write(self.lc.get_line())
 
-    def generate_expression(self) -> str:
+    def generate_expression(self, node) -> str:
         self._write = self.write_to_str
-        tree_traverse = TreeTraverse(self._tree.get_head(), self.phrase_processor, self.ascent)
+        tree_traverse = TreeTraverse(node, self.phrase_processor, self.ascent)
         tree_traverse.traverse()
         return self._temp_expression
 
-    def generate(self):
-        self._tree.submerge()
-        tree_traverse = TreeTraverse(self._tree.get_head(), self.phrase_processor, self.ascent)
+    def generate(self, node: Node):
+        self._write = self.write_to_file
+        tree_traverse = TreeTraverse(node, self.phrase_processor, self.ascent)
         tree_traverse.traverse()
+
+    def compile(self):
+        blocks = self._tree.get_head().nodes
+        for node in blocks:
+            if node.data.phrase_subclass == PhraseSubclass.body:
+                self.generate(node)
+            elif node.data.phrase_subclass == PhraseSubclass.expression:
+                self._lang_dict.set_output(node.data.keyword.value, self.generate_expression(node))
+                self._temp_expression = ""
+            elif node.data.phrase_class == PhraseClass.comment:
+                continue
