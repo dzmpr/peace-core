@@ -39,16 +39,21 @@ class SemanticAnalyzer:
 
         elif phrase.phrase_class == PhraseClass.operator:
             operator: str = phrase.keyword.value
-            if len(phrase.params):
-                identifier: str = phrase.params[0].value[1:-1]
-                if operator == "q":
-                    if not self.table.is_symbol_presence(identifier):
-                        self.table.add_symbol(identifier, phrase.phrase_class)
-                    else:
-                        raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_class.name}.")
-                elif operator == "dq":
-                    if not self.table.is_symbol_presence(identifier):
-                        raise SemanticError(f"Name \"{identifier}\" was never defined.")
+            if self.lang_dict.check_definition(operator):
+                sig_type = self.lang_dict.get_signature(operator).signature_type
+                if sig_type == SignatureType.operator:
+                    if len(phrase.params):
+                        identifier: str = phrase.params[0].value
+                        if operator == "q":
+                            if not self.table.is_symbol_presence(identifier):
+                                self.table.add_symbol(identifier, phrase.phrase_class)
+                            else:
+                                raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_class.name}.")
+                        elif operator == "dq":
+                            if not self.table.is_symbol_presence(identifier):
+                                raise SemanticError(f"Name \"{identifier}\" was never defined.")
+            else:
+                raise SemanticError(f"Unknown operator \"{operator}\".")
 
     def _argument_check(self, phrase: Phrase):
         if phrase.phrase_class == PhraseClass.operator:
