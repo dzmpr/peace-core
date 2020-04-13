@@ -14,7 +14,7 @@ class Signature:
                  output: str,
                  req_params: int,
                  max_params: int,
-                 params: Union[List[TokenClass], None] = None):
+                 params: List[TokenClass]):
         self.signature_type = signature_type
         self.output = output
         self.req_params = req_params
@@ -32,6 +32,8 @@ class LangDict:
                  output: str,
                  req_params: int,
                  params: Union[List[TokenClass], None] = None):
+        if params is None:
+            params = list()
         self.ld[definition] = Signature(signature_type, output, req_params, len(params), params)
 
     def get_signature(self, definition: str) -> Signature:
