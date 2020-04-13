@@ -4,7 +4,7 @@ main {
     gen("5,1")
     q(BUF)
     var("STUFF")
-    varinit("STUFF")
+    changevar("STUFF")
     compare(L,"STUFF")
     MEM {
         dq(BUF)

@@ -58,8 +58,8 @@ compare ("parameters")  -> TEST parameters
 
 
 # Savevalue statement
-var ("parameters")      -> SAVEVALUE parameters
+changevar ("parameters")-> SAVEVALUE parameters
 
 
 # Initial statement
-varinit ("parameters")  -> INITIAL parameters
+var ("parameters")      -> INITIAL parameters
