@@ -1,5 +1,5 @@
-from syntaxer.rules import operators
 from syntaxer.phrase import Phrase, PhraseSubclass
+from syntaxer.lang_dict import LangDict, SignatureType
 from lexer.token import Token, TokenClass
 from typing import List
 
@@ -28,7 +28,8 @@ def parameter_composer(params: List[Token], skip: int = 0) -> str:
 
 
 class LineComposer:
-    def __init__(self):
+    def __init__(self, lang_dict: LangDict):
+        self.lang_dict = lang_dict
         self.keyword: str = ""
         self.parameters: str = ""
         self.label: str = ""
@@ -39,16 +40,20 @@ class LineComposer:
         return self.line
 
     def compose_line(self, phrase: Phrase):
-        if phrase.keyword.value != "compare":
-            line = templates["regular"]
-            if len(phrase.params):
-                self.parameters = parameter_composer(phrase.params)
-            self.keyword = operators[phrase.keyword.value]
-        else:
-            line = templates["compare"]
-            self.parameters = parameter_composer(phrase.params, 1)
-            self.keyword = phrase.params[0].value
-        self.line = line.format(self.label, self.keyword, self.parameters)
+        phrase_signature = self.lang_dict.get_signature(phrase.keyword.value)
+        if phrase_signature.signature_type == SignatureType.operator:
+            if phrase.keyword.value != "compare":
+                line = templates["regular"]
+                if len(phrase.params):
+                    self.parameters = parameter_composer(phrase.params)
+                self.keyword = phrase_signature.output
+            else:
+                line = templates["compare"]
+                self.parameters = parameter_composer(phrase.params, 1)
+                self.keyword = phrase.params[0].value
+            self.line = line.format(self.label, self.keyword, self.parameters)
+        elif phrase_signature.signature_type == SignatureType.expression:
+            self.line = phrase_signature.output
 
     def reset_content(self):
         self.keyword = ""

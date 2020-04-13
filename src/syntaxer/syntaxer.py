@@ -8,6 +8,7 @@ from parsetree.tree_composer import TreeComposer
 from semanticanalyzer.symbol_table import SymbolTable
 from semanticanalyzer.semantic_analyzer import SemanticAnalyzer
 from syntaxer.phrase_builder import phrase_builder
+from syntaxer.lang_dict import LangDict
 from typing import List
 
 
@@ -54,14 +55,14 @@ machines = {
 }
 
 
-def process_tokens(tree: ParseTree, table: SymbolTable, tokens: List[Token]):
+def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tokens: List[Token]):
     active_machines: bool = False
     machine_found: bool = False
     token_index: int = 0
     line_counter: int = 0
     temp_phrase: List[Token] = []
     tree_composer = TreeComposer(tree)
-    sem_analyzer = SemanticAnalyzer(tree, table)
+    sem_analyzer = SemanticAnalyzer(tree, table, lang_dict)
 
     while token_index < len(tokens):
         token: Token = tokens[token_index]

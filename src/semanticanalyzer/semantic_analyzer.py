@@ -1,6 +1,7 @@
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
-from syntaxer.phrase import Phrase, PhraseClass
+from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
+from syntaxer.lang_dict import LangDict, SignatureType
 from lexer.token import TokenClass
 
 
@@ -10,12 +11,14 @@ class SemanticError(Exception):
 
 
 class SemanticAnalyzer:
-    def __init__(self, tree: ParseTree, symbol_table: SymbolTable):
+    def __init__(self, tree: ParseTree, symbol_table: SymbolTable, lang_dict: LangDict):
         self.tree: ParseTree = tree
         self.table: SymbolTable = symbol_table
+        self.lang_dict: LangDict = lang_dict
 
     def process_phrase(self, phrase: Phrase):
         self._name_processing(phrase)
+        self._signature_recorder(phrase)
         self._argument_check(phrase)
 
     # TODO: First version (without scope-dependent check), to be refactored
@@ -36,16 +39,21 @@ class SemanticAnalyzer:
 
         elif phrase.phrase_class == PhraseClass.operator:
             operator: str = phrase.keyword.value
-            if len(phrase.params):
-                identifier: str = phrase.params[0].value[1:-1]
-                if operator == "q":
-                    if not self.table.is_symbol_presence(identifier):
-                        self.table.add_symbol(identifier, phrase.phrase_class)
-                    else:
-                        raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_class.name}.")
-                elif operator == "dq":
-                    if not self.table.is_symbol_presence(identifier):
-                        raise SemanticError(f"Name \"{identifier}\" was never defined.")
+            if self.lang_dict.check_definition(operator):
+                sig_type = self.lang_dict.get_signature(operator).signature_type
+                if sig_type == SignatureType.operator:
+                    if len(phrase.params):
+                        identifier: str = phrase.params[0].value
+                        if operator == "q":
+                            if not self.table.is_symbol_presence(identifier):
+                                self.table.add_symbol(identifier, phrase.phrase_class)
+                            else:
+                                raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_class.name}.")
+                        elif operator == "dq":
+                            if not self.table.is_symbol_presence(identifier):
+                                raise SemanticError(f"Name \"{identifier}\" was never defined.")
+            else:
+                raise SemanticError(f"Unknown operator \"{operator}\".")
 
     def _argument_check(self, phrase: Phrase):
         if phrase.phrase_class == PhraseClass.operator:
@@ -92,3 +100,7 @@ class SemanticAnalyzer:
 
             elif param_num > 1:
                 raise SemanticError(f"Found \"{keyword}\" operator with {param_num} arguments, but expected 1.")
+
+    def _signature_recorder(self, phrase: Phrase):
+        if phrase.phrase_subclass == PhraseSubclass.expression:
+            self.lang_dict.add_word(phrase.keyword.value, SignatureType.expression, "")
