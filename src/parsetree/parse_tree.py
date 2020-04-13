@@ -60,8 +60,8 @@ class TreeTraverse:
                 self._temp = self._branch_head[self._index]
 
             except IndexError:
+                self._ascent()
                 if len(self._stack):
-                    self._ascent()
                     self._index = self._stack.pop()
                     self._branch_head = self._branch_head.parent
                 else:
