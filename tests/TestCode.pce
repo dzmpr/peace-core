@@ -1,8 +1,18 @@
+expr {
+    estart:
+    gen("10,1")
+    delay(10)
+    destroy()
+    eend:
+    init(10)
+}
+
 main {
     label:
     gen("5,1")
     gen("5,1")
     q(BUF)
+    expr()
     var("STUFF")
     changevar("STUFF")
     compare(L,"STUFF")
