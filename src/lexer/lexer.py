@@ -66,18 +66,23 @@ def process_line(string: str) -> List[Token]:
                 active_machines = True
 
         if not active_machines:
-            for machine in machines:
-                if machine.prevState != State.undefined and machine.prevState != State.begin and not machine_found:
-                    token = Token(machine.name, string[index:i])
-                    tokens.append(token)
-                    machine_found = True
-                machine.reset_state()
-            index = i
-            i = i - 1
-            machine_found = False
+            if i - index > 0:
+                for machine in machines:
+                    if machine.prevState != State.undefined and machine.prevState != State.begin and not machine_found:
+                        token = Token(machine.name, string[index:i])
+                        tokens.append(token)
+                        machine_found = True
+                    machine.reset_state()
+                index = i
+                i -= 1
+                machine_found = False
+            else:
+                tokens.append(Token(TokenClass.undefined, string[i]))
+                index = i
         active_machines = False
-        i = i + 1
+        i += 1
 
+    # Is last symbol was "\n"
     for machine in machines:
         if machine.state == State.newline:
             tokens.append(Token(machine.name, string[-1:]))
