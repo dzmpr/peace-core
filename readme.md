@@ -15,62 +15,77 @@ Source code not indentation dependent. Each line should contain one statement. P
   ```
   Used **inside main** block. Will be translated to SEIZE and RELEASE operators.
 
-* Expression block (*will be implemented soon*)
+* Expression block
   ```
   exprname {...}
   ```
-  Used **outside main** block. This block declares expression which be translated to inner representation which can be used across programm inside *main* block. Allowed to use inside expression block special characters which will be replaced with arguments passed to this expression in call place. Expression name should be unique across file, but can be the same with name of device or queue.
+  Used **outside main** block. This block declares expression which be translated to inner representation which can be used across programm inside *main* or another *expression* block. Expression name should be unique across file, but can be the same with name of device or queue. Allowed to use inside expression block special characters which will be replaced with arguments passed to this expression in call place (*not implemented yet*).
   
 ### Operators
 * ADVANCE
   ```
-  delay(*params*)
-  ADVANCE *params*
+  delay(number[, number])
+  ADVANCE number[, number]
   ```
 * GENERATE
   ```
-  gen(*params*)
-  GENERATE *params*
+  gen("params")
+  GENERATE params
   ```
 * QUEUE
   ```
-  q(queuename)
-  QUEUE queuename
+  q(word)
+  QUEUE word
   ```
 * DEPART
   ```
-  dq(queuename)
-  DEPART queuename
+  dq(word)
+  DEPART word
   ```
 * SAVEVALUE
   ```
-  changevar(*params*)
-  SAVEVALUE *params*
+  changevar("params")
+  SAVEVALUE params
   ```
 * INITIAL
   ```
-  var(*params*)
-  INITIAL *params*
+  var("params")
+  INITIAL params
   ```
 * TERMINATE
   ```
-  destroy(*params*)
-  TERMINATE(*params*)
+  destroy([number])
+  TERMINATE [number]
   ```
 * START
   ```
-  init(*params*)
-  START *params*
+  init(number)
+  START number
   ```
 * TEST
   ```
-  compare(*params*)
-  TEST *params*
+  compare("params")
+  TEST params
   ```
 * TRANSFER
   ```
-  goto(*params*)
-  TRANSFER *params*
+  goto("params")
+  TRANSFER params
+  ```
+* SPLIT
+  ```
+  copy("params")
+  SPLIT params
+  ```
+* LINK
+  ```
+  link("params")
+  LINK params
+  ```
+* UNLINK
+  ```
+  unlink("params")
+  UNLINK params
   ```
 
 ### Labels
@@ -89,6 +104,6 @@ Comments specifying with **#** symbol. Comment lasts to the end of line. They ha
 ## Goals
 - [x] Make a tree-based intermediate representation
 - [ ] Make scope dependent naming
-- [ ] Implement expressions
+- [x] Implement expressions
 - [ ] Implement expressions with substitutions
 - [ ] Limit naming according GPSS rules

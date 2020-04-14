@@ -1,14 +1,27 @@
+expr {
+    estart:
+    gen("10,1")
+    delay(10)
+    destroy()
+    eend:
+    init(10)
+}
+
 main {
     label:
-    gen(5,1)
-    gen(5,1)
+    gen("5,1")
+    gen("5,1")
     q(BUF)
-    var(112)
-    changevar(22)
-    compare(33)
+    expr()
+    var("STUFF")
+    link("STUFF")
+    unlink("STUFF")
+    copy("STUFF")
+    changevar("STUFF")
+    compare(L,"STUFF")
     MEM {
         dq(BUF)
-        delay(7)
+        delay(7,1)
     }
     destroy(1)
     init(40)

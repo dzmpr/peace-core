@@ -17,6 +17,9 @@ class State(Enum):
     sign = 9
     newline = 10
     tab = 11
+    str_start = 12
+    str_end = 13
+    operator_end = 14
     keyword = 100
     firstWord = 101
     secondWord = 102
@@ -26,8 +29,8 @@ class State(Enum):
     accoladeCloseSign = 106
     comment = 107
     body = 108
-    deviceStart = 109
-    device = 110
+    blockStart = 109
+    block = 110
     label = 111
 
 
@@ -35,7 +38,8 @@ class StateMachine:
     def __init__(self, name, rules):
         self.rules = rules
         self.name = name
-        self.reset_state()
+        self.prevState = State.begin
+        self.state = State.begin
 
     def __repr__(self):
         return self.name.name

@@ -3,8 +3,9 @@
 #       ...     -> *contents*
 # }             -> END
 #
-# *value -- one numerical GPSS operand
-# *parameters -- tuple of GPSS operands
+# number          -- one numerical GPSS operand
+# word            -- word
+# "parameters"    -- string with GPSS operands
 
 
 # Program body statement
@@ -25,40 +26,52 @@ exprName {
 }
 
 # Delay statement
-delay(*parameters)	    -> ADVANCE *parameters
+delay(number[, number])	-> ADVANCE number[, number]
 
 
 # Queue start statement
-q (name)	            -> QUEUE name
+q (word)	            -> QUEUE word
 
 
 # Queue exit statement
-dq (name)	            -> DEPART name
+dq (word)	            -> DEPART word
 
 
 # Generate statement
-gen (*parameters)       -> GENERATE *parameters
+gen ("parameters")      -> GENERATE parameters
 
 
 # Start statement
-init (*value)           -> START *value
+init (number)          -> START number
 
 
 # Terminate statement
-destroy (*value)        -> TERMINATE *value
+destroy ([number])       -> TERMINATE [number]
 
 
 # Transfer statement
-goto (*parameters)      -> TRANSFER *parameters
+goto ("parameters")     -> TRANSFER parameters
 
 
 # Test statement
-compare (*parameters)   -> TEST *parameters
+compare ("parameters")  -> TEST parameters
 
 
 # Savevalue statement
-changevar (*parameters) -> SAVEVALUE *parameters
+changevar ("parameters")-> SAVEVALUE parameters
 
 
 # Initial statement
-var (*parameters)       -> INITIAL *parameters
+var ("parameters")      -> INITIAL parameters
+
+
+# Split statement
+copy ("parameters")     -> SPLIT parameters
+
+
+# Link statement
+link ("parameters")     -> LINK parameters
+
+
+# Unlink statement
+unlink ("parameters")   -> UNLINK parameters

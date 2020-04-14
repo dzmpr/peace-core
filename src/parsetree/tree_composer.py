@@ -23,7 +23,5 @@ class TreeComposer:
                 raise syntaxer.SyntaxParseError("Extra '}' was found.")
             return
         self._tree.add_leaf(phrase)
-        if (phrase.phrase_class == PhraseClass.body or
-                phrase.phrase_class == PhraseClass.expression or
-                phrase.phrase_class == PhraseClass.device):
+        if phrase.phrase_class == PhraseClass.block:
             self._tree.submerge()
