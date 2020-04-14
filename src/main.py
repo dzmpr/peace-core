@@ -1,6 +1,6 @@
 import argparse
 import os
-from sys import exit
+import sys
 from typing import TextIO
 from lexer import lexer
 from lexer.token import Token, TokenClass
@@ -35,16 +35,16 @@ path = arguments.input
 print(f"Input file: {path}")
 
 if path[-4:] != ".pce":
-    print("Incorrect file.")
-    exit(1)
+    print("Incorrect file.", file=sys.stderr)
+    sys.exit(1)
 
 if not os.path.exists(path):
-    print("File doesn't exists.")
-    exit(1)
+    print("File doesn't exists.", file=sys.stderr)
+    sys.exit(1)
 
 if os.stat(path).st_size == 0:
-    print("File is empty.")
-    exit(1)
+    print("File is empty.", file=sys.stderr)
+    sys.exit(1)
 
 # Language dictionary
 lang_dict = LangDict()
@@ -120,10 +120,10 @@ symbol_table = SymbolTable()
 try:
     syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, result)
 except SyntaxParseError as error:
-    print(error.msg)
+    print(error.msg, file=sys.stderr)
     exit(2)
 except SemanticError as error:
-    print(error.msg)
+    print(error.msg, file=sys.stderr)
     exit(2)
 
 # Print processed phrases to file FIXME: TreePrint
