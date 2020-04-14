@@ -7,6 +7,7 @@ from lexer.token import Token, TokenClass
 from syntaxer import syntaxer
 from syntaxer.syntaxer import SyntaxParseError
 from syntaxer.lang_dict import LangDict, SignatureType
+from syntaxer.phrase_builder import PhraseBuildError
 from codegenerator.code_generator import CodeGenerator
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
@@ -101,7 +102,6 @@ pce_source.close()
 
 # Flatten lexer result
 result = [item for sublist in temp for item in sublist]
-result.append(Token(TokenClass.undefined, ""))
 temp.clear()
 
 # Print processed tokens to file
@@ -121,10 +121,13 @@ try:
     syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, result)
 except SyntaxParseError as error:
     print(error.msg, file=sys.stderr)
-    exit(2)
+    sys.exit(2)
 except SemanticError as error:
     print(error.msg, file=sys.stderr)
-    exit(2)
+    sys.exit(2)
+except PhraseBuildError as error:
+    print(error.msg, file=sys.stderr)
+    sys.exit(2)
 
 # Print processed phrases to file FIXME: TreePrint
 if arguments.so:
