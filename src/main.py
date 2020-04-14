@@ -92,11 +92,12 @@ lang_dict.add_word("unlink", SignatureType.operator, "UNLINK", 1, [
 
 
 temp = []
-file: TextIO = open(path, "r")
-for row in file:
+pce_source: TextIO = open(path, "r")
+for row in pce_source:
     if not row.endswith("\n"):
         row += "\n"
     temp.append(lexer.process_line(row))
+pce_source.close()
 
 # Flatten lexer result
 result = [item for sublist in temp for item in sublist]

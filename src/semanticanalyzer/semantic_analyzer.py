@@ -15,6 +15,9 @@ class SemanticAnalyzer:
         self.table: SymbolTable = symbol_table
         self.lang_dict: LangDict = lang_dict
 
+    def __repr__(self):
+        return f"Semantic an. ({self.tree}, {self.table}, {self.lang_dict})"
+
     def process_phrase(self, phrase: Phrase):
         self._name_processing(phrase)
         self._signature_recorder(phrase)

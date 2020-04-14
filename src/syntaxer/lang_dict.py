@@ -21,10 +21,16 @@ class Signature:
         self.max_params = max_params
         self.params = params
 
+    def __repr__(self):
+        return f"{self.signature_type.name}, params: {self.req_params}-{self.max_params}"
+
 
 class LangDict:
     def __init__(self):
         self.ld: Dict[str, Signature] = dict()
+
+    def __repr__(self):
+        return f"Lang dict ({len(self.ld)})"
 
     def add_word(self,
                  definition: str,

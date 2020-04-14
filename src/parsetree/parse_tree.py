@@ -20,6 +20,9 @@ class ParseTree:
         self.root: Node = Node(None, Phrase(PhraseClass.block, PhraseSubclass.program))
         self.head: Node = self.root
 
+    def __repr__(self):
+        return f"Root({len(self.root.nodes)}): {repr(self.root.nodes)}"
+
     def add_leaf(self, phrase: Phrase):
         self.head.nodes.append(Node(self.head, phrase))
 
@@ -45,13 +48,19 @@ class ParseTree:
 
 
 class TreeTraverse:
-    def __init__(self, branch_head: Node, node_processor: Callable[[Phrase], None], ascent: Callable[[], None]):
+    def __init__(self,
+                 branch_head: Node,
+                 node_processor: Callable[[Phrase], None],
+                 ascent: Callable[[], None]):
         self._branch_head: Node = branch_head
         self._ascent: Callable[[], None] = ascent
         self._node_processor: Callable[[Phrase], None] = node_processor
         self._stack: list = list()
         self._index: int = 0
         self._temp: Node = branch_head
+
+    def __repr__(self):
+        return f"Traverse node: {self._branch_head}"
 
     def traverse(self):
         self._node_processor(self._branch_head.data)
