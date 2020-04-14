@@ -15,28 +15,6 @@ def char_start(char):
     return State.undefined
 
 
-def open(char):
-    if char == "(":
-        return State.openBrace
-    return State.undefined
-
-
-def opened(char):
-    if char == " ":
-        return State.openBrace
-    elif char.isalnum() or char in signList:
-        return State.openBrace
-    elif char == ",":
-        return State.openBrace
-    elif char == ")":
-        return State.closeBrace
-    return State.undefined
-
-
-def closed(char):
-    return State.undefined
-
-
 def space(char):
     if char == " ":
         return State.space
@@ -78,7 +56,7 @@ def str_start(char):
 
 
 def str_body(char):
-    if char.isalnum() or char in signList:
+    if char.isalnum() or char in signList or char == " " or char == "\t":
         return State.str_start
     elif char == "\"":
         return State.str_end
