@@ -80,6 +80,15 @@ lang_dict.add_word("changevar", SignatureType.operator, "SAVEVALUE", 1, [
 lang_dict.add_word("var", SignatureType.operator, "INITIAL", 1, [
     TokenClass.string
 ])
+lang_dict.add_word("copy", SignatureType.operator, "SPLIT", 1, [
+    TokenClass.string
+])
+lang_dict.add_word("link", SignatureType.operator, "LINK", 1, [
+    TokenClass.string
+])
+lang_dict.add_word("unlink", SignatureType.operator, "UNLINK", 1, [
+    TokenClass.string
+])
 
 
 temp = []

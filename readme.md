@@ -72,6 +72,21 @@ Source code not indentation dependent. Each line should contain one statement. P
   goto("params")
   TRANSFER params
   ```
+* SPLIT
+  ```
+  copy("params")
+  SPLIT params
+  ```
+* LINK
+  ```
+  link("params")
+  LINK params
+  ```
+* UNLINK
+  ```
+  unlink("params")
+  UNLINK params
+  ```
 
 ### Labels
 Labels can be added with such syntax:

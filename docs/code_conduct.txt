@@ -63,3 +63,15 @@ changevar ("parameters")-> SAVEVALUE parameters
 
 # Initial statement
 var ("parameters")      -> INITIAL parameters
+
+
+# Split statement
+copy ("parameters")     -> SPLIT parameters
+
+
+# Link statement
+link ("parameters")     -> LINK parameters
+
+
+# Unlink statement
+unlink ("parameters")   -> UNLINK parameters
