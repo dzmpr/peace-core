@@ -92,22 +92,18 @@ lang_dict.add_word("unlink", SignatureType.operator, "UNLINK", 1, [
 ])
 
 
-temp = []
+token_list = []
 pce_source: TextIO = open(path, "r")
 for row in pce_source:
     if not row.endswith("\n"):
         row += "\n"
-    temp.append(lexer.process_line(row))
+    token_list.extend(lexer.process_line(row))
 pce_source.close()
-
-# Flatten lexer result
-result = [item for sublist in temp for item in sublist]
-temp.clear()
 
 # Print processed tokens to file
 if arguments.lo:
     lexer_output: TextIO = open(path + ".lo", "w")
-    for token in result:
+    for token in token_list:
         lexer_output.write(str(token) + "\n")
     lexer_output.close()
 
@@ -118,7 +114,8 @@ symbol_table = SymbolTable()
 
 # Process tokens with syntax analyzer
 try:
-    syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, result)
+    syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, token_list)
+    token_list.clear()
 except SyntaxParseError as error:
     print(error.msg, file=sys.stderr)
     sys.exit(2)
