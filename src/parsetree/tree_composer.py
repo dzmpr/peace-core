@@ -7,6 +7,9 @@ class TreeComposer:
     def __init__(self, tree: ParseTree):
         self._tree: ParseTree = tree
 
+    def __repr__(self):
+        return f"Composer node: {self._tree.head.data}"
+
     def get_tree(self):
         return self._tree
 
