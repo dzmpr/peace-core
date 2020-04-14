@@ -20,6 +20,9 @@ class ParseTree:
         self.root: Node = Node(None, Phrase(PhraseClass.block, PhraseSubclass.program))
         self.head: Node = self.root
 
+    def __repr__(self):
+        return f"Tree root: {repr(self.root.nodes)} ({len(self.root.nodes)})"
+
     def add_leaf(self, phrase: Phrase):
         self.head.nodes.append(Node(self.head, phrase))
 
