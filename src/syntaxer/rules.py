@@ -106,7 +106,7 @@ def undefined(token: Token):
     return State.undefined
 
 
-def label_start(token: Token):
+def label(token: Token):
     if token.token_class == TokenClass.word:
         return State.label
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
@@ -114,8 +114,8 @@ def label_start(token: Token):
     return State.undefined
 
 
-def label(token: Token):
+def label_start(token: Token):
     if token.token_class == TokenClass.sign:
         if token.value == ":":
-            return State.label
+            return State.label_end
     return State.undefined
