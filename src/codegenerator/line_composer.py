@@ -36,6 +36,9 @@ class LineComposer:
         self.stack = list()
         self.line: str = ""
 
+    def __repr__(self):
+        return f"l: {self.label}, k: {self.keyword}, p: {self.parameters}"
+
     def get_line(self) -> str:
         return self.line
 
