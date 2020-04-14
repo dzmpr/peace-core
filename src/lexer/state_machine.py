@@ -42,7 +42,7 @@ class StateMachine:
         self.state = State.begin
 
     def __repr__(self):
-        return self.name.name
+        return f"{self.name.name}: {self.state.name}"
 
     def process_object(self, obj):
         self.prevState = self.state
