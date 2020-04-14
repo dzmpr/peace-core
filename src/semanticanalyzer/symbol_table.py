@@ -6,10 +6,16 @@ class Symbol:
     def __init__(self, phrase_class: PhraseClass):
         self.phrase_class: PhraseClass = phrase_class
 
+    def __repr__(self):
+        return f"{self.phrase_class.name} symbol"
+
 
 class SymbolTable:
     def __init__(self):
         self._table: Dict[str, Symbol] = dict()
+
+    def __repr__(self):
+        return f"Symbol table ({len(self._table)})"
 
     def is_symbol_presence(self, identifier: str):
         if identifier in self._table:
