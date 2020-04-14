@@ -1,7 +1,7 @@
 from lexer.state_machine import State
 from lexer.token import TokenClass, Token
 from syntaxer.syntaxer_state_machine import SyntaxerStateMachine
-from syntaxer.phrase import PhraseClass, Phrase
+from syntaxer.phrase import PhraseClass
 from syntaxer import rules
 from parsetree.parse_tree import ParseTree
 from parsetree.tree_composer import TreeComposer
@@ -92,7 +92,8 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             if not machine_found:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxParseError(f"Syntax error. Expected {machine.name.name} at line {line_counter}.")
+                        raise SyntaxParseError(f"Syntax error. Unexpected token "
+                                               f"{repr(token.value)} at line {line_counter}.")
 
             # Reset machine states
             for machine in machines:
