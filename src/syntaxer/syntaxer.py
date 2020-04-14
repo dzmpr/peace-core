@@ -87,11 +87,6 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
                     machine_found = True
                     temp_phrase.clear()
 
-            if token.token_class == TokenClass.undefined:
-                if not tree_composer.is_tree_valid():
-                    raise SyntaxParseError("Syntax error. Bad scoping.")
-                return
-
             # Token wasn't recognized by any machine
             if not machine_found:
                 for machine in machines:
@@ -105,13 +100,22 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             token_index = token_index - 1
             machine_found = False
         else:
-            if token.token_class != TokenClass.space and \
-                    token.token_class != TokenClass.newline and \
-                    token.token_class != TokenClass.undefined and \
-                    token.token_class != TokenClass.sign:
+            if (token.token_class != TokenClass.space and
+                    token.token_class != TokenClass.newline and
+                    token.token_class != TokenClass.undefined and
+                    token.token_class != TokenClass.sign):
                 temp_phrase.append(token)
 
         token_index += 1
         active_machines = False
 
+    for machine in machines:
+        if not machine_found and machine.is_sequence_recognized():
+            recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase)
+            sem_analyzer.process_phrase(recognized_phrase)
+            tree_composer.add_phrase(recognized_phrase)
+            machine_found = True
+
+    if not tree_composer.is_tree_valid():
+        raise SyntaxParseError("Syntax error. Bad scoping.")
     return
