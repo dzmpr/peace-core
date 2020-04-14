@@ -32,6 +32,7 @@ class State(Enum):
     blockStart = 109
     block = 110
     label = 111
+    label_end = 112
 
 
 class StateMachine:

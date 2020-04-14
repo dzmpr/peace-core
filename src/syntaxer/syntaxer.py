@@ -41,9 +41,10 @@ blockCloseMachine = SyntaxerStateMachine(PhraseClass.blockClose, State.accoladeC
     State.accoladeCloseSign: rules.accolade_end
 })
 
-labelMachine = SyntaxerStateMachine(PhraseClass.label, State.label, {
-    State.begin: rules.label_start,
-    State.label: rules.label
+labelMachine = SyntaxerStateMachine(PhraseClass.label, State.label_end, {
+    State.begin: rules.label,
+    State.label: rules.label_start,
+    State.label_end: rules.undefined
 })
 
 machines = {
