@@ -8,6 +8,7 @@ from syntaxer import syntaxer
 from syntaxer.syntaxer import SyntaxParseError
 from syntaxer.lang_dict import LangDict, SignatureType
 from syntaxer.phrase_builder import PhraseBuildError
+from syntaxer.error_handler import print_error_info
 from codegenerator.code_generator import CodeGenerator
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
@@ -116,14 +117,8 @@ symbol_table = SymbolTable()
 try:
     syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, token_list)
     token_list.clear()
-except SyntaxParseError as error:
-    print(error.msg, file=sys.stderr)
-    sys.exit(2)
-except SemanticError as error:
-    print(error.msg, file=sys.stderr)
-    sys.exit(2)
-except PhraseBuildError as error:
-    print(error.msg, file=sys.stderr)
+except (SyntaxParseError, SemanticError, PhraseBuildError) as error:
+    print_error_info(error, path)
     sys.exit(2)
 
 # Print processed phrases to file FIXME: TreePrint

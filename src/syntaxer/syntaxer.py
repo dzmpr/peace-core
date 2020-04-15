@@ -9,12 +9,17 @@ from semanticanalyzer.symbol_table import SymbolTable
 from semanticanalyzer.semantic_analyzer import SemanticAnalyzer
 from syntaxer.phrase_builder import phrase_builder
 from syntaxer.lang_dict import LangDict
-from typing import List
+from typing import List, Union
 
 
 class SyntaxParseError(Exception):
-    def __init__(self, msg):
+    def __init__(self,
+                 msg: str,
+                 line: Union[int, None] = None,
+                 token: Union[Token, None] = None):
         self.msg = msg
+        self.line = line
+        self.token = token
 
 
 operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.operator_end, {
@@ -92,8 +97,9 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             if not machine_found:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxParseError(f"Syntax error. Unexpected token "
-                                               f"{repr(token.value)} at line {line_counter}.")
+                        raise SyntaxParseError(f"Syntax error.\nUnexpected token "
+                                               f"{repr(token.value)} at line {line_counter}.",
+                                               line_counter, token)
 
             # Reset machine states
             for machine in machines:
@@ -123,5 +129,6 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             machine_found = True
 
     if not tree_composer.is_tree_valid():
-        raise SyntaxParseError("Syntax error. Bad scoping.")
+        # Fixme: complete
+        raise SyntaxParseError("Syntax error.\nBad scoping.")
     return
