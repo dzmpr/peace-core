@@ -11,6 +11,13 @@ templates = {
 
 
 def parameter_composer(params: List[Token], skip: int = 0) -> str:
+    """
+    Compose parameters string from phrase.
+
+    :param params: parameters
+    :param skip: number of parameters to skip
+    :return: composed string
+    """
     index = skip
     if params[index].token_class == TokenClass.string:
         result = params[index].value[1:-1]
