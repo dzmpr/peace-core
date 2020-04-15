@@ -33,6 +33,8 @@ class CodeGenerator:
                 self.lc.compose_line(phrase)
             elif phrase.phrase_subclass == PhraseSubclass.expression:
                 self.lc.stack.append("")
+            elif phrase.phrase_class == PhraseClass.comment:
+                return
             self._write(self.lc.get_line())
             self.lc.reset_content()
 
