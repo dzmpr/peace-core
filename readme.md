@@ -64,8 +64,8 @@ Source code not indentation dependent. Each line should contain one statement. P
   ```
 * TEST
   ```
-  compare("params")
-  TEST params
+  compare(operation, "params")
+  TEST op params
   ```
 * TRANSFER
   ```
