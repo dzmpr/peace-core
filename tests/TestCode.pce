@@ -8,6 +8,7 @@ expr {
 }
 
 main {
+    #Comment
     label:
     gen("5,1")
     gen("5,1")
