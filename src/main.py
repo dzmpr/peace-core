@@ -3,7 +3,7 @@ import os
 import sys
 from typing import TextIO
 from lexer import lexer
-from lexer.token import Token, TokenClass
+from lexer.token import TokenClass
 from syntaxer import syntaxer
 from syntaxer.syntaxer import SyntaxParseError
 from syntaxer.lang_dict import LangDict, SignatureType
@@ -49,45 +49,45 @@ if os.stat(path).st_size == 0:
 
 # Language dictionary
 lang_dict = LangDict()
-lang_dict.add_word("q", SignatureType.operator, "QUEUE", 1, [
+lang_dict.add_signature("q", SignatureType.operator, "QUEUE", 1, [
     TokenClass.word
 ])
-lang_dict.add_word("dq", SignatureType.operator, "DEPART", 1, [
+lang_dict.add_signature("dq", SignatureType.operator, "DEPART", 1, [
     TokenClass.word
 ])
-lang_dict.add_word("gen", SignatureType.operator, "GENERATE", 1, [
+lang_dict.add_signature("gen", SignatureType.operator, "GENERATE", 1, [
     TokenClass.string
 ])
-lang_dict.add_word("init", SignatureType.operator, "START", 1, [
+lang_dict.add_signature("init", SignatureType.operator, "START", 1, [
     TokenClass.num
 ])
-lang_dict.add_word("delay", SignatureType.operator, "ADVANCE", 1, [
+lang_dict.add_signature("delay", SignatureType.operator, "ADVANCE", 1, [
     TokenClass.num,
     TokenClass.num
 ])
-lang_dict.add_word("destroy", SignatureType.operator, "TERMINATE", 0, [
+lang_dict.add_signature("destroy", SignatureType.operator, "TERMINATE", 0, [
     TokenClass.num
 ])
-lang_dict.add_word("goto", SignatureType.operator, "TRANSFER", 1, [
+lang_dict.add_signature("goto", SignatureType.operator, "TRANSFER", 1, [
     TokenClass.string
 ])
-lang_dict.add_word("compare", SignatureType.operator, "TEST", 2, [
+lang_dict.add_signature("compare", SignatureType.operator, "TEST", 2, [
     TokenClass.word,
     TokenClass.string
 ])
-lang_dict.add_word("changevar", SignatureType.operator, "SAVEVALUE", 1, [
+lang_dict.add_signature("changevar", SignatureType.operator, "SAVEVALUE", 1, [
     TokenClass.string
 ])
-lang_dict.add_word("var", SignatureType.operator, "INITIAL", 1, [
+lang_dict.add_signature("var", SignatureType.operator, "INITIAL", 1, [
     TokenClass.string
 ])
-lang_dict.add_word("copy", SignatureType.operator, "SPLIT", 1, [
+lang_dict.add_signature("copy", SignatureType.operator, "SPLIT", 1, [
     TokenClass.string
 ])
-lang_dict.add_word("link", SignatureType.operator, "LINK", 1, [
+lang_dict.add_signature("link", SignatureType.operator, "LINK", 1, [
     TokenClass.string
 ])
-lang_dict.add_word("unlink", SignatureType.operator, "UNLINK", 1, [
+lang_dict.add_signature("unlink", SignatureType.operator, "UNLINK", 1, [
     TokenClass.string
 ])
 
