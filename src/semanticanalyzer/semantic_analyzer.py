@@ -1,4 +1,5 @@
 from parsetree.parse_tree import ParseTree
+from parsetree.tree_composer import TreeComposer
 from semanticanalyzer.symbol_table import SymbolTable
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from syntaxer.lang_dict import LangDict, SignatureType
@@ -12,8 +13,19 @@ class SemanticError(Exception):
 class SemanticAnalyzer:
     def __init__(self, tree: ParseTree, symbol_table: SymbolTable, lang_dict: LangDict):
         self.tree: ParseTree = tree
+        self.composer: TreeComposer = TreeComposer(tree)
         self.table: SymbolTable = symbol_table
         self.lang_dict: LangDict = lang_dict
+        self._line_count: int = 1
+
+    def add_line(self):
+        self._line_count += 1
+
+    def remove_line(self):
+        self._line_count -= 1
+
+    def get_line(self) -> int:
+        return self._line_count
 
     def __repr__(self):
         return f"Semantic an. ({self.tree}, {self.table}, {self.lang_dict})"
@@ -22,6 +34,7 @@ class SemanticAnalyzer:
         self._name_processing(phrase)
         self._signature_recorder(phrase)
         self._params_check(phrase)
+        self.composer.add_phrase(phrase)
 
     # TODO: First version (without scope-dependent check), to be refactored
     def _name_processing(self, phrase: Phrase):
