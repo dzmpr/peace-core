@@ -37,6 +37,12 @@ class State(Enum):
 
 class StateMachine:
     def __init__(self, name, rules):
+        """
+        State machine constructor.
+
+        :param name: state machine token class
+        :param rules: dict containing rules for machine
+        """
         self.rules = rules
         self.name = name
         self.prevState = State.begin
@@ -51,5 +57,8 @@ class StateMachine:
             self.state = self.rules[self.prevState](obj)
 
     def reset_state(self):
+        """
+        Set begin state for machine.
+        """
         self.prevState = State.begin
         self.state = State.begin
