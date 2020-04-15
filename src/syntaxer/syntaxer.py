@@ -60,7 +60,7 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
     active_machines: bool = False
     machine_found: bool = False
     token_index: int = 0
-    line_counter: int = 0
+    line_counter: int = 1
     temp_phrase: List[Token] = []
     tree_composer = TreeComposer(tree)
     sem_analyzer = SemanticAnalyzer(tree, table, lang_dict)
@@ -98,6 +98,10 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             # Reset machine states
             for machine in machines:
                 machine.reset_state()
+
+            # If current token newline - decrease line counter
+            if token.token_class == TokenClass.newline:
+                line_counter -= 1
 
             token_index = token_index - 1
             machine_found = False
