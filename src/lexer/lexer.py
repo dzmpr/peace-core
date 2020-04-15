@@ -53,6 +53,12 @@ machines = {
 
 # lexer
 def process_line(string: str) -> List[Token]:
+    """
+    Split input string in tokens.
+
+    :param string: string to process
+    :return: list contains recognized tokens
+    """
     tokens: List[Token] = []
     index = 0
     i = 0

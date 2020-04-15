@@ -17,17 +17,17 @@ class SymbolTable:
     def __repr__(self):
         return f"Symbol table ({len(self._table)})"
 
-    def is_symbol_presence(self, identifier: str):
+    def is_symbol_presence(self, identifier: str) -> bool:
         if identifier in self._table:
             return True
         return False
 
-    def is_symbol_equal(self, identifier: str, phrase_class: PhraseClass):
+    def is_symbol_equal(self, identifier: str, phrase_class: PhraseClass) -> bool:
         if self._table[identifier].phrase_class == phrase_class:
             return True
         return False
 
-    def get_symbol(self, identifier: str):
+    def get_symbol(self, identifier: str) -> Symbol:
         return self._table[identifier]
 
     def add_symbol(self, identifier: str, phrase_class: PhraseClass):

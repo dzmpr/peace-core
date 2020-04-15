@@ -75,4 +75,4 @@ class SemanticAnalyzer:
 
     def _signature_recorder(self, phrase: Phrase):
         if phrase.phrase_subclass == PhraseSubclass.expression:
-            self.lang_dict.add_word(phrase.keyword.value, SignatureType.expression, "", 0)
+            self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
