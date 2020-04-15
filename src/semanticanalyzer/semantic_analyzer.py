@@ -3,11 +3,17 @@ from parsetree.tree_composer import TreeComposer
 from semanticanalyzer.symbol_table import SymbolTable
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from syntaxer.lang_dict import LangDict, SignatureType
+from typing import Union
 
 
 class SemanticError(Exception):
-    def __init__(self, msg: str):
+    def __init__(self,
+                 msg: str,
+                 line: Union[int, None] = None,
+                 identifier: Union[str, None] = None):
         self.msg = msg
+        self.line = line
+        self.identifier = identifier
 
 
 class SemanticAnalyzer:
@@ -43,14 +49,20 @@ class SemanticAnalyzer:
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_subclass)
             else:
-                raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_class.name}.")
+                raise SemanticError(f"Naming error at line {self._line_count - 1}."
+                                    f"\nName \"{identifier}\" already used by "
+                                    f"{self.table.get_symbol(identifier).phrase_class.name}.",
+                                    self._line_count, identifier)
 
         elif phrase.phrase_class == PhraseClass.label:
             identifier: str = phrase.keyword.value
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_class)
             else:
-                raise SemanticError(f"Naming error. Name \"{identifier}\" already used by {self.table.get_symbol(identifier).phrase_class.name}.")
+                raise SemanticError(f"Naming error at line {self._line_count - 1}."
+                                    f"\nName \"{identifier}\" already used by "
+                                    f"{self.table.get_symbol(identifier).phrase_class.name}.",
+                                    self._line_count, identifier)
 
         elif phrase.phrase_class == PhraseClass.operator:
             operator: str = phrase.keyword.value
@@ -63,13 +75,18 @@ class SemanticAnalyzer:
                             if not self.table.is_symbol_presence(identifier):
                                 self.table.add_symbol(identifier, phrase.phrase_class)
                             else:
-                                raise SemanticError(f"Naming error. Name \"{identifier}\" already used "
-                                                    f"by {self.table.get_symbol(identifier).phrase_class.name}.")
+                                raise SemanticError(f"Naming error at line {self._line_count - 1}.\n"
+                                                    f"Name \"{identifier}\" already used by "
+                                                    f"{self.table.get_symbol(identifier).phrase_class.name}.",
+                                                    self._line_count, identifier)
                         elif operator == "dq":
                             if not self.table.is_symbol_presence(identifier):
-                                raise SemanticError(f"Name \"{identifier}\" was never defined.")
+                                raise SemanticError(f"Naming error at line {self._line_count - 1}."
+                                                    f"\nName \"{identifier}\" was never defined.",
+                                                    self._line_count, identifier)
             else:
-                raise SemanticError(f"Unknown operator \"{operator}\".")
+                raise SemanticError(f"Naming error at line {self._line_count - 1}.\nUnknown operator \"{operator}\".",
+                                    self._line_count, operator)
 
     def _params_check(self, phrase: Phrase):
         if phrase.phrase_class == PhraseClass.operator:
@@ -79,12 +96,16 @@ class SemanticAnalyzer:
             if op_signature.req_params <= params_num <= op_signature.max_params:
                 for i in range(params_num):
                     if phrase.params[i].token_class != op_signature.params[i]:
-                        raise SemanticError(f"Wrong parameter for \"{keyword}\", "
-                                            f"expected {op_signature.params[i].name} "
-                                            f"but found {phrase.params[i].token_class.name}.")
+                        raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
+                                            f"Wrong parameter for \"{keyword}\", expected "
+                                            f"{op_signature.params[i].name} but found "
+                                            f"{phrase.params[i].token_class.name}.",
+                                            self._line_count, phrase.params[i].value)
             else:
-                raise SemanticError(f"Found \"{keyword}\" operator with {params_num} "
-                                    f"parameters, but expected {op_signature.req_params}-{op_signature.max_params}.")
+                raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
+                                    f"Found \"{keyword}\" operator with {params_num} "
+                                    f"parameters, but expected {op_signature.req_params}-{op_signature.max_params}.",
+                                    self._line_count, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
         if phrase.phrase_subclass == PhraseSubclass.expression:
