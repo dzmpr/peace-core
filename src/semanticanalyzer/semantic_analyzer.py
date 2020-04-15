@@ -15,6 +15,9 @@ class SemanticAnalyzer:
         self.table: SymbolTable = symbol_table
         self.lang_dict: LangDict = lang_dict
 
+    def __repr__(self):
+        return f"Semantic an. ({self.tree}, {self.table}, {self.lang_dict})"
+
     def process_phrase(self, phrase: Phrase):
         self._name_processing(phrase)
         self._signature_recorder(phrase)
@@ -72,4 +75,4 @@ class SemanticAnalyzer:
 
     def _signature_recorder(self, phrase: Phrase):
         if phrase.phrase_subclass == PhraseSubclass.expression:
-            self.lang_dict.add_word(phrase.keyword.value, SignatureType.expression, "", 0)
+            self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)

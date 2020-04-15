@@ -2,7 +2,7 @@ from lexer.state_machine import State
 from lexer.token import TokenClass, Token
 
 
-def comment_start(token: Token):
+def comment_start(token: Token) -> State:
     if token.token_class == TokenClass.sign:
         if token.value == "#":
             return State.comment
@@ -11,13 +11,13 @@ def comment_start(token: Token):
     return State.undefined
 
 
-def comment_end(token: Token):
+def comment_end(token: Token) -> State:
     if token.token_class != TokenClass.newline:
         return State.comment
     return State.undefined
 
 
-def keyword(token: Token):
+def keyword(token: Token) -> State:
     if token.token_class == TokenClass.word:
         return State.openBrace
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
@@ -25,7 +25,7 @@ def keyword(token: Token):
     return State.undefined
 
 
-def block_start(token: Token):
+def block_start(token: Token) -> State:
     if token.token_class == TokenClass.word:
         return State.blockStart
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
@@ -33,7 +33,7 @@ def block_start(token: Token):
     return State.undefined
 
 
-def block_end(token: Token):
+def block_end(token: Token) -> State:
     if token.token_class == TokenClass.sign:
         if token.value == "{":
             return State.block
@@ -42,7 +42,7 @@ def block_end(token: Token):
     return State.undefined
 
 
-def accolade_start(token: Token):
+def accolade_start(token: Token) -> State:
     if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
     elif token.token_class == TokenClass.sign:
@@ -51,19 +51,19 @@ def accolade_start(token: Token):
     return State.undefined
 
 
-def accolade_end(token: Token):
+def accolade_end(token: Token) -> State:
     if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.accoladeCloseSign
     return State.undefined
 
 
-def block(token: Token):
+def block(token: Token) -> State:
     if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.block
     return State.undefined
 
 
-def open_brace(token: Token):
+def open_brace(token: Token) -> State:
     if token.token_class == TokenClass.sign:
         if token.value == "(":
             return State.parameter
@@ -72,7 +72,7 @@ def open_brace(token: Token):
     return State.undefined
 
 
-def parameter(token: Token):
+def parameter(token: Token) -> State:
     if (token.token_class == TokenClass.word or
             token.token_class == TokenClass.num or
             token.token_class == TokenClass.string):
@@ -85,7 +85,7 @@ def parameter(token: Token):
     return State.undefined
 
 
-def param_sign(token: Token):
+def param_sign(token: Token) -> State:
     if token.token_class == TokenClass.sign:
         if token.value == ",":
             return State.parameter
@@ -96,17 +96,17 @@ def param_sign(token: Token):
     return State.undefined
 
 
-def operator_end(token: Token):
+def operator_end(token: Token) -> State:
     if token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.operator_end
     return State.undefined
 
 
-def undefined(token: Token):
+def undefined(token: Token) -> State:
     return State.undefined
 
 
-def label_start(token: Token):
+def label(token: Token) -> State:
     if token.token_class == TokenClass.word:
         return State.label
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
@@ -114,8 +114,8 @@ def label_start(token: Token):
     return State.undefined
 
 
-def label(token: Token):
+def label_start(token: Token) -> State:
     if token.token_class == TokenClass.sign:
         if token.value == ":":
-            return State.label
+            return State.label_end
     return State.undefined

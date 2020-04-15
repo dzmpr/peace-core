@@ -14,6 +14,9 @@ class CodeGenerator:
         self._temp_expression: str = ""
         self._write: Callable[[str], None] = self.write_to_file
 
+    def __repr__(self):
+        return f"CG - ({repr(self._tree)}, {repr(self._lang_dict)})"
+
     def write_to_file(self, line: str):
         self._output.write(line)
 

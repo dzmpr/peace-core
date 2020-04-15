@@ -11,6 +11,13 @@ templates = {
 
 
 def parameter_composer(params: List[Token], skip: int = 0) -> str:
+    """
+    Compose parameters string from phrase.
+
+    :param params: parameters
+    :param skip: number of parameters to skip
+    :return: composed string
+    """
     index = skip
     if params[index].token_class == TokenClass.string:
         result = params[index].value[1:-1]
@@ -35,6 +42,9 @@ class LineComposer:
         self.label: str = ""
         self.stack = list()
         self.line: str = ""
+
+    def __repr__(self):
+        return f"l: {self.label}, k: {self.keyword}, p: {self.parameters}"
 
     def get_line(self) -> str:
         return self.line

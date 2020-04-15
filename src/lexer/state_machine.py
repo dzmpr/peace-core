@@ -32,17 +32,24 @@ class State(Enum):
     blockStart = 109
     block = 110
     label = 111
+    label_end = 112
 
 
 class StateMachine:
     def __init__(self, name, rules):
+        """
+        State machine constructor.
+
+        :param name: state machine token class
+        :param rules: dict containing rules for machine
+        """
         self.rules = rules
         self.name = name
         self.prevState = State.begin
         self.state = State.begin
 
     def __repr__(self):
-        return self.name.name
+        return f"{self.name.name}: {self.state.name}"
 
     def process_object(self, obj):
         self.prevState = self.state
@@ -50,5 +57,8 @@ class StateMachine:
             self.state = self.rules[self.prevState](obj)
 
     def reset_state(self):
+        """
+        Set begin state for machine.
+        """
         self.prevState = State.begin
         self.state = State.begin

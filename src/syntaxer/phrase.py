@@ -36,7 +36,11 @@ class Phrase:
         self.params = params
 
     def __repr__(self):
-        return f"Phrase {self.phrase_class.name}"
+        if self.phrase_subclass is not None:
+            return f"{self.phrase_class.name} ({self.phrase_subclass.name})"
+        return f"{self.phrase_class.name}"
 
     def __str__(self):
-        return f"Phrase {self.phrase_class.name}, value: {self.params}"
+        if self.phrase_subclass is not None:
+            return f"{self.phrase_class.name} ({self.phrase_subclass.name}), val: {self.params}"
+        return f"{self.phrase_class.name}, val: {self.params}"
