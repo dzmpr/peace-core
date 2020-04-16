@@ -1,63 +1,76 @@
 from lexer.state_machine import State
 
-signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]", "{", "}", ":", ",", "(", ")", "."]
+signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]",
+            "{", "}", ":", ",", "(", ")", "."]
 
 
-def char(char):
-    if char.isalnum():
+def char(symbol):
+    if symbol.isalnum():
         return State.char
     return State.undefined
 
 
-def char_start(char):
-    if char.isalpha():
+def char_start(symbol):
+    if symbol.isalpha():
         return State.char
     return State.undefined
 
 
-def space(char):
-    if char == " ":
+def space(symbol):
+    if symbol == " ":
         return State.space
     return State.undefined
 
 
-def tab(char):
-    if char == "\t":
+def tab(symbol):
+    if symbol == "\t":
         return State.tab
     return State.undefined
 
 
-def num(char):
-    if char.isdigit():
+def num(symbol):
+    if symbol.isdigit():
         return State.num
     return State.undefined
 
 
-def undefined(char):
+def undefined(symbol):
     return State.undefined
 
 
-def sign(char):
-    if char in signList:
+def sign(symbol):
+    if symbol in signList:
         return State.sign
     return State.undefined
 
 
-def newline(char):
-    if char == "\n":
+def newline(symbol):
+    if symbol == "\n":
         return State.newline
     return State.undefined
 
 
-def str_start(char):
-    if char == "\"":
+def str_start(symbol):
+    if symbol == "\"":
         return State.str_start
     return State.undefined
 
 
-def str_body(char):
-    if char.isalnum() or char in signList or char == " " or char == "\t":
+def str_body(symbol):
+    if symbol.isalnum() or symbol in signList or symbol == " " or symbol == "\t":
         return State.str_start
-    elif char == "\"":
+    elif symbol == "\"":
         return State.str_end
+    return State.undefined
+
+
+def parameter_start(symbol):
+    if symbol == "@":
+        return State.parameter
+    return State.undefined
+
+
+def parameter(symbol):
+    if symbol.isdigit():
+        return State.parameter
     return State.undefined

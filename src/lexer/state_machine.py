@@ -9,9 +9,6 @@ class State(Enum):
     begin = 1
     char = 2
     openBrace = 3
-    closeBrace = 4
-    openBlock = 5
-    closeBlock = 6
     space = 7
     num = 8
     sign = 9
@@ -20,10 +17,11 @@ class State(Enum):
     str_start = 12
     str_end = 13
     operator_end = 14
+    parameter = 15
+    parameter_end = 16
     keyword = 100
     firstWord = 101
     secondWord = 102
-    parameter = 103
     equalSign = 104
     accoladeOpenSign = 105
     accoladeCloseSign = 106
