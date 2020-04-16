@@ -31,7 +31,7 @@ def semantic_error(error: SemanticError, source_path: str):
     if error.line is not None and error.identifier is not None:
         source = open(source_path, mode="r", encoding="utf-8")
         for i, line in enumerate(source, start=1):
-            if i == error.line - 1:
+            if i == error.line:
                 print(line, end="", file=sys.stderr)
                 index: int = line.find(error.identifier)
                 print(" " * index, end="", file=sys.stderr)

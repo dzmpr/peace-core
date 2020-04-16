@@ -36,14 +36,14 @@ class SemanticAnalyzer:
     def __repr__(self):
         return f"Semantic an. ({self.tree}, {self.table}, {self.lang_dict})"
 
-    def process_phrase(self, phrase: Phrase):
-        self._name_processing(phrase)
+    def process_phrase(self, phrase: Phrase, line_number: int):
+        self._name_processing(phrase, line_number)
         self._signature_recorder(phrase)
-        self._params_check(phrase)
+        self._params_check(phrase, line_number)
         self.composer.add_phrase(phrase)
 
     # TODO: First version (without scope-dependent check), to be refactored
-    def _name_processing(self, phrase: Phrase):
+    def _name_processing(self, phrase: Phrase, line_number: int):
         if phrase.phrase_class == PhraseClass.block:
             identifier: str = phrase.keyword.value
             if not self.table.is_symbol_presence(identifier):
@@ -52,7 +52,7 @@ class SemanticAnalyzer:
                 raise SemanticError(f"Naming error at line {self._line_count - 1}."
                                     f"\nName \"{identifier}\" already used by "
                                     f"{self.table.get_symbol(identifier).phrase_class.name}.",
-                                    self._line_count, identifier)
+                                    line_number, identifier)
 
         elif phrase.phrase_class == PhraseClass.label:
             identifier: str = phrase.keyword.value
@@ -62,7 +62,7 @@ class SemanticAnalyzer:
                 raise SemanticError(f"Naming error at line {self._line_count - 1}."
                                     f"\nName \"{identifier}\" already used by "
                                     f"{self.table.get_symbol(identifier).phrase_class.name}.",
-                                    self._line_count, identifier)
+                                    line_number, identifier)
 
         elif phrase.phrase_class == PhraseClass.operator:
             operator: str = phrase.keyword.value
@@ -78,17 +78,17 @@ class SemanticAnalyzer:
                                 raise SemanticError(f"Naming error at line {self._line_count - 1}.\n"
                                                     f"Name \"{identifier}\" already used by "
                                                     f"{self.table.get_symbol(identifier).phrase_class.name}.",
-                                                    self._line_count, identifier)
+                                                    line_number, identifier)
                         elif operator == "dq":
                             if not self.table.is_symbol_presence(identifier):
                                 raise SemanticError(f"Naming error at line {self._line_count - 1}."
                                                     f"\nName \"{identifier}\" was never defined.",
-                                                    self._line_count, identifier)
+                                                    line_number, identifier)
             else:
                 raise SemanticError(f"Naming error at line {self._line_count - 1}.\nUnknown operator \"{operator}\".",
-                                    self._line_count, operator)
+                                    line_number, operator)
 
-    def _params_check(self, phrase: Phrase):
+    def _params_check(self, phrase: Phrase, line_number: int):
         if phrase.phrase_class == PhraseClass.operator:
             keyword = phrase.keyword.value
             op_signature = self.lang_dict.get_signature(keyword)
@@ -100,12 +100,12 @@ class SemanticAnalyzer:
                                             f"Wrong parameter for \"{keyword}\", expected "
                                             f"{op_signature.params[i].name} but found "
                                             f"{phrase.params[i].token_class.name}.",
-                                            self._line_count, phrase.params[i].value)
+                                            line_number, phrase.params[i].value)
             else:
                 raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
                                     f"Found \"{keyword}\" operator with {params_num} "
                                     f"parameters, but expected {op_signature.req_params}-{op_signature.max_params}.",
-                                    self._line_count, keyword)
+                                    line_number, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
         if phrase.phrase_subclass == PhraseSubclass.expression:

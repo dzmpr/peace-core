@@ -64,6 +64,7 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
     active_machines: bool = False
     machine_found: bool = False
     token_index: int = 0
+    phrase_start_line: int = 1
     temp_phrase: List[Token] = []
     sem_analyzer = SemanticAnalyzer(tree, table, lang_dict)
 
@@ -85,7 +86,7 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
                     recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase)
-                    sem_analyzer.process_phrase(recognized_phrase)
+                    sem_analyzer.process_phrase(recognized_phrase, phrase_start_line)
                     machine_found = True
                     temp_phrase.clear()
 
@@ -100,6 +101,9 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             # Reset machine states
             for machine in machines:
                 machine.reset_state()
+
+            # Get new phrase start line
+            phrase_start_line = sem_analyzer.get_line()
 
             # If current token newline - decrease line counter
             if token.token_class == TokenClass.newline:
@@ -120,10 +124,11 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
     for machine in machines:
         if not machine_found and machine.is_sequence_recognized():
             recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase)
-            sem_analyzer.process_phrase(recognized_phrase)
+            sem_analyzer.process_phrase(recognized_phrase, phrase_start_line)
             machine_found = True
 
     if not sem_analyzer.composer.is_tree_valid():
         # Fixme: complete
-        raise SyntaxParseError("Syntax error.\nBad scoping.")
+        raise SyntaxParseError(f"Syntax error at line {phrase_start_line}.\n"
+                               f"Missing '}}'.")
     return
