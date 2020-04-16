@@ -94,7 +94,7 @@ lang_dict.add_signature("unlink", SignatureType.operator, "UNLINK", 1, [
 
 
 token_list = []
-pce_source: TextIO = open(path, "r")
+pce_source: TextIO = open(path, "r", encoding="utf8")
 for row in pce_source:
     if not row.endswith("\n"):
         row += "\n"
@@ -103,7 +103,7 @@ pce_source.close()
 
 # Print processed tokens to file
 if arguments.lo:
-    lexer_output: TextIO = open(path + ".lo", "w")
+    lexer_output: TextIO = open(path + ".lo", "w", encoding="utf8")
     for token in token_list:
         lexer_output.write(str(token) + "\n")
     lexer_output.close()
@@ -123,11 +123,11 @@ except (SyntaxParseError, SemanticError, PhraseBuildError) as error:
 
 # Print processed phrases to file FIXME: TreePrint
 if arguments.so:
-    syntaxer_output: TextIO = open(path + ".so", "w")
+    syntaxer_output: TextIO = open(path + ".so", "w", encoding="utf8")
     syntaxer_output.close()
 
 # Code generator
-output_file: TextIO = open(path[:-3] + "gpss", "w")
+output_file: TextIO = open(path[:-3] + "gpss", "w", encoding="utf8")
 cg = CodeGenerator(parse_tree, lang_dict, output_file)
 cg.compile()
 output_file.close()
