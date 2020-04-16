@@ -85,7 +85,7 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
         if not active_machines:
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
-                    recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase)
+                    recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase, phrase_start_line)
                     sem_analyzer.process_phrase(recognized_phrase, phrase_start_line)
                     machine_found = True
                     temp_phrase.clear()
@@ -123,12 +123,11 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
 
     for machine in machines:
         if not machine_found and machine.is_sequence_recognized():
-            recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase)
+            recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase, phrase_start_line)
             sem_analyzer.process_phrase(recognized_phrase, phrase_start_line)
             machine_found = True
 
     if not sem_analyzer.composer.is_tree_valid():
-        # Fixme: complete
         raise SyntaxParseError(f"Syntax error at line {phrase_start_line}.\n"
                                f"Missing '}}'.")
     return
