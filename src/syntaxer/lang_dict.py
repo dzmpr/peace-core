@@ -88,3 +88,8 @@ class LangDict:
         :param output: new destination language output
         """
         self.ld[definition].output = output
+
+    def update_params(self, definition: str, params: List[TokenClass]):
+        self.ld[definition].req_params = len(params)
+        self.ld[definition].max_params = len(params)
+        self.ld[definition].params = params
