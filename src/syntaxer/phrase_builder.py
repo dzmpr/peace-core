@@ -44,8 +44,12 @@ def build_block(phrase: Phrase, context: Phrase, temp_phrase: List[Token], phras
                                    f"Main block can not be defined inside {context.phrase_subclass.name}.", phrase_line)
     elif context.phrase_subclass == PhraseSubclass.program:
         phrase.phrase_subclass = PhraseSubclass.expression
-    elif context.phrase_subclass == PhraseSubclass.body or context == PhraseSubclass.expression:
+    elif context.phrase_subclass == PhraseSubclass.body or context.phrase_subclass == PhraseSubclass.expression:
         phrase.phrase_subclass = PhraseSubclass.device
+    else:
+        raise PhraseBuildError(f"Phrase build error at line {phrase_line}.\n"
+                               f"Unspecified \"{phrase.keyword.value}\" block subclass.",
+                               phrase_line)
 
 
 def build_operator(phrase: Phrase, context: Phrase, temp_phrase: List[Token], phrase_line):
