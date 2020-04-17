@@ -75,7 +75,8 @@ def open_brace(token: Token) -> State:
 def parameter(token: Token) -> State:
     if (token.token_class == TokenClass.word or
             token.token_class == TokenClass.num or
-            token.token_class == TokenClass.string):
+            token.token_class == TokenClass.string or
+            token.token_class == TokenClass.parameter):
         return State.sign
     elif token.token_class == TokenClass.space:
         return State.parameter
@@ -108,9 +109,16 @@ def undefined(token: Token) -> State:
 
 def label(token: Token) -> State:
     if token.token_class == TokenClass.word:
-        return State.label
+        return State.label_start
     elif token.token_class == TokenClass.space or token.token_class == TokenClass.newline:
         return State.begin
+    return State.undefined
+
+
+def label_colon(token: Token) -> State:
+    if token.token_class == TokenClass.sign:
+        if token.value == ":":
+            return State.label_end
     return State.undefined
 
 
@@ -118,4 +126,7 @@ def label_start(token: Token) -> State:
     if token.token_class == TokenClass.sign:
         if token.value == ":":
             return State.label_end
+    elif token.token_class == TokenClass.parameter:
+        if token.value == "@":
+            return State.label_param
     return State.undefined
