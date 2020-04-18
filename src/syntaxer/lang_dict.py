@@ -26,6 +26,7 @@ class Signature:
         """
         self.signature_type = signature_type
         self.output = output
+        self.uses_num: int = 0
         self.req_params = req_params
         self.max_params = max_params
         self.params = params
@@ -90,6 +91,15 @@ class LangDict:
         self.ld[definition].output = output
 
     def update_params(self, definition: str, params: List[TokenClass]):
+        """
+        Update parameter list of defined signature
+
+        :param definition: keyword
+        :param params: new parameters list
+        """
         self.ld[definition].req_params = len(params)
         self.ld[definition].max_params = len(params)
         self.ld[definition].params = params
+
+    def add_use(self, definition: str):
+        self.ld[definition].uses_num += 1
