@@ -75,6 +75,8 @@ def build_label(phrase: Phrase, context: Phrase, temp_phrase: List[Token], phras
     if context.phrase_subclass != PhraseSubclass.program:
         if temp_phrase[0].token_class == TokenClass.word:
             phrase.keyword = temp_phrase[0]
+
+            phrase.params = temp_phrase[1:]
         else:
             raise PhraseBuildError(f"Phrase build error at line {phrase_line}.\n"
                                    f"Unexpected phrase sequence.", phrase_line)
