@@ -52,7 +52,17 @@ class LineComposer:
 
     def _compose_expression(self, phrase: Phrase, signature: Signature):
         if signature.contains_param or signature.output == "":
-            self.expr_gen(phrase.keyword.value, phrase.params)
+            # Create new parameters list to replace parametrised arguments to actual params
+            params = list()
+            for param in phrase.params:
+                if param.token_class == TokenClass.parameter:
+                    param_num = int(param.value[1:]) - 1
+                    params.append(self.param_list[param_num])
+                else:
+                    params.append(param)
+
+            self.expr_gen(phrase.keyword.value, params)
+
         self.line = signature.output
 
     def reset_content(self):
