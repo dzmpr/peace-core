@@ -51,6 +51,14 @@ def build_block(phrase: Phrase, context: Phrase, temp_phrase: List[Token], phras
                                f"Unspecified \"{phrase.keyword.value}\" block subclass.",
                                phrase_line)
 
+    if len(temp_phrase) > 1:
+        if phrase.phrase_subclass == PhraseSubclass.device:
+            phrase.params = temp_phrase[1:]
+        else:
+            raise PhraseBuildError(f"Phrase build error at line {phrase_line}.\n"
+                                   f"Not allowed to use parameters in \"{phrase.keyword.value}\" definition.",
+                                   phrase_line)
+
 
 def build_operator(phrase: Phrase, context: Phrase, temp_phrase: List[Token], phrase_line):
     if context.phrase_subclass != PhraseSubclass.program:
