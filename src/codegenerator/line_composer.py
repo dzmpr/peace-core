@@ -94,8 +94,8 @@ class LineComposer:
             if params[index].value == "@":
                 result = self.expr_uses
             else:
-                param_num = int(params[index].value[1:])
-                result = self.param_list[param_num]
+                param_num = int(params[index].value[1:]) - 1
+                result = self.param_list[param_num].value
         else:
             result = params[index].value
         index += 1
@@ -108,8 +108,8 @@ class LineComposer:
                 if params[index].value == "@":
                     result += self.expr_uses
                 else:
-                    param_num = int(params[index].value[1:])
-                    result += self.param_list[param_num]
+                    param_num = int(params[index].value[1:]) - 1
+                    result += self.param_list[param_num].value
             else:
                 result += params[index].value
             index += 1
