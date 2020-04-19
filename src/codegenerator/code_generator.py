@@ -13,6 +13,7 @@ class CodeGenerator:
         self._output: TextIO = file
         self._temp_expression: str = ""
         self._write: Callable[[str], None] = self.write_to_file
+        self._stack = list()
 
     def __repr__(self):
         return f"CG - ({repr(self._tree)}, {repr(self._lang_dict)})"
@@ -28,19 +29,18 @@ class CodeGenerator:
             self.lc.add_label(phrase)
         else:
             if phrase.phrase_subclass == PhraseSubclass.body or phrase.phrase_subclass == PhraseSubclass.device:
-                self.lc.block_open(phrase)
+                self._stack.append(self.lc.block_open(phrase))
             elif phrase.phrase_class == PhraseClass.operator:
                 self.lc.compose_line(phrase)
             elif phrase.phrase_subclass == PhraseSubclass.expression:
-                self.lc.stack.append("")
+                self._stack.append("")
             elif phrase.phrase_class == PhraseClass.comment:
                 return
             self._write(self.lc.get_line())
             self.lc.reset_content()
 
     def ascent(self):
-        self.lc.close_block()
-        self._write(self.lc.get_line())
+        self._write(self._stack.pop())
 
     def generate_expression(self, node) -> str:
         self._write = self.write_to_str

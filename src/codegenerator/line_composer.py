@@ -40,7 +40,6 @@ class LineComposer:
         self.keyword: str = ""
         self.parameters: str = ""
         self.label: str = ""
-        self.stack = list()
         self.line: str = ""
 
     def __repr__(self):
@@ -73,23 +72,18 @@ class LineComposer:
     def add_label(self, phrase: Phrase):
         self.label = phrase.keyword.value
 
-    def block_open(self, phrase: Phrase):
+    def block_open(self, phrase: Phrase) -> str:
         block_open = templates["regular"]
         block_close = templates["regular"]
         if phrase.phrase_subclass == PhraseSubclass.body:
             self.keyword = "SIMULATE"
             block_open = block_open.format(self.label, self.keyword, self.parameters)
             self.keyword = "END"
-            block_close = block_close.format(self.label, self.keyword, self.parameters)
-            self.stack.append(block_close)
         elif phrase.phrase_subclass == PhraseSubclass.device:
             self.keyword = "SEIZE"
             self.parameters = phrase.keyword.value
             block_open = block_open.format(self.label, self.keyword, self.parameters)
             self.keyword = "RELEASE"
-            block_close = block_close.format(self.label, self.keyword, self.parameters)
-            self.stack.append(block_close)
+        block_close = block_close.format(self.label, self.keyword, self.parameters)
         self.line = block_open
-
-    def close_block(self):
-        self.line = self.stack.pop()
+        return block_close
