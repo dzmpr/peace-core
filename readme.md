@@ -1,7 +1,12 @@
 # Python to GPSS source-to-source translator
+Peace source code not indentation dependent. Each line should contain one statement. Peace not checking validity of GPSS code. Peace checking validity of used names for device blocks, operators and expressions (now across whole code, in future - scope dependent).
 
-## How to use? Syntax.
-Source code not indentation dependent. Each line should contain one statement. Peace not cheching validity of GPSS code i.e. program from Peace can be translated to GPSS without SIMULATE and END blocks if *main* statement isn't used. Peace checking validity of used names for device blocks, operators and expressions (now across whole code, in future - scope dependent).
+## How to use?
+**Minimum python version - 3.8.**
+```bash
+python main.py <path to .pce>
+```
+Interpreter will generate output .gpss file in the same folder with .pce.
 ### Blocks
 * Main block
   ```
@@ -15,11 +20,15 @@ Source code not indentation dependent. Each line should contain one statement. P
   ```
   Used **inside main** block. Will be translated to SEIZE and RELEASE operators.
 
+  Inside expression it's allowed to add "@" after device name. This syntax add expression occurrence number after each device name.
+
 * Expression block
   ```
   exprname {...}
   ```
-  Used **outside main** block. This block declares expression which be translated to inner representation which can be used across programm inside *main* or another *expression* block. Expression name should be unique across file, but can be the same with name of device or queue. Allowed to use inside expression block special characters which will be replaced with arguments passed to this expression in call place (*not implemented yet*).
+  Used **outside main** block. This block declares expression which be translated to inner representation which can be used across programm inside *main* or another *expression* block. Expression name should be unique across file, but can be the same with name of device or queue. 
+  
+  Allowed to use inside expression block special characters which will be replaced with arguments passed to this expression in call place. "@" parameter refers to number of certain expression was called. Positional arguments can be inserted by "@" sign with followed number of argument (f.e. @1, @10). Positional parameter get such type, in what place it first used.
   
 ### Operators
 * ADVANCE
@@ -64,8 +73,8 @@ Source code not indentation dependent. Each line should contain one statement. P
   ```
 * TEST
   ```
-  compare("params")
-  TEST params
+  compare(word, "params")
+  TEST word    params
   ```
 * TRANSFER
   ```
@@ -95,6 +104,8 @@ labelname:
 ```
 They can be at the same line with next statement or lines before.
 
+Inside expression it's allowed to add "@" after label name. This syntax add expression occurrence number after each label. 
+
 ### Comments
 Comments specifying with **#** symbol. Comment lasts to the end of line. They has no affect to the output code and just will be ignored by translator.
 ```
@@ -103,7 +114,7 @@ Comments specifying with **#** symbol. Comment lasts to the end of line. They ha
 
 ## Goals
 - [x] Make a tree-based intermediate representation
-- [ ] Make scope dependent naming
 - [x] Implement expressions
-- [ ] Implement expressions with substitutions
-- [ ] Limit naming according GPSS rules
+- [x] Implement expressions with substitutions
+- [ ] Make scope dependent naming
+- [ ] More familiar syntax with high-level languages
