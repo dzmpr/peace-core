@@ -26,10 +26,10 @@ class Signature:
         """
         self.signature_type = signature_type
         self.output = output
-        self.uses_num: int = 0
         self.req_params = req_params
         self.max_params = max_params
         self.params = params
+        self.uses_number = 0
 
     def __repr__(self):
         return f"{self.signature_type.name}, params: {self.req_params}-{self.max_params}"
@@ -102,4 +102,4 @@ class LangDict:
         self.ld[definition].params = params
 
     def add_use(self, definition: str):
-        self.ld[definition].uses_num += 1
+        self.ld[definition].uses_number += 1
