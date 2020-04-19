@@ -51,6 +51,8 @@ class LineComposer:
         self.line = line.format(self.label, self.keyword, self.parameters)
 
     def _compose_expression(self, phrase: Phrase, signature: Signature):
+        if signature.output == "" or signature.req_params != 0:
+            self.expr_gen(phrase.keyword.value, phrase.params)
         self.line = signature.output
 
     def reset_content(self):
