@@ -85,7 +85,10 @@ class LineComposer:
             self.keyword = "END"
         elif phrase.phrase_subclass == PhraseSubclass.device:
             self.keyword = "SEIZE"
-            self.parameters = phrase.keyword.value
+            if phrase.params is not None:
+                self.parameters = phrase.keyword.value + str(self.expr_uses)
+            else:
+                self.parameters = phrase.keyword.value
             block_open = block_open.format(self.label, self.keyword, self.parameters)
             self.keyword = "RELEASE"
         block_close = block_close.format(self.label, self.keyword, self.parameters)
