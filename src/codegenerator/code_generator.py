@@ -2,17 +2,19 @@ from codegenerator.line_composer import LineComposer
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from syntaxer.lang_dict import LangDict
 from parsetree.parse_tree import ParseTree, TreeTraverse, Node
-from typing import TextIO, Callable
+from lexer.token import Token
+from typing import TextIO, Callable, Union, List
 
 
 class CodeGenerator:
-    def __init__(self, tree: ParseTree, lang_dict: LangDict, file: TextIO):
+    def __init__(self, tree: ParseTree, lang_dict: LangDict, file: TextIO, params: Union[List[Token], None] = None):
         self._tree: ParseTree = tree
         self._lang_dict: LangDict = lang_dict
-        self.lc = LineComposer(lang_dict)
+        self.composer = LineComposer(lang_dict)
         self._output: TextIO = file
         self._temp_expression: str = ""
         self._write: Callable[[str], None] = self.write_to_file
+        self._params = params
         self._stack = list()
 
     def __repr__(self):
@@ -24,21 +26,23 @@ class CodeGenerator:
     def write_to_str(self, line: str):
         self._temp_expression += line
 
+    # Callback for processing phrases
     def phrase_processor(self, phrase: Phrase):
         if phrase.phrase_class == PhraseClass.label:
-            self.lc.add_label(phrase)
+            self.composer.add_label(phrase)
         else:
             if phrase.phrase_subclass == PhraseSubclass.body or phrase.phrase_subclass == PhraseSubclass.device:
-                self._stack.append(self.lc.block_open(phrase))
+                self._stack.append(self.composer.block_open(phrase))
             elif phrase.phrase_class == PhraseClass.operator:
-                self.lc.compose_line(phrase)
+                self.composer.compose_line(phrase)
             elif phrase.phrase_subclass == PhraseSubclass.expression:
                 self._stack.append("")
             elif phrase.phrase_class == PhraseClass.comment:
                 return
-            self._write(self.lc.get_line())
-            self.lc.reset_content()
+            self._write(self.composer.get_line())
+            self.composer.reset_content()
 
+    # Callback for processing subtree leave
     def ascent(self):
         self._write(self._stack.pop())
 
