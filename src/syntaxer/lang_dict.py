@@ -30,6 +30,7 @@ class Signature:
         self.max_params = max_params
         self.params = params
         self.uses_number = 0
+        self.contains_param: bool = False
 
     def __repr__(self):
         return f"{self.signature_type.name}, params: {self.req_params}-{self.max_params}"
