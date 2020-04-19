@@ -27,11 +27,13 @@ class State(Enum):
     accoladeCloseSign = 106
     comment = 107
     body = 108
-    blockStart = 109
-    block = 110
-    label_start = 111
-    label_param = 112
-    label_end = 113
+    block_word = 109
+    block_sign = 110
+    block_param = 111
+    block_end = 112
+    label_start = 113
+    label_param = 114
+    label_end = 115
 
 
 class StateMachine:
