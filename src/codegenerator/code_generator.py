@@ -7,7 +7,12 @@ from typing import TextIO, Callable, Union, List
 
 
 class CodeGenerator:
-    def __init__(self, tree: ParseTree, lang_dict: LangDict, file: TextIO, params: Union[List[Token], None] = None, uses_num: int = 0):
+    def __init__(self,
+                 tree: ParseTree,
+                 lang_dict: LangDict,
+                 file: TextIO,
+                 params: Union[List[Token], None] = None,
+                 uses_num: int = 0):
         self._tree: ParseTree = tree
         self._lang_dict: LangDict = lang_dict
         self.composer = LineComposer(lang_dict, self.expression_processor, params, uses_num)
@@ -57,9 +62,10 @@ class CodeGenerator:
         self._write = self.write_to_str
         nodes = self._tree.get_head().nodes
         for node in nodes:
-            if node.data.keyword.value == expr_name:
-                tree_traverse = TreeTraverse(node, self.phrase_processor, self.ascent)
-                tree_traverse.traverse()
+            if node.data.phrase_class == PhraseClass.block:
+                if node.data.keyword.value == expr_name:
+                    tree_traverse = TreeTraverse(node, self.phrase_processor, self.ascent)
+                    tree_traverse.traverse()
         return self._temp_expression
 
     def generate(self, node: Node):
