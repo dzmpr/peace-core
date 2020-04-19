@@ -1,7 +1,7 @@
 from syntaxer.phrase import Phrase, PhraseSubclass
 from syntaxer.lang_dict import LangDict, SignatureType, Signature
 from lexer.token import Token, TokenClass
-from typing import List
+from typing import List, Callable, Union
 
 
 templates = {
@@ -10,33 +10,16 @@ templates = {
 }
 
 
-def parameter_composer(params: List[Token], skip: int = 0) -> str:
-    """
-    Compose parameters string from phrase.
-
-    :param params: parameters
-    :param skip: number of parameters to skip
-    :return: composed string
-    """
-    index = skip
-    if params[index].token_class == TokenClass.string:
-        result = params[index].value[1:-1]
-    else:
-        result = params[index].value
-    index += 1
-    while index < len(params):
-        result += ","
-        if params[index].token_class == TokenClass.string:
-            result += params[index].value[1:-1]
-        else:
-            result += params[index].value
-        index += 1
-    return result
-
-
 class LineComposer:
-    def __init__(self, lang_dict: LangDict):
+    def __init__(self,
+                 lang_dict: LangDict,
+                 expr_gen: Callable,
+                 param_list: Union[List[Token], None] = None,
+                 expr_uses: int = 0):
         self.lang_dict = lang_dict
+        self.expr_gen = expr_gen
+        self.param_list = param_list
+        self.expr_uses = expr_uses
         self.keyword: str = ""
         self.parameters: str = ""
         self.label: str = ""
@@ -59,11 +42,11 @@ class LineComposer:
         if phrase.keyword.value != "compare":
             line = templates["regular"]
             if len(phrase.params):
-                self.parameters = parameter_composer(phrase.params)
+                self.parameters = self._parameter_composer(phrase.params)
             self.keyword = signature.output
         else:
             line = templates["compare"]
-            self.parameters = parameter_composer(phrase.params, 1)
+            self.parameters = self._parameter_composer(phrase.params, 1)
             self.keyword = phrase.params[0].value
         self.line = line.format(self.label, self.keyword, self.parameters)
 
@@ -93,3 +76,40 @@ class LineComposer:
         block_close = block_close.format(self.label, self.keyword, self.parameters)
         self.line = block_open
         return block_close
+
+    def _parameter_composer(self, params: List[Token], skip: int = 0) -> str:
+        """
+        Compose parameters string from phrase.
+
+        :param params: parameters
+        :param skip: number of parameters to skip
+        :return: composed string
+        """
+        index = skip
+        if params[index].token_class == TokenClass.string:
+            result = params[index].value[1:-1]
+        elif params[index].token_class == TokenClass.parameter:
+            if params[index].value == "@":
+                result = self.expr_uses
+            else:
+                param_num = int(params[index].value[1:])
+                result = self.param_list[param_num]
+        else:
+            result = params[index].value
+        index += 1
+
+        while index < len(params):
+            result += ","
+            if params[index].token_class == TokenClass.string:
+                result += params[index].value[1:-1]
+            elif params[index].token_class == TokenClass.parameter:
+                if params[index].value == "@":
+                    result += self.expr_uses
+                else:
+                    param_num = int(params[index].value[1:])
+                    result += self.param_list[param_num]
+            else:
+                result += params[index].value
+            index += 1
+
+        return result
