@@ -61,6 +61,9 @@ class LineComposer:
         self.label = ""
 
     def add_label(self, phrase: Phrase):
+        if len(phrase.params):
+            self.label = phrase.keyword.value + str(self.expr_uses)
+            return
         self.label = phrase.keyword.value
 
     def block_open(self, phrase: Phrase) -> str:
