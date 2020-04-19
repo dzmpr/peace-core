@@ -7,10 +7,10 @@ from typing import TextIO, Callable, Union, List
 
 
 class CodeGenerator:
-    def __init__(self, tree: ParseTree, lang_dict: LangDict, file: TextIO, params: Union[List[Token], None] = None):
+    def __init__(self, tree: ParseTree, lang_dict: LangDict, file: TextIO, params: Union[List[Token], None] = None, uses_num: int = 0):
         self._tree: ParseTree = tree
         self._lang_dict: LangDict = lang_dict
-        self.composer = LineComposer(lang_dict)
+        self.composer = LineComposer(lang_dict, self.expression_processor, params, uses_num)
         self._output: TextIO = file
         self._temp_expression: str = ""
         self._write: Callable[[str], None] = self.write_to_file
@@ -26,11 +26,16 @@ class CodeGenerator:
     def write_to_str(self, line: str):
         self._temp_expression += line
 
+    def expression_processor(self, definition: str, params: Union[List[Token], None] = None):
+        expr_generator = CodeGenerator(self._tree, self._lang_dict, self._output, params)
+        self._lang_dict.set_output(definition, expr_generator.generate_expression(definition))
+
     # Callback for processing phrases
     def phrase_processor(self, phrase: Phrase):
         if phrase.phrase_class == PhraseClass.label:
             self.composer.add_label(phrase)
         else:
+
             if phrase.phrase_subclass == PhraseSubclass.body or phrase.phrase_subclass == PhraseSubclass.device:
                 self._stack.append(self.composer.block_open(phrase))
             elif phrase.phrase_class == PhraseClass.operator:
@@ -46,10 +51,13 @@ class CodeGenerator:
     def ascent(self):
         self._write(self._stack.pop())
 
-    def generate_expression(self, node) -> str:
+    def generate_expression(self, expr_name: str) -> str:
         self._write = self.write_to_str
-        tree_traverse = TreeTraverse(node, self.phrase_processor, self.ascent)
-        tree_traverse.traverse()
+        nodes = self._tree.get_head().nodes
+        for node in nodes:
+            if node.data.keyword.value == expr_name:
+                tree_traverse = TreeTraverse(node, self.phrase_processor, self.ascent)
+                tree_traverse.traverse()
         return self._temp_expression
 
     def generate(self, node: Node):
@@ -62,8 +70,3 @@ class CodeGenerator:
         for node in blocks:
             if node.data.phrase_subclass == PhraseSubclass.body:
                 self.generate(node)
-            elif node.data.phrase_subclass == PhraseSubclass.expression:
-                self._lang_dict.set_output(node.data.keyword.value, self.generate_expression(node))
-                self._temp_expression = ""
-            elif node.data.phrase_class == PhraseClass.comment:
-                continue
