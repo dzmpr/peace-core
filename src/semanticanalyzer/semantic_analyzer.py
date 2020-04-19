@@ -3,6 +3,7 @@ from parsetree.tree_composer import TreeComposer
 from semanticanalyzer.symbol_table import SymbolTable
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from syntaxer.lang_dict import LangDict, SignatureType
+from lexer.token import TokenClass
 from typing import Union
 
 
@@ -23,6 +24,8 @@ class SemanticAnalyzer:
         self.table: SymbolTable = symbol_table
         self.lang_dict: LangDict = lang_dict
         self._line_count: int = 1
+        self._expr_params: Union[dict, None] = None
+        self._expr_name: Union[str, None] = None
 
     def add_line(self):
         self._line_count += 1
@@ -37,8 +40,8 @@ class SemanticAnalyzer:
         return f"Semantic an. ({self.tree}, {self.table}, {self.lang_dict})"
 
     def process_phrase(self, phrase: Phrase, line_number: int):
-        self._name_processing(phrase, line_number)
         self._signature_recorder(phrase)
+        self._name_processing(phrase, line_number)
         self._params_check(phrase, line_number)
         self.composer.add_phrase(phrase, line_number)
 
@@ -85,16 +88,42 @@ class SemanticAnalyzer:
                                                     f"\nName \"{identifier}\" was never defined.",
                                                     line_number, identifier)
             else:
-                raise SemanticError(f"Naming error at line {self._line_count - 1}.\nUnknown operator \"{operator}\".",
+                raise SemanticError(f"Naming error at line {self._line_count - 1}.\n"
+                                    f"Unknown operator \"{operator}\".",
                                     line_number, operator)
 
     def _params_check(self, phrase: Phrase, line_number: int):
         if phrase.phrase_class == PhraseClass.operator:
             keyword = phrase.keyword.value
+            context = self.tree.get_context()
             op_signature = self.lang_dict.get_signature(keyword)
             params_num = len(phrase.params)
             if op_signature.req_params <= params_num <= op_signature.max_params:
                 for i in range(params_num):
+                    # Using parameters in body forbidden
+                    if context.phrase_subclass == PhraseSubclass.body:
+                        if phrase.params[i].token_class == TokenClass.parameter:
+                            raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
+                                                f"Parameter \"{phrase.params[i].value}\" can't be used inside main.",
+                                                line_number, phrase.params[i].value)
+                    # Check parameter define in expression
+                    elif context.phrase_subclass == PhraseSubclass.expression:
+                        if phrase.params[i].token_class == TokenClass.parameter:
+                            if phrase.params[i].value in self._expr_params:
+                                if self._expr_params[phrase.params[i].value] != op_signature.params[i]:
+                                    raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
+                                                        f"Wrong parameter for \"{keyword}\", expected "
+                                                        f"{op_signature.params[i].name} but "
+                                                        f"\"{phrase.params[i].value}\" has "
+                                                        f"{self._expr_params[phrase.params[i].value].name} type.",
+                                                        line_number, phrase.params[i].value)
+                            else:
+                                self._expr_params[phrase.params[i].value] = op_signature.params[i]
+
+                            self.lang_dict.get_signature(context.keyword.value).contains_param = True
+                            continue
+
+                    # Check coincidence of parameter with operator signature
                     if phrase.params[i].token_class != op_signature.params[i]:
                         raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
                                             f"Wrong parameter for \"{keyword}\", expected "
@@ -108,5 +137,45 @@ class SemanticAnalyzer:
                                     line_number, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
+        # Check if parameter names are consistent
+        def is_params_consistent(params: dict):
+            for i in range(1, len(params)):
+                key = "@" + str(i)
+                if key not in params:
+                    return False
+            return True
+
+        # Build ordered parameter list
+        def build_params(params_dict: dict):
+            params = list()
+            for i in range(1, len(params_dict)):
+                key = "@" + str(i)
+                params.append(params_dict[key])
+            return params
+
         if phrase.phrase_subclass == PhraseSubclass.expression:
             self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
+            if self._expr_params is None:
+                self._expr_params = dict()
+                self._expr_params.update({"@": TokenClass.num})
+                self._expr_name = phrase.keyword.value
+            else:
+                if not is_params_consistent(self._expr_params):
+                    raise SemanticError(f"Parameter error.\n"
+                                        f"Parameters in {self._expr_name} not consistent.")
+                # Update expression signature
+                else:
+                    self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))
+                self._expr_params.clear()
+                self._expr_params.update({"@": TokenClass.num})
+                self._expr_name = phrase.keyword.value
+        elif phrase.phrase_subclass == PhraseSubclass.body:
+            if self._expr_params is not None:
+                if not is_params_consistent(self._expr_params):
+                    raise SemanticError(f"Parameter error.\n"
+                                        f"Parameters in {self._expr_name} not consistent.")
+                # Update expression signature
+                else:
+                    self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))
+                self._expr_params.clear()
+                self._expr_name = phrase.keyword.value

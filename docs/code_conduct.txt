@@ -6,6 +6,9 @@
 # number          -- one numerical GPSS operand
 # word            -- word
 # "parameters"    -- string with GPSS operands
+# @               -- insertion counter in expression
+#                    can be applied to label or device
+# @num            -- positional argument
 
 
 # Program body statement
@@ -26,52 +29,52 @@ exprName {
 }
 
 # Delay statement
-delay(number[, number])	-> ADVANCE number[, number]
+delay(number[, number])	      -> ADVANCE number[, number]
 
 
 # Queue start statement
-q (word)	            -> QUEUE word
+q (word)	                  -> QUEUE word
 
 
 # Queue exit statement
-dq (word)	            -> DEPART word
+dq (word)	                  -> DEPART word
 
 
 # Generate statement
-gen ("parameters")      -> GENERATE parameters
+gen ("parameters")            -> GENERATE parameters
 
 
 # Start statement
-init (number)          -> START number
+init (number)                 -> START number
 
 
 # Terminate statement
-destroy ([number])       -> TERMINATE [number]
+destroy ([number])            -> TERMINATE [number]
 
 
 # Transfer statement
-goto ("parameters")     -> TRANSFER parameters
+goto ("parameters")           -> TRANSFER parameters
 
 
 # Test statement
-compare ("parameters")  -> TEST parameters
+compare (word, "parameters")  -> TEST word   parameters
 
 
 # Savevalue statement
-changevar ("parameters")-> SAVEVALUE parameters
+changevar ("parameters")      -> SAVEVALUE parameters
 
 
 # Initial statement
-var ("parameters")      -> INITIAL parameters
+var ("parameters")            -> INITIAL parameters
 
 
 # Split statement
-copy ("parameters")     -> SPLIT parameters
+copy ("parameters")           -> SPLIT parameters
 
 
 # Link statement
-link ("parameters")     -> LINK parameters
+link ("parameters")           -> LINK parameters
 
 
 # Unlink statement
-unlink ("parameters")   -> UNLINK parameters
+unlink ("parameters")         -> UNLINK parameters

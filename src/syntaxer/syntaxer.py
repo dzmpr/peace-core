@@ -34,10 +34,12 @@ commentMachine = SyntaxerStateMachine(PhraseClass.comment, State.comment, {
     State.comment: rules.comment_end,
 })
 
-blockMachine = SyntaxerStateMachine(PhraseClass.block, State.block, {
-    State.begin: rules.block_start,
-    State.blockStart: rules.block_end,
-    State.block: rules.block
+blockMachine = SyntaxerStateMachine(PhraseClass.block, State.block_end, {
+    State.begin: rules.block,
+    State.block_word: rules.block_start,
+    State.block_param: rules.block_param,
+    State.block_sign: rules.block_sign,
+    State.block_end: rules.block_end
 })
 
 blockCloseMachine = SyntaxerStateMachine(PhraseClass.blockClose, State.accoladeCloseSign, {
@@ -47,7 +49,8 @@ blockCloseMachine = SyntaxerStateMachine(PhraseClass.blockClose, State.accoladeC
 
 labelMachine = SyntaxerStateMachine(PhraseClass.label, State.label_end, {
     State.begin: rules.label,
-    State.label: rules.label_start,
+    State.label_start: rules.label_start,
+    State.label_param: rules.label_colon,
     State.label_end: rules.undefined
 })
 

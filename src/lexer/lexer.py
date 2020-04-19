@@ -40,6 +40,11 @@ newlineMachine = StateMachine(TokenClass.newline, {
     State.newline: rules.newline
 })
 
+parameterMachine = StateMachine(TokenClass.parameter, {
+    State.begin: rules.parameter_start,
+    State.parameter: rules.parameter
+})
+
 machines = {
     wordMachine,
     spaceMachine,
@@ -47,7 +52,8 @@ machines = {
     numberMachine,
     signMachine,
     newlineMachine,
-    stringMachine
+    stringMachine,
+    parameterMachine
 }
 
 
