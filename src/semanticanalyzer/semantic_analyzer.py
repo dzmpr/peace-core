@@ -119,6 +119,8 @@ class SemanticAnalyzer:
                                                         line_number, phrase.params[i].value)
                             else:
                                 self._expr_params[phrase.params[i].value] = op_signature.params[i]
+
+                            self.lang_dict.get_signature(context.keyword.value).contains_param = True
                             continue
 
                     # Check coincidence of parameter with operator signature
@@ -165,6 +167,7 @@ class SemanticAnalyzer:
                 else:
                     self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))
                 self._expr_params.clear()
+                self._expr_params.update({"@": TokenClass.num})
                 self._expr_name = phrase.keyword.value
         elif phrase.phrase_subclass == PhraseSubclass.body:
             if self._expr_params is not None:
