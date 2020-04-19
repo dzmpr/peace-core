@@ -29,6 +29,8 @@ class Signature:
         self.req_params = req_params
         self.max_params = max_params
         self.params = params
+        self.uses_number = 0
+        self.contains_param: bool = False
 
     def __repr__(self):
         return f"{self.signature_type.name}, params: {self.req_params}-{self.max_params}"
@@ -88,3 +90,17 @@ class LangDict:
         :param output: new destination language output
         """
         self.ld[definition].output = output
+
+    def update_params(self, definition: str, params: List[TokenClass]):
+        """
+        Update parameter list of defined signature
+
+        :param definition: keyword
+        :param params: new parameters list
+        """
+        self.ld[definition].req_params = len(params)
+        self.ld[definition].max_params = len(params)
+        self.ld[definition].params = params
+
+    def add_use(self, definition: str):
+        self.ld[definition].uses_number += 1

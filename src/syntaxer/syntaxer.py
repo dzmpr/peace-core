@@ -4,17 +4,21 @@ from syntaxer.syntaxer_state_machine import SyntaxerStateMachine
 from syntaxer.phrase import PhraseClass
 from syntaxer import rules
 from parsetree.parse_tree import ParseTree
-from parsetree.tree_composer import TreeComposer
 from semanticanalyzer.symbol_table import SymbolTable
 from semanticanalyzer.semantic_analyzer import SemanticAnalyzer
 from syntaxer.phrase_builder import phrase_builder
 from syntaxer.lang_dict import LangDict
-from typing import List
+from typing import List, Union
 
 
 class SyntaxParseError(Exception):
-    def __init__(self, msg):
+    def __init__(self,
+                 msg: str,
+                 line: Union[int, None] = None,
+                 token: Union[Token, None] = None):
         self.msg = msg
+        self.line = line
+        self.token = token
 
 
 operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.operator_end, {
@@ -30,10 +34,12 @@ commentMachine = SyntaxerStateMachine(PhraseClass.comment, State.comment, {
     State.comment: rules.comment_end,
 })
 
-blockMachine = SyntaxerStateMachine(PhraseClass.block, State.block, {
-    State.begin: rules.block_start,
-    State.blockStart: rules.block_end,
-    State.block: rules.block
+blockMachine = SyntaxerStateMachine(PhraseClass.block, State.block_end, {
+    State.begin: rules.block,
+    State.block_word: rules.block_start,
+    State.block_param: rules.block_param,
+    State.block_sign: rules.block_sign,
+    State.block_end: rules.block_end
 })
 
 blockCloseMachine = SyntaxerStateMachine(PhraseClass.blockClose, State.accoladeCloseSign, {
@@ -43,7 +49,8 @@ blockCloseMachine = SyntaxerStateMachine(PhraseClass.blockClose, State.accoladeC
 
 labelMachine = SyntaxerStateMachine(PhraseClass.label, State.label_end, {
     State.begin: rules.label,
-    State.label: rules.label_start,
+    State.label_start: rules.label_start,
+    State.label_param: rules.label_colon,
     State.label_end: rules.undefined
 })
 
@@ -60,9 +67,8 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
     active_machines: bool = False
     machine_found: bool = False
     token_index: int = 0
-    line_counter: int = 1
+    phrase_start_line: int = 1
     temp_phrase: List[Token] = []
-    tree_composer = TreeComposer(tree)
     sem_analyzer = SemanticAnalyzer(tree, table, lang_dict)
 
     while token_index < len(tokens):
@@ -70,7 +76,7 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
 
         # New line check
         if token.token_class == TokenClass.newline:
-            line_counter += 1
+            sem_analyzer.add_line()
 
         # Process token
         for machine in machines:
@@ -82,9 +88,8 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
         if not active_machines:
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
-                    recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase)
-                    sem_analyzer.process_phrase(recognized_phrase)
-                    tree_composer.add_phrase(recognized_phrase)
+                    recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase, phrase_start_line)
+                    sem_analyzer.process_phrase(recognized_phrase, phrase_start_line)
                     machine_found = True
                     temp_phrase.clear()
 
@@ -92,16 +97,20 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             if not machine_found:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxParseError(f"Syntax error. Unexpected token "
-                                               f"{repr(token.value)} at line {line_counter}.")
+                        raise SyntaxParseError(f"Syntax error.\nUnexpected token "
+                                               f"{repr(token.value)} at line {sem_analyzer.get_line()}.",
+                                               sem_analyzer.get_line(), token)
 
             # Reset machine states
             for machine in machines:
                 machine.reset_state()
 
+            # Get new phrase start line
+            phrase_start_line = sem_analyzer.get_line()
+
             # If current token newline - decrease line counter
             if token.token_class == TokenClass.newline:
-                line_counter -= 1
+                sem_analyzer.remove_line()
 
             token_index = token_index - 1
             machine_found = False
@@ -117,11 +126,11 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
 
     for machine in machines:
         if not machine_found and machine.is_sequence_recognized():
-            recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase)
-            sem_analyzer.process_phrase(recognized_phrase)
-            tree_composer.add_phrase(recognized_phrase)
+            recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase, phrase_start_line)
+            sem_analyzer.process_phrase(recognized_phrase, phrase_start_line)
             machine_found = True
 
-    if not tree_composer.is_tree_valid():
-        raise SyntaxParseError("Syntax error. Bad scoping.")
+    if not sem_analyzer.composer.is_tree_valid():
+        raise SyntaxParseError(f"Syntax error at line {phrase_start_line}.\n"
+                               f"Missing '}}'.")
     return

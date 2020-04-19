@@ -51,18 +51,18 @@ class ParseTree:
         """
         self.head = self.head.nodes[index]
 
-    def get_context(self) -> PhraseSubclass:
+    def get_context(self) -> Phrase:
         """
         Find nearest node with "block" class.
 
-        :return: subclass of nearest block class
+        :return: nearest phrase with block class
         """
         current = self.head
         while (current.data.phrase_subclass != PhraseSubclass.program and
                current.data.phrase_subclass != PhraseSubclass.body and
                current.data.phrase_subclass != PhraseSubclass.expression):
             current = current.parent
-        return current.data.phrase_subclass
+        return current.data
 
     def get_head(self) -> Node:
         """

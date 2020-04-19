@@ -25,17 +25,20 @@ class TreeComposer:
             return True
         return False
 
-    def add_phrase(self, phrase: Phrase):
+    def add_phrase(self, phrase: Phrase, phrase_line: int):
         """
         Add new phrase to tree.
 
         :param phrase: phrase to add
+        :param phrase_line: phrase start line
         """
         if phrase.phrase_class == PhraseClass.blockClose:
             if self._tree.head.parent is not None:
                 self._tree.ascend()
             else:
-                raise syntaxer.SyntaxParseError("Extra '}' was found.")
+                raise syntaxer.SyntaxParseError(f"Syntax error.\n"
+                                                f"Extra '}}' was found at line {phrase_line}.",
+                                                phrase_line)
             return
         self._tree.add_leaf(phrase)
         if phrase.phrase_class == PhraseClass.block:
