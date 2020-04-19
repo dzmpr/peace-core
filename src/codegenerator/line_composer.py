@@ -87,31 +87,25 @@ class LineComposer:
         :param skip: number of parameters to skip
         :return: composed string
         """
-        index = skip
-        if params[index].token_class == TokenClass.string:
-            result = params[index].value[1:-1]
-        elif params[index].token_class == TokenClass.parameter:
-            if params[index].value == "@":
-                result = self.expr_uses
+        def get_param(param: Token) -> str:
+            if param.token_class == TokenClass.string:
+                return param.value[1:-1]
+            elif param.token_class == TokenClass.parameter:
+                if param.value == "@":
+                    return str(self.expr_uses)
+                else:
+                    param_num = int(param.value[1:]) - 1
+                    return get_param(self.param_list[param_num])
             else:
-                param_num = int(params[index].value[1:]) - 1
-                result = self.param_list[param_num].value
-        else:
-            result = params[index].value
+                return param.value
+
+        index = skip
+        result = get_param(params[index])
         index += 1
 
         while index < len(params):
             result += ","
-            if params[index].token_class == TokenClass.string:
-                result += params[index].value[1:-1]
-            elif params[index].token_class == TokenClass.parameter:
-                if params[index].value == "@":
-                    result += self.expr_uses
-                else:
-                    param_num = int(params[index].value[1:]) - 1
-                    result += self.param_list[param_num].value
-            else:
-                result += params[index].value
+            result += get_param(params[index])
             index += 1
 
         return result
