@@ -55,10 +55,17 @@ class LineComposer:
             # Create new parameters list to replace parametrised arguments to actual params
             params = list()
             for param in phrase.params:
+                # Check is parameter has parameter class
                 if param.token_class == TokenClass.parameter:
+                    # When parameter value "@" - should be inserted expression occurrence number
+                    if param.value == "@":
+                        params.append(Token(TokenClass.num, str(self.expr_uses)))
+                        break
+                    # Otherwise insert parameter from parameters list
                     param_num = int(param.value[1:]) - 1
                     params.append(self.param_list[param_num])
                 else:
+                    # Else insert a parameter from operator
                     params.append(param)
 
             self.expr_gen(phrase.keyword.value, params)
@@ -91,6 +98,7 @@ class LineComposer:
                 self.parameters = phrase.keyword.value
             block_open = block_open.format(self.label, self.keyword, self.parameters)
             self.keyword = "RELEASE"
+            self.label = ""
         block_close = block_close.format(self.label, self.keyword, self.parameters)
         self.line = block_open
         return block_close
