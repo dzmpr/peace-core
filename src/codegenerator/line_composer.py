@@ -98,6 +98,7 @@ class LineComposer:
                 self.parameters = phrase.keyword.value
             block_open = block_open.format(self.label, self.keyword, self.parameters)
             self.keyword = "RELEASE"
+            self.label = ""
         block_close = block_close.format(self.label, self.keyword, self.parameters)
         self.line = block_open
         return block_close
