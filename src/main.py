@@ -91,6 +91,23 @@ lang_dict.add_signature("link", SignatureType.operator, "LINK", 1, [
 lang_dict.add_signature("unlink", SignatureType.operator, "UNLINK", 1, [
     TokenClass.string
 ])
+lang_dict.add_signature("priority", SignatureType.operator, "PRIORITY", 1, [
+    TokenClass.num
+])
+lang_dict.add_signature("assign", SignatureType.operator, "ASSIGN", 1, [
+    TokenClass.string
+])
+lang_dict.add_signature("func", SignatureType.operator, "FUNCTION", 3, [
+    TokenClass.word,
+    TokenClass.string,
+    TokenClass.string
+])
+lang_dict.add_signature("preempt", SignatureType.operator, "PREEMPT", 1, [
+    TokenClass.string
+])
+lang_dict.add_signature("ret", SignatureType.operator, "RETURN", 1, [
+    TokenClass.string
+])
 
 
 token_list = []

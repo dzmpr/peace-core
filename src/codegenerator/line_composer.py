@@ -3,10 +3,10 @@ from syntaxer.lang_dict import LangDict, SignatureType, Signature
 from lexer.token import Token, TokenClass
 from typing import List, Callable, Union
 
-
 templates = {
     "regular": " {:6} {:11} {:<}\n",
-    "compare": " {:6} TEST {:6} {:<}\n"
+    "compare": " {:6} TEST {:6} {:<}\n",
+    "func": " {:6} {:11} {:<}\n {:<}\n"
 }
 
 
@@ -39,16 +39,21 @@ class LineComposer:
             self._compose_expression(phrase, phrase_signature)
 
     def _compose_operator(self, phrase: Phrase, signature: Signature):
-        if phrase.keyword.value != "compare":
+        if phrase.keyword.value == "compare":
+            line = templates["compare"]
+            self.parameters = self._parameter_composer(phrase.params, 1)
+            self.keyword = phrase.params[0].value
+            self.line = line.format(self.label, self.keyword, self.parameters)
+        elif phrase.keyword.value == "func":
+            line = templates["func"]
+            self.line = line.format(phrase.params[0].value, signature.output,
+                                    phrase.params[1].value[1:-1], phrase.params[2].value[1:-1])
+        else:
             line = templates["regular"]
             if len(phrase.params):
                 self.parameters = self._parameter_composer(phrase.params)
             self.keyword = signature.output
-        else:
-            line = templates["compare"]
-            self.parameters = self._parameter_composer(phrase.params, 1)
-            self.keyword = phrase.params[0].value
-        self.line = line.format(self.label, self.keyword, self.parameters)
+            self.line = line.format(self.label, self.keyword, self.parameters)
 
     def _compose_expression(self, phrase: Phrase, signature: Signature):
         if signature.contains_param or signature.output == "":
@@ -111,6 +116,7 @@ class LineComposer:
         :param skip: number of parameters to skip
         :return: composed string
         """
+
         def get_param(param: Token) -> str:
             if param.token_class == TokenClass.string:
                 return param.value[1:-1]
