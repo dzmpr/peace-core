@@ -96,6 +96,32 @@ Interpreter will generate output .gpss file in the same folder with .pce.
   unlink("params")
   UNLINK params
   ```
+* PRIORITY
+  ```
+  priority(number)
+  PRIORITY number
+  ```
+* ASSIGN
+  ```
+  assign("params")
+  ASSIGN params
+  ```
+* FUNCTION
+  ```
+  func(word, "params", "params")
+  word FUNCTION params
+  params
+  ```
+* PREEMPT
+  ```
+  preempt("params")
+  PREEMPT params
+  ```
+* RETURN
+  ```
+  ret("params")
+  RETURN params
+  ```
 
 ### Labels
 Labels can be added with such syntax:
