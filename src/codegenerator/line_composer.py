@@ -46,7 +46,7 @@ class LineComposer:
             self.line = line.format(self.label, self.keyword, self.parameters)
         elif phrase.keyword.value == "func":
             line = templates["func"]
-            self.line = line.format(phrase.params[0].value[1:-1], signature.output,
+            self.line = line.format(phrase.params[0].value, signature.output,
                                     phrase.params[1].value[1:-1], phrase.params[2].value[1:-1])
         else:
             line = templates["regular"]

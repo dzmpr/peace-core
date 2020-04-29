@@ -98,7 +98,7 @@ lang_dict.add_signature("assign", SignatureType.operator, "ASSIGN", 1, [
     TokenClass.string
 ])
 lang_dict.add_signature("func", SignatureType.operator, "FUNCTION", 3, [
-    TokenClass.string,
+    TokenClass.word,
     TokenClass.string,
     TokenClass.string
 ])
