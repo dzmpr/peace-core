@@ -11,6 +11,7 @@ class SignatureType(Enum):
 class Signature:
     def __init__(self,
                  signature_type: SignatureType,
+                 definition: str,
                  output: str,
                  req_params: int,
                  max_params: int,
@@ -25,20 +26,35 @@ class Signature:
         :param params: list of param types
         """
         self.signature_type = signature_type
+        self.definition = definition
         self.output = output
-        self.req_params = req_params
+        self.required_params = req_params
         self.max_params = max_params
         self.params = params
         self.uses_number = 0
         self.contains_param: bool = False
 
     def __repr__(self):
-        return f"{self.signature_type.name}, params: {self.req_params}-{self.max_params}"
+        return f"{self.signature_type.name}, params: {self.required_params}-{self.max_params}"
+
+    def update_params(self, params: List[TokenClass]):
+        """
+        Update parameter list of defined signature
+
+        :param params: new parameters list
+        """
+        self.required_params = len(params)
+        self.max_params = len(params)
+        self.params = params
+
+    def add_use(self):
+        self.uses_number += 1
 
 
 class LangDict:
     def __init__(self):
-        self.ld: Dict[str, Signature] = dict()
+        self.ld: Dict[int, Signature] = dict()
+        self.counter: int = 0
 
     def __repr__(self):
         return f"Lang dict ({len(self.ld)})"
@@ -48,7 +64,7 @@ class LangDict:
                       signature_type: SignatureType,
                       output: str,
                       req_params: int,
-                      params: Union[List[TokenClass], None] = None):
+                      params: Union[List[TokenClass], None] = None) -> int:
         """
         Adds signature to language dictionary.
 
@@ -57,50 +73,32 @@ class LangDict:
         :param output: destination language output
         :param req_params: number of required params
         :param params: list of param types
+        :return identifier of added signature
         """
         if params is None:
             params = list()
-        self.ld[definition] = Signature(signature_type, output, req_params, len(params), params)
+        self.ld[self.counter] = Signature(signature_type, definition, output, req_params, len(params), params)
+        self.counter += 1
+        return self.counter - 1
 
-    def get_signature(self, definition: str) -> Signature:
+    def get_candidates(self, definition: str) -> List[int]:
         """
-        Get signature by keyword.
+        Get signatures indexes that fits definition.
 
         :param definition: keyword to find
-        :return: signature by keyword
+        :return: list of signatures that fits definition
         """
-        return self.ld[definition]
+        result = list()
+        for num, signature in self.ld.items():
+            if signature.definition == definition:
+                result.append(num)
+        return result
 
-    def check_definition(self, definition: str) -> bool:
+    def get_signature(self, identifier: int) -> Union[Signature, None]:
         """
         Check if keyword presence in dictionary.
 
-        :param definition: keyword
-        :return: true if keyword in dictionary
+        :param identifier: signature identifier
+        :return: signature if it was found, otherwise - None
         """
-        if definition in self.ld:
-            return True
-        return False
-
-    def set_output(self, definition: str, output: str):
-        """
-        Set new output to signature by keyword.
-
-        :param definition: keyword
-        :param output: new destination language output
-        """
-        self.ld[definition].output = output
-
-    def update_params(self, definition: str, params: List[TokenClass]):
-        """
-        Update parameter list of defined signature
-
-        :param definition: keyword
-        :param params: new parameters list
-        """
-        self.ld[definition].req_params = len(params)
-        self.ld[definition].max_params = len(params)
-        self.ld[definition].params = params
-
-    def add_use(self, definition: str):
-        self.ld[definition].uses_number += 1
+        return self.ld.get(identifier)
