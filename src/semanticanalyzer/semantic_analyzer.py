@@ -26,6 +26,7 @@ class SemanticAnalyzer:
         self._line_count: int = 1
         self._expr_params: Union[dict, None] = None
         self._expr_name: Union[str, None] = None
+        self._expr_id: Union[int, None] = None
 
     def add_line(self):
         self._line_count += 1
@@ -98,7 +99,7 @@ class SemanticAnalyzer:
             context = self.tree.get_context()
             op_signature = self.lang_dict.get_signature(keyword)
             params_num = len(phrase.params)
-            if op_signature.req_params <= params_num <= op_signature.max_params:
+            if op_signature.required_params <= params_num <= op_signature.max_params:
                 for i in range(params_num):
                     # Using parameters in body forbidden
                     if context.phrase_subclass == PhraseSubclass.body:
@@ -133,7 +134,7 @@ class SemanticAnalyzer:
             else:
                 raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
                                     f"Found \"{keyword}\" operator with {params_num} "
-                                    f"parameters, but expected {op_signature.req_params}-{op_signature.max_params}.",
+                                    f"parameters, but expected {op_signature.required_params}-{op_signature.max_params}.",
                                     line_number, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
@@ -153,29 +154,40 @@ class SemanticAnalyzer:
                 params.append(params_dict[key])
             return params
 
+        # When enter expression block
         if phrase.phrase_subclass == PhraseSubclass.expression:
-            self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
+            # Add signature for expression
+            self._expr_id = self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
+            # If this is first expression - create template
             if self._expr_params is None:
                 self._expr_params = dict()
                 self._expr_params.update({"@": TokenClass.num})
                 self._expr_name = phrase.keyword.value
             else:
+                # Parameter numbers should be consistent
                 if not is_params_consistent(self._expr_params):
                     raise SemanticError(f"Parameter error.\n"
                                         f"Parameters in {self._expr_name} not consistent.")
+
                 # Update expression signature
                 else:
-                    self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))
+                    self.lang_dict.get_signature(self._expr_id).update_params(build_params(self._expr_params))
                 self._expr_params.clear()
                 self._expr_params.update({"@": TokenClass.num})
                 self._expr_name = phrase.keyword.value
+
+        # When enter body
         elif phrase.phrase_subclass == PhraseSubclass.body:
+            # If above body was expression declaration
             if self._expr_params is not None:
+                # Parameter numbers should be consistent
                 if not is_params_consistent(self._expr_params):
                     raise SemanticError(f"Parameter error.\n"
                                         f"Parameters in {self._expr_name} not consistent.")
+
                 # Update expression signature
                 else:
-                    self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))
+                    self.lang_dict.get_signature(self._expr_id).update_params(build_params(self._expr_params))
+                # TODO: is this should be here?
                 self._expr_params.clear()
                 self._expr_name = phrase.keyword.value
