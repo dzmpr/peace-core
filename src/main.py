@@ -63,6 +63,9 @@ lang_dict.add_signature("delay", SignatureType.operator, "ADVANCE", 1, [
     TokenClass.num,
     TokenClass.num
 ])
+lang_dict.add_signature("delay", SignatureType.operator, "ADVANCE", 1, [
+    TokenClass.string
+])
 lang_dict.add_signature("destroy", SignatureType.operator, "TERMINATE", 0, [
     TokenClass.num
 ])

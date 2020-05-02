@@ -2,7 +2,7 @@ from parsetree.parse_tree import ParseTree
 from parsetree.tree_composer import TreeComposer
 from semanticanalyzer.symbol_table import SymbolTable
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
-from syntaxer.lang_dict import LangDict, SignatureType
+from syntaxer.lang_dict import LangDict, SignatureType, Signature
 from lexer.token import TokenClass
 from syntaxer.interpretation_error import InterpretationError, ErrorType, PeaceError
 from typing import Union
@@ -15,8 +15,10 @@ class SemanticAnalyzer:
         self.table: SymbolTable = symbol_table
         self.lang_dict: LangDict = lang_dict
         self._line_count: int = 1
+        self._expr_signature: Union[Signature, None] = None
         self._expr_params: Union[dict, None] = None
         self._expr_name: Union[str, None] = None
+        self._expr_id: Union[int, None] = None
 
     def add_line(self):
         self._line_count += 1
@@ -32,8 +34,8 @@ class SemanticAnalyzer:
 
     def process_phrase(self, phrase: Phrase, line_number: int):
         self._signature_recorder(phrase)
+        self._signature_inference(phrase, line_number)
         self._name_processing(phrase, line_number)
-        self._params_check(phrase, line_number)
         self.composer.add_phrase(phrase, line_number)
 
     # TODO: First version (without scope-dependent check), to be refactored
@@ -60,75 +62,93 @@ class SemanticAnalyzer:
 
         elif phrase.phrase_class == PhraseClass.operator:
             operator: str = phrase.keyword.value
-            if self.lang_dict.check_definition(operator):
-                sig_type = self.lang_dict.get_signature(operator).signature_type
-                if sig_type == SignatureType.operator:
-                    if len(phrase.params):
-                        identifier: str = phrase.params[0].value
-                        if operator == "q":
-                            if not self.table.is_symbol_presence(identifier):
-                                self.table.add_symbol(identifier, phrase.phrase_class)
-                            else:
-                                raise InterpretationError(
-                                    PeaceError(f"Name \"{identifier}\" already used by "
-                                               f"{self.table.get_symbol(identifier).phrase_class.name}.",
-                                               ErrorType.naming_error, line_number, identifier))
-                        elif operator == "dq":
-                            if not self.table.is_symbol_presence(identifier):
-                                raise InterpretationError(
-                                    PeaceError(f"\nName \"{identifier}\" was never defined.",
-                                               ErrorType.naming_error, line_number, identifier))
-            else:
-                raise InterpretationError(
-                    PeaceError(f"Unknown operator \"{operator}\".",
-                               ErrorType.naming_error, line_number, operator))
-
-    def _params_check(self, phrase: Phrase, line_number: int):
-        if phrase.phrase_class == PhraseClass.operator:
-            keyword = phrase.keyword.value
-            context = self.tree.get_context()
-            op_signature = self.lang_dict.get_signature(keyword)
-            params_num = len(phrase.params)
-            if op_signature.req_params <= params_num <= op_signature.max_params:
-                for i in range(params_num):
-                    # Using parameters in body forbidden
-                    if context.phrase_subclass == PhraseSubclass.body:
-                        if phrase.params[i].token_class == TokenClass.parameter:
+            sig_type = self.lang_dict.get_signature(phrase.signature_id).signature_type
+            if sig_type == SignatureType.operator:
+                if len(phrase.params):
+                    identifier: str = phrase.params[0].value
+                    if operator == "q":
+                        if not self.table.is_symbol_presence(identifier):
+                            self.table.add_symbol(identifier, phrase.phrase_class)
+                        else:
                             raise InterpretationError(
-                                PeaceError(f"Parameter \"{phrase.params[i].value}\" can't be used inside main.",
-                                           ErrorType.parameter_error, line_number, phrase.params[i].value))
+                                PeaceError(f"Name \"{identifier}\" already used by "
+                                           f"{self.table.get_symbol(identifier).phrase_class.name}.",
+                                           ErrorType.naming_error, line_number, identifier))
+                    elif operator == "dq":
+                        if not self.table.is_symbol_presence(identifier):
+                            raise InterpretationError(
+                                PeaceError(f"\nName \"{identifier}\" was never defined.",
+                                           ErrorType.naming_error, line_number, identifier))
 
-                    # Check parameter define in expression
-                    elif context.phrase_subclass == PhraseSubclass.expression:
-                        if phrase.params[i].token_class == TokenClass.parameter:
-                            if phrase.params[i].value in self._expr_params:
-                                if self._expr_params[phrase.params[i].value] != op_signature.params[i]:
-                                    raise InterpretationError(
-                                        PeaceError(f"Wrong parameter for \"{keyword}\", expected "
-                                                   f"{op_signature.params[i].name} but "
-                                                   f"\"{phrase.params[i].value}\" has "
-                                                   f"{self._expr_params[phrase.params[i].value].name} type.",
-                                                   ErrorType.parameter_error, line_number, phrase.params[i].value))
+    def _signature_inference(self, phrase: Phrase, line_number: int):
+        if phrase.phrase_class == PhraseClass.operator:
+            candidates = self.lang_dict.get_candidates(phrase.keyword.value)
+            unsuitable_candidates = InterpretationError()
+            temp_params: Union[dict, None] = None
+            for signature_id in candidates:
+                signature = self.lang_dict.get_signature(signature_id)
+                if self._expr_params is not None:
+                    temp_params = self._expr_params.copy()
 
-                            else:
-                                self._expr_params[phrase.params[i].value] = op_signature.params[i]
+                try:
+                    self._signature_check(signature, phrase, temp_params, line_number)
 
-                            self.lang_dict.get_signature(context.keyword.value).contains_param = True
-                            continue
+                except PeaceError as error:
+                    unsuitable_candidates.add_error(error)
 
-                    # Check coincidence of parameter with operator signature
-                    if phrase.params[i].token_class != op_signature.params[i]:
-                        raise InterpretationError(
-                            PeaceError(f"Wrong parameter for \"{keyword}\", expected "
-                                       f"{op_signature.params[i].name} but "
-                                       f"\"{phrase.params[i].value}\" has "
-                                       f"{self._expr_params[phrase.params[i].value].name} type.",
-                                       ErrorType.parameter_error, line_number, phrase.params[i].value))
-            else:
-                raise InterpretationError(
-                    PeaceError(f"Found \"{keyword}\" operator with {params_num} "
-                               f"parameters, but expected {op_signature.req_params}-{op_signature.max_params}.",
-                               ErrorType.parameter_error, line_number, keyword))
+                else:
+                    if self._expr_params is not None:
+                        self._expr_params.update(temp_params)
+                    phrase.signature_id = signature_id
+                    break
+
+            if phrase.signature_id is None:
+                raise unsuitable_candidates
+
+    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: Union[dict, None], line_number: int):
+        keyword = phrase.keyword.value
+        context = self.tree.get_context()
+        params_num = len(phrase.params)
+        param_usage: bool = False
+        if candidate.required_params <= params_num <= candidate.max_params:
+            for i in range(params_num):
+                # Using parameters in body forbidden
+                if context.phrase_subclass == PhraseSubclass.body:
+                    if phrase.params[i].token_class == TokenClass.parameter:
+                        raise PeaceError(f"Parameter \"{phrase.params[i].value}\" can't be used inside main.",
+                                         ErrorType.parameter_error, line_number, phrase.params[i].value)
+
+                # Check parameter define in expression
+                elif context.phrase_subclass == PhraseSubclass.expression:
+                    if phrase.params[i].token_class == TokenClass.parameter:
+                        if phrase.params[i].value in expr_params:
+                            if expr_params[phrase.params[i].value] != candidate.params[i]:
+                                raise PeaceError(f"Wrong parameter for \"{keyword}\", expected "
+                                                 f"{candidate.params[i].name} but "
+                                                 f"\"{phrase.params[i].value}\" has "
+                                                 f"{expr_params[phrase.params[i].value].name} type.",
+                                                 ErrorType.parameter_error, line_number, phrase.params[i].value)
+
+                        else:
+                            expr_params[phrase.params[i].value] = candidate.params[i]
+
+                        param_usage = True
+                        continue
+
+                # Check coincidence of parameter with operator signature
+                if phrase.params[i].token_class != candidate.params[i]:
+                    raise PeaceError(f"Wrong parameter for \"{keyword}\", expected "
+                                     f"{candidate.params[i].name} but found {phrase.params[i].token_class.name}.",
+                                     ErrorType.parameter_error, line_number, phrase.params[i].value)
+
+            # If exceptions not occurred - update signature
+            if param_usage is True:
+                if self._expr_signature is not None:
+                    self._expr_signature.contains_param = param_usage
+        else:
+            raise PeaceError(f"Found \"{keyword}\" operator with {params_num} "
+                             f"parameters, but expected {candidate.required_params}-{candidate.max_params}.",
+                             ErrorType.parameter_error, line_number, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
         # Check if parameter names are consistent
@@ -147,31 +167,40 @@ class SemanticAnalyzer:
                 params.append(params_dict[key])
             return params
 
+        # When enter expression block
         if phrase.phrase_subclass == PhraseSubclass.expression:
-            self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
+            # Add signature for expression
+            self._expr_id = self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
+            # If this is first expression - create template
             if self._expr_params is None:
                 self._expr_params = dict()
                 self._expr_params.update({"@": TokenClass.num})
                 self._expr_name = phrase.keyword.value
+                self._expr_signature = self.lang_dict.get_signature(self._expr_id)
             else:
+                # Parameter numbers should be consistent
                 if not is_params_consistent(self._expr_params):
-                    raise InterpretationError(
-                        PeaceError(f"Parameters in {self._expr_name} not consistent.",
-                                   ErrorType.parameter_error))
+                    raise InterpretationError(PeaceError(f"Parameters in {self._expr_name} not consistent.",
+                                                         ErrorType.parameter_error))
                 # Update expression signature
                 else:
-                    self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))
+                    self._expr_signature.update_params(build_params(self._expr_params))
                 self._expr_params.clear()
                 self._expr_params.update({"@": TokenClass.num})
                 self._expr_name = phrase.keyword.value
+                self._expr_signature = self.lang_dict.get_signature(self._expr_id)
+
+        # When enter body
         elif phrase.phrase_subclass == PhraseSubclass.body:
+            # If above body was expression declaration
             if self._expr_params is not None:
+                # Parameter numbers should be consistent
                 if not is_params_consistent(self._expr_params):
-                    raise InterpretationError(
-                        PeaceError(f"Parameters in {self._expr_name} not consistent.",
-                                   ErrorType.parameter_error))
+                    raise InterpretationError(PeaceError(f"Parameters in {self._expr_name} not consistent.",
+                                                         ErrorType.parameter_error))
                 # Update expression signature
                 else:
-                    self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))
+                    self._expr_signature.update_params(build_params(self._expr_params))
+                # TODO: is this should be here?
                 self._expr_params.clear()
                 self._expr_name = phrase.keyword.value

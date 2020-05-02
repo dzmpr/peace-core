@@ -32,10 +32,11 @@ class CodeGenerator:
         self._temp_expression += line
 
     def expression_processor(self, definition: str, params: Union[List[Token], None] = None):
-        expr_signature = self._lang_dict.get_signature(definition)
+        candidates = self._lang_dict.get_candidates(definition)
+        expr_signature = self._lang_dict.get_signature(candidates[0])
         expr_generator = CodeGenerator(self._tree, self._lang_dict, self._output, params, expr_signature.uses_number)
-        self._lang_dict.set_output(definition, expr_generator.generate_expression(definition))
-        self._lang_dict.add_use(definition)
+        expr_signature.set_output(expr_generator.generate_expression(definition))
+        expr_signature.add_use()
 
     # Callback for processing phrases
     def phrase_processor(self, phrase: Phrase):

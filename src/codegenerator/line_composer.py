@@ -32,7 +32,7 @@ class LineComposer:
         return self.line
 
     def compose_line(self, phrase: Phrase):
-        phrase_signature = self.lang_dict.get_signature(phrase.keyword.value)
+        phrase_signature = self.lang_dict.get_signature(phrase.signature_id)
         if phrase_signature.signature_type == SignatureType.operator:
             self._compose_operator(phrase, phrase_signature)
         elif phrase_signature.signature_type == SignatureType.expression:
