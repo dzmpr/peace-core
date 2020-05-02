@@ -5,14 +5,11 @@ from typing import TextIO
 from lexer import lexer
 from lexer.token import TokenClass
 from syntaxer import syntaxer
-from syntaxer.syntaxer import SyntaxParseError
 from syntaxer.lang_dict import LangDict, SignatureType
-from syntaxer.phrase_builder import PhraseBuildError
-from syntaxer.error_info import print_error_info
+from syntaxer.interpretation_error import InterpretationError, print_error_info
 from codegenerator.code_generator import CodeGenerator
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
-from semanticanalyzer.semantic_analyzer import SemanticError
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pce files into .gpss.")
 parser.add_argument(
@@ -134,7 +131,7 @@ symbol_table = SymbolTable()
 try:
     syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, token_list)
     token_list.clear()
-except (SyntaxParseError, SemanticError, PhraseBuildError) as error:
+except InterpretationError as error:
     print_error_info(error, path)
     sys.exit(2)
 
