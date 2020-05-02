@@ -47,6 +47,9 @@ class Signature:
         self.max_params = len(params)
         self.params = params
 
+    def set_output(self, output: str):
+        self.output = output
+
     def add_use(self):
         self.uses_number += 1
 
