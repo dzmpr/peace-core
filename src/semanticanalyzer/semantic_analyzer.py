@@ -84,26 +84,32 @@ class SemanticAnalyzer:
         if phrase.phrase_class == PhraseClass.operator:
             candidates = self.lang_dict.get_candidates(phrase.keyword.value)
             unsuitable_candidates = InterpretationError()
+            temp_params: Union[dict, None] = None
             for signature_id in candidates:
                 signature = self.lang_dict.get_signature(signature_id)
-                try:
+                if self._expr_params is not None:
                     temp_params = self._expr_params.copy()
+
+                try:
                     self._signature_check(signature, phrase, temp_params, line_number)
+
                 except PeaceError as error:
                     unsuitable_candidates.add_error(error)
+
                 else:
-                    self._expr_params.update(temp_params)
+                    if self._expr_params is not None:
+                        self._expr_params.update(temp_params)
                     phrase.signature_id = signature_id
                     break
 
             if phrase.signature_id is None:
                 raise unsuitable_candidates
 
-    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: dict, line_number: int):
+    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: Union[dict, None], line_number: int):
         keyword = phrase.keyword.value
         context = self.tree.get_context()
         params_num = len(phrase.params)
-        param_usage = self._expr_signature.contains_param
+        param_usage: bool = False
         if candidate.required_params <= params_num <= candidate.max_params:
             for i in range(params_num):
                 # Using parameters in body forbidden
@@ -136,7 +142,9 @@ class SemanticAnalyzer:
                                      ErrorType.parameter_error, line_number, phrase.params[i].value)
 
             # If exceptions not occurred - update signature
-            self._expr_signature.contains_param = param_usage
+            if param_usage is True:
+                if self._expr_signature is not None:
+                    self._expr_signature.contains_param = param_usage
         else:
             raise PeaceError(f"Found \"{keyword}\" operator with {params_num} "
                              f"parameters, but expected {candidate.required_params}-{candidate.max_params}.",
