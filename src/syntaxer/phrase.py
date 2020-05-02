@@ -28,10 +28,12 @@ class Phrase:
     def __init__(self,
                  phrase_class: PhraseClass,
                  phrase_subclass: Union[PhraseSubclass, None] = None,
+                 signature_id: Union[int, None] = None,
                  keyword: Union[Token, None] = None,
                  params: Union[List[Token], None] = None):
         self.phrase_class = phrase_class
         self.phrase_subclass = phrase_subclass
+        self.signature_id = signature_id
         self.keyword = keyword
         self.params = params
 
