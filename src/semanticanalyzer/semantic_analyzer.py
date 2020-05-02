@@ -4,17 +4,8 @@ from semanticanalyzer.symbol_table import SymbolTable
 from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from syntaxer.lang_dict import LangDict, SignatureType
 from lexer.token import TokenClass
+from syntaxer.interpretation_error import InterpretationError, ErrorType, PeaceError
 from typing import Union
-
-
-class SemanticError(Exception):
-    def __init__(self,
-                 msg: str,
-                 line: Union[int, None] = None,
-                 identifier: Union[str, None] = None):
-        self.msg = msg
-        self.line = line
-        self.identifier = identifier
 
 
 class SemanticAnalyzer:
@@ -52,20 +43,20 @@ class SemanticAnalyzer:
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_subclass)
             else:
-                raise SemanticError(f"Naming error at line {self._line_count - 1}."
-                                    f"\nName \"{identifier}\" already used by "
-                                    f"{self.table.get_symbol(identifier).phrase_class.name}.",
-                                    line_number, identifier)
+                raise InterpretationError(
+                    PeaceError(f"\nName \"{identifier}\" already used by "
+                               f"{self.table.get_symbol(identifier).phrase_class.name}.",
+                               ErrorType.naming_error, line_number, identifier))
 
         elif phrase.phrase_class == PhraseClass.label:
             identifier: str = phrase.keyword.value
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_class)
             else:
-                raise SemanticError(f"Naming error at line {self._line_count - 1}."
-                                    f"\nName \"{identifier}\" already used by "
-                                    f"{self.table.get_symbol(identifier).phrase_class.name}.",
-                                    line_number, identifier)
+                raise InterpretationError(
+                    PeaceError(f"\nName \"{identifier}\" already used by "
+                               f"{self.table.get_symbol(identifier).phrase_class.name}.",
+                               ErrorType.naming_error, line_number, identifier))
 
         elif phrase.phrase_class == PhraseClass.operator:
             operator: str = phrase.keyword.value
@@ -78,19 +69,19 @@ class SemanticAnalyzer:
                             if not self.table.is_symbol_presence(identifier):
                                 self.table.add_symbol(identifier, phrase.phrase_class)
                             else:
-                                raise SemanticError(f"Naming error at line {self._line_count - 1}.\n"
-                                                    f"Name \"{identifier}\" already used by "
-                                                    f"{self.table.get_symbol(identifier).phrase_class.name}.",
-                                                    line_number, identifier)
+                                raise InterpretationError(
+                                    PeaceError(f"Name \"{identifier}\" already used by "
+                                               f"{self.table.get_symbol(identifier).phrase_class.name}.",
+                                               ErrorType.naming_error, line_number, identifier))
                         elif operator == "dq":
                             if not self.table.is_symbol_presence(identifier):
-                                raise SemanticError(f"Naming error at line {self._line_count - 1}."
-                                                    f"\nName \"{identifier}\" was never defined.",
-                                                    line_number, identifier)
+                                raise InterpretationError(
+                                    PeaceError(f"\nName \"{identifier}\" was never defined.",
+                                               ErrorType.naming_error, line_number, identifier))
             else:
-                raise SemanticError(f"Naming error at line {self._line_count - 1}.\n"
-                                    f"Unknown operator \"{operator}\".",
-                                    line_number, operator)
+                raise InterpretationError(
+                    PeaceError(f"Unknown operator \"{operator}\".",
+                               ErrorType.naming_error, line_number, operator))
 
     def _params_check(self, phrase: Phrase, line_number: int):
         if phrase.phrase_class == PhraseClass.operator:
@@ -103,20 +94,22 @@ class SemanticAnalyzer:
                     # Using parameters in body forbidden
                     if context.phrase_subclass == PhraseSubclass.body:
                         if phrase.params[i].token_class == TokenClass.parameter:
-                            raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
-                                                f"Parameter \"{phrase.params[i].value}\" can't be used inside main.",
-                                                line_number, phrase.params[i].value)
+                            raise InterpretationError(
+                                PeaceError(f"Parameter \"{phrase.params[i].value}\" can't be used inside main.",
+                                           ErrorType.parameter_error, line_number, phrase.params[i].value))
+
                     # Check parameter define in expression
                     elif context.phrase_subclass == PhraseSubclass.expression:
                         if phrase.params[i].token_class == TokenClass.parameter:
                             if phrase.params[i].value in self._expr_params:
                                 if self._expr_params[phrase.params[i].value] != op_signature.params[i]:
-                                    raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
-                                                        f"Wrong parameter for \"{keyword}\", expected "
-                                                        f"{op_signature.params[i].name} but "
-                                                        f"\"{phrase.params[i].value}\" has "
-                                                        f"{self._expr_params[phrase.params[i].value].name} type.",
-                                                        line_number, phrase.params[i].value)
+                                    raise InterpretationError(
+                                        PeaceError(f"Wrong parameter for \"{keyword}\", expected "
+                                                   f"{op_signature.params[i].name} but "
+                                                   f"\"{phrase.params[i].value}\" has "
+                                                   f"{self._expr_params[phrase.params[i].value].name} type.",
+                                                   ErrorType.parameter_error, line_number, phrase.params[i].value))
+
                             else:
                                 self._expr_params[phrase.params[i].value] = op_signature.params[i]
 
@@ -125,16 +118,17 @@ class SemanticAnalyzer:
 
                     # Check coincidence of parameter with operator signature
                     if phrase.params[i].token_class != op_signature.params[i]:
-                        raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
-                                            f"Wrong parameter for \"{keyword}\", expected "
-                                            f"{op_signature.params[i].name} but found "
-                                            f"{phrase.params[i].token_class.name}.",
-                                            line_number, phrase.params[i].value)
+                        raise InterpretationError(
+                            PeaceError(f"Wrong parameter for \"{keyword}\", expected "
+                                       f"{op_signature.params[i].name} but "
+                                       f"\"{phrase.params[i].value}\" has "
+                                       f"{self._expr_params[phrase.params[i].value].name} type.",
+                                       ErrorType.parameter_error, line_number, phrase.params[i].value))
             else:
-                raise SemanticError(f"Parameter error at line {self._line_count - 1}.\n"
-                                    f"Found \"{keyword}\" operator with {params_num} "
-                                    f"parameters, but expected {op_signature.req_params}-{op_signature.max_params}.",
-                                    line_number, keyword)
+                raise InterpretationError(
+                    PeaceError(f"Found \"{keyword}\" operator with {params_num} "
+                               f"parameters, but expected {op_signature.req_params}-{op_signature.max_params}.",
+                               ErrorType.parameter_error, line_number, keyword))
 
     def _signature_recorder(self, phrase: Phrase):
         # Check if parameter names are consistent
@@ -161,8 +155,9 @@ class SemanticAnalyzer:
                 self._expr_name = phrase.keyword.value
             else:
                 if not is_params_consistent(self._expr_params):
-                    raise SemanticError(f"Parameter error.\n"
-                                        f"Parameters in {self._expr_name} not consistent.")
+                    raise InterpretationError(
+                        PeaceError(f"Parameters in {self._expr_name} not consistent.",
+                                   ErrorType.parameter_error))
                 # Update expression signature
                 else:
                     self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))
@@ -172,8 +167,9 @@ class SemanticAnalyzer:
         elif phrase.phrase_subclass == PhraseSubclass.body:
             if self._expr_params is not None:
                 if not is_params_consistent(self._expr_params):
-                    raise SemanticError(f"Parameter error.\n"
-                                        f"Parameters in {self._expr_name} not consistent.")
+                    raise InterpretationError(
+                        PeaceError(f"Parameters in {self._expr_name} not consistent.",
+                                   ErrorType.parameter_error))
                 # Update expression signature
                 else:
                     self.lang_dict.update_params(self._expr_name, build_params(self._expr_params))

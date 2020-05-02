@@ -1,6 +1,6 @@
 from parsetree.parse_tree import ParseTree
 from syntaxer.phrase import Phrase, PhraseClass
-from syntaxer import syntaxer
+from syntaxer.interpretation_error import InterpretationError, ErrorType, PeaceError
 
 
 class TreeComposer:
@@ -36,9 +36,9 @@ class TreeComposer:
             if self._tree.head.parent is not None:
                 self._tree.ascend()
             else:
-                raise syntaxer.SyntaxParseError(f"Syntax error.\n"
-                                                f"Extra '}}' was found at line {phrase_line}.",
-                                                phrase_line)
+                raise InterpretationError(
+                    PeaceError(f"Extra '}}' was found.",
+                               ErrorType.syntax_error, phrase_line))
             return
         self._tree.add_leaf(phrase)
         if phrase.phrase_class == PhraseClass.block:
