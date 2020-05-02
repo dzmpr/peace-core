@@ -61,75 +61,66 @@ class SemanticAnalyzer:
 
         elif phrase.phrase_class == PhraseClass.operator:
             operator: str = phrase.keyword.value
-            if self.lang_dict.check_definition(operator):
-                sig_type = self.lang_dict.get_signature(operator).signature_type
-                if sig_type == SignatureType.operator:
-                    if len(phrase.params):
-                        identifier: str = phrase.params[0].value
-                        if operator == "q":
-                            if not self.table.is_symbol_presence(identifier):
-                                self.table.add_symbol(identifier, phrase.phrase_class)
-                            else:
-                                raise InterpretationError(
-                                    PeaceError(f"Name \"{identifier}\" already used by "
-                                               f"{self.table.get_symbol(identifier).phrase_class.name}.",
-                                               ErrorType.naming_error, line_number, identifier))
-                        elif operator == "dq":
-                            if not self.table.is_symbol_presence(identifier):
-                                raise InterpretationError(
-                                    PeaceError(f"\nName \"{identifier}\" was never defined.",
-                                               ErrorType.naming_error, line_number, identifier))
-            else:
-                raise InterpretationError(
-                    PeaceError(f"Unknown operator \"{operator}\".",
-                               ErrorType.naming_error, line_number, operator))
+            sig_type = self.lang_dict.get_signature(phrase.signature_id).signature_type
+            if sig_type == SignatureType.operator:
+                if len(phrase.params):
+                    identifier: str = phrase.params[0].value
+                    if operator == "q":
+                        if not self.table.is_symbol_presence(identifier):
+                            self.table.add_symbol(identifier, phrase.phrase_class)
+                        else:
+                            raise InterpretationError(
+                                PeaceError(f"Name \"{identifier}\" already used by "
+                                           f"{self.table.get_symbol(identifier).phrase_class.name}.",
+                                           ErrorType.naming_error, line_number, identifier))
+                    elif operator == "dq":
+                        if not self.table.is_symbol_presence(identifier):
+                            raise InterpretationError(
+                                PeaceError(f"\nName \"{identifier}\" was never defined.",
+                                           ErrorType.naming_error, line_number, identifier))
 
     def _signature_inference(self, phrase: Phrase, line_number: int):
         if phrase.phrase_class == PhraseClass.operator:
-            keyword = phrase.keyword.value
-            candidates = self.lang_dict.get_candidates(keyword)
+            candidates = self.lang_dict.get_candidates(phrase.keyword.value)
             unsuitable_candidates = InterpretationError()
             for signature_id in candidates:
                 signature = self.lang_dict.get_signature(signature_id)
                 try:
                     temp_params = self._expr_params.copy()
-                    temp_param_usage = signature.contains_param
-                    self._signature_check(signature, phrase, temp_params, temp_param_usage, line_number)
+                    self._signature_check(signature, phrase, temp_params, line_number)
                 except PeaceError as error:
                     unsuitable_candidates.add_error(error)
                 else:
                     self._expr_params.update(temp_params)
-                    signature.contains_param = temp_param_usage
                     phrase.signature_id = signature_id
                     break
 
             if phrase.signature_id is None:
                 raise unsuitable_candidates
 
-    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: dict, param_usage: bool, line_number: int):
+    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: dict, line_number: int):
         keyword = phrase.keyword.value
         context = self.tree.get_context()
         params_num = len(phrase.params)
+        param_usage = candidate.contains_param
         if candidate.required_params <= params_num <= candidate.max_params:
             for i in range(params_num):
                 # Using parameters in body forbidden
                 if context.phrase_subclass == PhraseSubclass.body:
                     if phrase.params[i].token_class == TokenClass.parameter:
-                        raise InterpretationError(
-                            PeaceError(f"Parameter \"{phrase.params[i].value}\" can't be used inside main.",
-                                       ErrorType.parameter_error, line_number, phrase.params[i].value))
+                        raise PeaceError(f"Parameter \"{phrase.params[i].value}\" can't be used inside main.",
+                                         ErrorType.parameter_error, line_number, phrase.params[i].value)
 
                 # Check parameter define in expression
                 elif context.phrase_subclass == PhraseSubclass.expression:
                     if phrase.params[i].token_class == TokenClass.parameter:
                         if phrase.params[i].value in expr_params:
                             if expr_params[phrase.params[i].value] != candidate.params[i]:
-                                raise InterpretationError(
-                                    PeaceError(f"Wrong parameter for \"{keyword}\", expected "
-                                               f"{candidate.params[i].name} but "
-                                               f"\"{phrase.params[i].value}\" has "
-                                               f"{expr_params[phrase.params[i].value].name} type.",
-                                               ErrorType.parameter_error, line_number, phrase.params[i].value))
+                                raise PeaceError(f"Wrong parameter for \"{keyword}\", expected "
+                                                 f"{candidate.params[i].name} but "
+                                                 f"\"{phrase.params[i].value}\" has "
+                                                 f"{expr_params[phrase.params[i].value].name} type.",
+                                                 ErrorType.parameter_error, line_number, phrase.params[i].value)
 
                         else:
                             expr_params[phrase.params[i].value] = candidate.params[i]
@@ -139,17 +130,16 @@ class SemanticAnalyzer:
 
                 # Check coincidence of parameter with operator signature
                 if phrase.params[i].token_class != candidate.params[i]:
-                    raise InterpretationError(
-                        PeaceError(f"Wrong parameter for \"{keyword}\", expected "
-                                   f"{candidate.params[i].name} but "
-                                   f"\"{phrase.params[i].value}\" has "
-                                   f"{expr_params[phrase.params[i].value].name} type.",
-                                   ErrorType.parameter_error, line_number, phrase.params[i].value))
+                    raise PeaceError(f"Wrong parameter for \"{keyword}\", expected "
+                                     f"{candidate.params[i].name} but found {phrase.params[i].token_class.name}.",
+                                     ErrorType.parameter_error, line_number, phrase.params[i].value)
+
+            # If exceptions not occurred - update signature
+            candidate.contains_param = param_usage
         else:
-            raise InterpretationError(
-                PeaceError(f"Found \"{keyword}\" operator with {params_num} "
-                           f"parameters, but expected {candidate.required_params}-{candidate.max_params}.",
-                           ErrorType.parameter_error, line_number, keyword))
+            raise PeaceError(f"Found \"{keyword}\" operator with {params_num} "
+                             f"parameters, but expected {candidate.required_params}-{candidate.max_params}.",
+                             ErrorType.parameter_error, line_number, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
         # Check if parameter names are consistent
@@ -170,8 +160,6 @@ class SemanticAnalyzer:
 
         # When enter expression block
         if phrase.phrase_subclass == PhraseSubclass.expression:
-            # Add signature for expression
-            self._expr_id = self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
             # If this is first expression - create template
             if self._expr_params is None:
                 self._expr_params = dict()
@@ -189,6 +177,9 @@ class SemanticAnalyzer:
                 self._expr_params.clear()
                 self._expr_params.update({"@": TokenClass.num})
                 self._expr_name = phrase.keyword.value
+
+            # Add signature for expression
+            self._expr_id = self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
 
         # When enter body
         elif phrase.phrase_subclass == PhraseSubclass.body:
