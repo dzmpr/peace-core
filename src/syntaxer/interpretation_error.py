@@ -26,8 +26,8 @@ class PeaceError(Exception):
 
     def get_exception(self):
         if self.line is not None:
-            return f"{self.type.get_error_name()} at line {self.line}.\n{self.msg}\n"
-        return f"{self.type.get_error_name()}.\n{self.msg}\n"
+            return f"{self.type.get_error_name()} at line {self.line}.\n{self.msg}"
+        return f"{self.type.get_error_name()}.\n{self.msg}"
 
 
 class InterpretationError(Exception):
