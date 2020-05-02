@@ -15,6 +15,7 @@ class SemanticAnalyzer:
         self.table: SymbolTable = symbol_table
         self.lang_dict: LangDict = lang_dict
         self._line_count: int = 1
+        self._expr_signature: Union[Signature, None] = None
         self._expr_params: Union[dict, None] = None
         self._expr_name: Union[str, None] = None
         self._expr_id: Union[int, None] = None
@@ -102,7 +103,7 @@ class SemanticAnalyzer:
         keyword = phrase.keyword.value
         context = self.tree.get_context()
         params_num = len(phrase.params)
-        param_usage = candidate.contains_param
+        param_usage = self._expr_signature.contains_param
         if candidate.required_params <= params_num <= candidate.max_params:
             for i in range(params_num):
                 # Using parameters in body forbidden
@@ -135,7 +136,7 @@ class SemanticAnalyzer:
                                      ErrorType.parameter_error, line_number, phrase.params[i].value)
 
             # If exceptions not occurred - update signature
-            candidate.contains_param = param_usage
+            self._expr_signature.contains_param = param_usage
         else:
             raise PeaceError(f"Found \"{keyword}\" operator with {params_num} "
                              f"parameters, but expected {candidate.required_params}-{candidate.max_params}.",
@@ -160,26 +161,26 @@ class SemanticAnalyzer:
 
         # When enter expression block
         if phrase.phrase_subclass == PhraseSubclass.expression:
+            # Add signature for expression
+            self._expr_id = self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
             # If this is first expression - create template
             if self._expr_params is None:
                 self._expr_params = dict()
                 self._expr_params.update({"@": TokenClass.num})
                 self._expr_name = phrase.keyword.value
+                self._expr_signature = self.lang_dict.get_signature(self._expr_id)
             else:
                 # Parameter numbers should be consistent
                 if not is_params_consistent(self._expr_params):
-                    raise InterpretationError(
-                        PeaceError(f"Parameters in {self._expr_name} not consistent.",
-                                   ErrorType.parameter_error))
+                    raise InterpretationError(PeaceError(f"Parameters in {self._expr_name} not consistent.",
+                                                         ErrorType.parameter_error))
                 # Update expression signature
                 else:
-                    self.lang_dict.get_signature(self._expr_id).update_params(build_params(self._expr_params))
+                    self._expr_signature.update_params(build_params(self._expr_params))
                 self._expr_params.clear()
                 self._expr_params.update({"@": TokenClass.num})
                 self._expr_name = phrase.keyword.value
-
-            # Add signature for expression
-            self._expr_id = self.lang_dict.add_signature(phrase.keyword.value, SignatureType.expression, "", 0)
+                self._expr_signature = self.lang_dict.get_signature(self._expr_id)
 
         # When enter body
         elif phrase.phrase_subclass == PhraseSubclass.body:
@@ -187,12 +188,11 @@ class SemanticAnalyzer:
             if self._expr_params is not None:
                 # Parameter numbers should be consistent
                 if not is_params_consistent(self._expr_params):
-                    raise InterpretationError(
-                        PeaceError(f"Parameters in {self._expr_name} not consistent.",
-                                   ErrorType.parameter_error))
+                    raise InterpretationError(PeaceError(f"Parameters in {self._expr_name} not consistent.",
+                                                         ErrorType.parameter_error))
                 # Update expression signature
                 else:
-                    self.lang_dict.get_signature(self._expr_id).update_params(build_params(self._expr_params))
+                    self._expr_signature.update_params(build_params(self._expr_params))
                 # TODO: is this should be here?
                 self._expr_params.clear()
                 self._expr_name = phrase.keyword.value
