@@ -6,19 +6,10 @@ from syntaxer import rules
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
 from semanticanalyzer.semantic_analyzer import SemanticAnalyzer
+from syntaxer.interpretation_error import InterpretationError, ErrorType, PeaceError
 from syntaxer.phrase_builder import phrase_builder
 from syntaxer.lang_dict import LangDict
-from typing import List, Union
-
-
-class SyntaxParseError(Exception):
-    def __init__(self,
-                 msg: str,
-                 line: Union[int, None] = None,
-                 token: Union[Token, None] = None):
-        self.msg = msg
-        self.line = line
-        self.token = token
+from typing import List
 
 
 operatorMachine = SyntaxerStateMachine(PhraseClass.operator, State.operator_end, {
@@ -97,9 +88,9 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             if not machine_found:
                 for machine in machines:
                     if machine.prevState != State.undefined:
-                        raise SyntaxParseError(f"Syntax error.\nUnexpected token "
-                                               f"{repr(token.value)} at line {sem_analyzer.get_line()}.",
-                                               sem_analyzer.get_line(), token)
+                        raise InterpretationError(
+                            PeaceError(f"Unexpected token {repr(token.value)}.",
+                                       ErrorType.syntax_error, sem_analyzer.get_line(), token.value))
 
             # Reset machine states
             for machine in machines:
@@ -131,6 +122,6 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             machine_found = True
 
     if not sem_analyzer.composer.is_tree_valid():
-        raise SyntaxParseError(f"Syntax error at line {phrase_start_line}.\n"
-                               f"Missing '}}'.")
+        raise InterpretationError(
+            PeaceError("Missing '}}'.", ErrorType.syntax_error, phrase_start_line))
     return
