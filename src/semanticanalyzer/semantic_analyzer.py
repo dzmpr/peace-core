@@ -146,9 +146,15 @@ class SemanticAnalyzer:
                 if self._expr_signature is not None:
                     self._expr_signature.contains_param = param_usage
         else:
-            raise PeaceError(f"Found \"{keyword}\" operator with {params_num} "
-                             f"parameters, but expected {candidate.required_params}-{candidate.max_params}.",
-                             ErrorType.parameter_error, line_number, keyword)
+            if params_num > candidate.max_params:
+                raise PeaceError(f"Found \"{keyword}\" operator with {params_num}"
+                                 f" parameters, but it takes {candidate.max_params}.",
+                                 ErrorType.parameter_error, line_number, keyword)
+
+            else:
+                raise PeaceError(f"Found \"{keyword}\" operator with {params_num} "
+                                 f"parameters, but expected at least {candidate.required_params}.",
+                                 ErrorType.parameter_error, line_number, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
         # Check if parameter names are consistent
