@@ -73,3 +73,4 @@ def print_error(error: PeaceError, source_path: str):
     if error.line is not None:
         line = get_n_line(error.line, source_path)
         highlight_line(line, error.highlight)
+    print("", file=sys.stderr)
