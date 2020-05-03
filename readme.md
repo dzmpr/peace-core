@@ -35,6 +35,9 @@ Interpreter will generate output .gpss file in the same folder with .pce.
   ```
   delay(number[, number])
   ADVANCE number[, number]
+  
+  delay ("params")
+  ADVANCE params
   ```
 * GENERATE
   ```

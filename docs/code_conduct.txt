@@ -29,7 +29,8 @@ exprName {
 }
 
 # Delay statement
-delay(number[, number])	        -> ADVANCE number[, number]
+delay (number[, number])	    -> ADVANCE number[, number]
+delay ("parameters")            -> ADVANCE parameters
 
 
 # Queue start statement
