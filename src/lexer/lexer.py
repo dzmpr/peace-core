@@ -70,33 +70,44 @@ def process_line(string: str) -> List[Token]:
     i = 0
     active_machines = False
     machine_found = False
+
     while i < len(string):
         char = string[i]
+        # Process symbol by each machine
         for machine in machines:
             machine.process_object(char)
             if machine.state != State.undefined:
                 active_machines = True
 
         if not active_machines:
+            # If all machines reach undefined state and sequence length is not zero
             if i - index > 0:
                 for machine in machines:
+                    # Find machine with not undefined state
                     if machine.prevState != State.undefined and machine.prevState != State.begin and not machine_found:
                         token = Token(machine.name, string[index:i])
                         tokens.append(token)
                         machine_found = True
                     machine.reset_state()
                 index = i
+                # Roll back for 1 symbol, that led to undefined state (and is an part of next token)
                 i -= 1
                 machine_found = False
+            # If all machines reach undefined state and current symbol was not recognized
             else:
+                # Classify symbol as undefined
                 tokens.append(Token(TokenClass.undefined, string[i]))
                 index = i
+        # Reset active machines flag
         active_machines = False
         i += 1
 
-    # Is last symbol was "\n"
+    # Recognize final token
     for machine in machines:
-        if machine.state == State.newline:
-            tokens.append(Token(machine.name, string[-1:]))
+        if machine.state != State.undefined and machine.state != State.begin and not machine_found:
+            token = Token(machine.name, string[index:i])
+            tokens.append(token)
+            machine_found = True
         machine.reset_state()
+
     return tokens
