@@ -1,4 +1,5 @@
 import unittest
+from typing import List
 from lexer import lexer
 from lexer.lexer import Token, TokenClass
 
@@ -11,17 +12,82 @@ def are_tokens_equal(a: Token, b: Token):
 
 
 class TestLexer(unittest.TestCase):
-    def test_word(self):
-        res = lexer.process_line("word\n")
-        exp = [Token(TokenClass.word, "word"), Token(TokenClass.newline, "\n")]
-        self.assertEqual(len(res), len(exp))
+    def is_token_correct(self, input_text: str, expected_output: List[Token]):
+        res = lexer.process_line(input_text)
+        self.assertEqual(len(res), len(expected_output),
+                         f"Result has {len(res)} len when expected len is {len(expected_output)}.")
         for i in range(len(res)):
-            with self.subTest(i=i):
-                self.assertTrue(are_tokens_equal(res[i], exp[i]), True)
+            self.assertTrue(are_tokens_equal(res[i], expected_output[i]), True)
+
+    def test_word(self):
+        input_text = "word"
+        result = [Token(TokenClass.word, "word")]
+        self.is_token_correct(input_text, result)
+
+    def test_number(self):
+        input_text = "100"
+        result = [Token(TokenClass.num, "100")]
+        self.is_token_correct(input_text, result)
+
+    def test_space(self):
+        input_text = " "
+        result = [Token(TokenClass.space, " ")]
+        self.is_token_correct(input_text, result)
+
+    def test_tab(self):
+        input_text = "\t"
+        result = [Token(TokenClass.space, "\t")]
+        self.is_token_correct(input_text, result)
+
+    def test_undefined(self):
+        input_text = "!"
+        result = [Token(TokenClass.undefined, "!")]
+        self.is_token_correct(input_text, result)
+
+    def test_newline(self):
+        input_text = "\n"
+        result = [Token(TokenClass.newline, "\n")]
+        self.is_token_correct(input_text, result)
+
+    def test_parameter(self):
+        input_text = "@"
+        result = [Token(TokenClass.parameter, "@")]
+        self.is_token_correct(input_text, result)
+
+        input_text = "@10"
+        result = [Token(TokenClass.parameter, "@10")]
+        self.is_token_correct(input_text, result)
+
+    def test_string(self):
+        input_text = "\"string\""
+        result = [Token(TokenClass.string, "\"string\"")]
+        self.is_token_correct(input_text, result)
+
+    def test_sign(self):
+        input_text = "+-/*=#$:,.[]{}()"
+        result = [
+            Token(TokenClass.sign, "+"),
+            Token(TokenClass.sign, "-"),
+            Token(TokenClass.sign, "/"),
+            Token(TokenClass.sign, "*"),
+            Token(TokenClass.sign, "="),
+            Token(TokenClass.sign, "#"),
+            Token(TokenClass.sign, "$"),
+            Token(TokenClass.sign, ":"),
+            Token(TokenClass.sign, ","),
+            Token(TokenClass.sign, "."),
+            Token(TokenClass.sign, "["),
+            Token(TokenClass.sign, "]"),
+            Token(TokenClass.sign, "{"),
+            Token(TokenClass.sign, "}"),
+            Token(TokenClass.sign, "("),
+            Token(TokenClass.sign, ")")
+        ]
+        self.is_token_correct(input_text, result)
 
     def test_all_tokens(self):
-        res = lexer.process_line("Word 123 ! @ \"string\"\n")
-        exp = [
+        input_text = "Word 123 ! @ \"str\"\nwrd"
+        result = [
             Token(TokenClass.word, "Word"),
             Token(TokenClass.space, " "),
             Token(TokenClass.num, "123"),
@@ -30,14 +96,11 @@ class TestLexer(unittest.TestCase):
             Token(TokenClass.space, " "),
             Token(TokenClass.parameter, "@"),
             Token(TokenClass.space, " "),
-            Token(TokenClass.string, "\"string\""),
-            Token(TokenClass.newline, "\n")
+            Token(TokenClass.string, "\"str\""),
+            Token(TokenClass.newline, "\n"),
+            Token(TokenClass.word, "wrd")
         ]
-        self.assertEqual(len(res), len(exp), f"Result:\n{res}\nExpected:\n{exp}")
-        for i in range(len(exp)):
-            with self.subTest(i=i):
-                self.assertTrue(are_tokens_equal(res[i], exp[i]),
-                                msg=f"\nExpected - {str(exp[i])}\nResult - {str(res[i])}")
+        self.is_token_correct(input_text, result)
 
 
 if __name__ == '__main__':
