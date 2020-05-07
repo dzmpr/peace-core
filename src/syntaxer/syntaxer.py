@@ -69,14 +69,15 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
         if token.token_class == TokenClass.newline:
             sem_analyzer.add_line()
 
-        # Process token
+        # Process token with parser machines
         for machine in machines:
             machine.process_object(token)
             if machine.state != State.undefined:
                 active_machines = True
 
-        # Check machine states
+        # If all machines reach undefined state
         if not active_machines:
+            # Trying to find machine that recognized phrase
             for machine in machines:
                 if not machine_found and machine.is_sequence_recognized():
                     recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase, phrase_start_line)
@@ -89,7 +90,7 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
                 for machine in machines:
                     if machine.prevState != State.undefined:
                         raise InterpretationError(
-                            PeaceError(f"Unexpected token {repr(token.value)}.",
+                            PeaceError(f"Unexpected token {repr(token.value)}, expected {machine.name.name}.",
                                        ErrorType.syntax_error, sem_analyzer.get_line(), token.value))
 
             # Reset machine states
@@ -103,9 +104,11 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
             if token.token_class == TokenClass.newline:
                 sem_analyzer.remove_line()
 
+            # Roll back for 1 token, that led to undefined state (and is an part of next phrase)
             token_index = token_index - 1
             machine_found = False
         else:
+            # If token belong to some phrase add it to temp phrase
             if (token.token_class != TokenClass.space and
                     token.token_class != TokenClass.newline and
                     token.token_class != TokenClass.undefined and
@@ -115,13 +118,15 @@ def process_tokens(tree: ParseTree, table: SymbolTable, lang_dict: LangDict, tok
         token_index += 1
         active_machines = False
 
+    # Recognize final phrase
     for machine in machines:
+        machine.process_object(Token(TokenClass.undefined, ""))
         if not machine_found and machine.is_sequence_recognized():
             recognized_phrase = phrase_builder(tree.get_context(), machine.name, temp_phrase, phrase_start_line)
             sem_analyzer.process_phrase(recognized_phrase, phrase_start_line)
             machine_found = True
 
     if not sem_analyzer.composer.is_tree_valid():
-        raise InterpretationError(
-            PeaceError("Missing '}}'.", ErrorType.syntax_error, phrase_start_line))
+        raise InterpretationError(PeaceError("Missing '}}'.", ErrorType.syntax_error, phrase_start_line))
+
     return
