@@ -49,7 +49,11 @@ def highlight_line(line: str, highlight=None):
     # Highlight all line if string not passed
     if highlight is not None:
         index: int = line.find(highlight)
-        print(" " * index, end="", file=sys.stderr)
+        for i in range(index):
+            if line[i] == "\t":
+                print("\t", end="", file=sys.stderr)
+            else:
+                print(" ", end="", file=sys.stderr)
         print("^" * len(highlight), file=sys.stderr)
     else:
         print("^" * len(line), file=sys.stderr)
