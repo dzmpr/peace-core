@@ -26,7 +26,7 @@ def are_signatures_equal(signature: Signature, reference: Signature) -> bool:
 
 class TestLangDict(unittest.TestCase):
     @classmethod
-    def setUp(cls) -> None:
+    def setUpClass(cls) -> None:
         cls.language_dictionary = LangDict()
         cls.language_dictionary.add_signature("test", SignatureType.operator, "TEST", 1, [
             TokenClass.string
