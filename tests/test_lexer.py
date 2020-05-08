@@ -5,9 +5,17 @@ from lexer.lexer import Token, TokenClass
 
 
 def are_tokens_equal(a: Token, b: Token):
-    if a.token_class == b.token_class:
-        if a.value == b.value:
-            return True
+    # Check for None both tokens
+    if a is b:
+        return True
+    else:
+        # Check for None each of tokens
+        if a is None or b is None:
+            return False
+        # Check tokens
+        if a.token_class == b.token_class:
+            if a.value == b.value:
+                return True
     return False
 
 
