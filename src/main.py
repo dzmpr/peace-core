@@ -94,6 +94,9 @@ lang_dict.add_signature("unlink", SignatureType.operator, "UNLINK", 1, [
 lang_dict.add_signature("priority", SignatureType.operator, "PRIORITY", 1, [
     TokenClass.num
 ])
+lang_dict.add_signature("priority", SignatureType.operator, "PRIORITY", 1, [
+    TokenClass.string
+])
 lang_dict.add_signature("assign", SignatureType.operator, "ASSIGN", 1, [
     TokenClass.string
 ])
