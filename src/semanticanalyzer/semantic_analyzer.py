@@ -5,7 +5,7 @@ from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from syntaxer.lang_dict import LangDict, SignatureType, Signature
 from lexer.token import TokenClass
 from syntaxer.interpretation_error import InterpretationError, ErrorType, PeaceError
-from typing import Union
+from typing import Optional
 
 
 class SemanticAnalyzer:
@@ -15,10 +15,10 @@ class SemanticAnalyzer:
         self.table: SymbolTable = symbol_table
         self.lang_dict: LangDict = lang_dict
         self._line_count: int = 1
-        self._expr_signature: Union[Signature, None] = None
-        self._expr_params: Union[dict, None] = None
-        self._expr_name: Union[str, None] = None
-        self._expr_id: Union[int, None] = None
+        self._expr_signature: Optional[Signature] = None
+        self._expr_params: Optional[dict] = None
+        self._expr_name: Optional[str] = None
+        self._expr_id: Optional[int] = None
 
     def add_line(self):
         self._line_count += 1
@@ -84,7 +84,7 @@ class SemanticAnalyzer:
         if phrase.phrase_class == PhraseClass.operator:
             candidates = self.lang_dict.get_candidates(phrase.keyword.value)
             unsuitable_candidates = InterpretationError()
-            temp_params: Union[dict, None] = None
+            temp_params: Optional[dict] = None
             for signature_id in candidates:
                 signature = self.lang_dict.get_signature(signature_id)
                 if self._expr_params is not None:
@@ -104,8 +104,25 @@ class SemanticAnalyzer:
 
             if phrase.signature_id is None:
                 raise unsuitable_candidates
+        elif phrase.phrase_class == PhraseClass.label:
+            if len(phrase.params) > 0:
+                if self._expr_signature is not None:
+                    self._expr_signature.contains_param = True
+        elif phrase.phrase_subclass == PhraseSubclass.device:
+            if len(phrase.params) > 0:
+                if self._expr_signature is not None:
+                    self._expr_signature.contains_param = True
 
-    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: Union[dict, None], line_number: int):
+    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: Optional[dict], line_number: int):
+        """
+        Checking is signature candidate parameters are equal to parameters in phrase.
+
+        :param candidate: signature to compare with
+        :param phrase: phrase to check
+        :param expr_params: current expression parameters list
+        :param line_number: line number used to generate exception
+        :rtype: None
+        """
         keyword = phrase.keyword.value
         context = self.tree.get_context()
         params_num = len(phrase.params)
@@ -157,6 +174,12 @@ class SemanticAnalyzer:
                                  ErrorType.parameter_error, line_number, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
+        """
+        Handle new expression. Add expression signature to dictionary.
+
+        :param phrase: input phrase to handle
+        """
+
         # Check if parameter names are consistent
         def is_params_consistent(params: dict):
             for i in range(1, len(params)):
