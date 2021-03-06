@@ -5,7 +5,7 @@ from syntaxer.phrase import Phrase, PhraseClass, PhraseSubclass
 from syntaxer.lang_dict import LangDict, SignatureType, Signature
 from lexer.token import TokenClass
 from syntaxer.interpretation_error import InterpretationError, ErrorType, PeaceError
-from typing import Union
+from typing import Optional
 
 
 class SemanticAnalyzer:
@@ -15,10 +15,10 @@ class SemanticAnalyzer:
         self.table: SymbolTable = symbol_table
         self.lang_dict: LangDict = lang_dict
         self._line_count: int = 1
-        self._expr_signature: Union[Signature, None] = None
-        self._expr_params: Union[dict, None] = None
-        self._expr_name: Union[str, None] = None
-        self._expr_id: Union[int, None] = None
+        self._expr_signature: Optional[Signature] = None
+        self._expr_params: Optional[dict] = None
+        self._expr_name: Optional[str] = None
+        self._expr_id: Optional[int] = None
 
     def add_line(self):
         self._line_count += 1
@@ -41,7 +41,7 @@ class SemanticAnalyzer:
     # TODO: First version (without scope-dependent check), to be refactored
     def _name_processing(self, phrase: Phrase, line_number: int):
         if phrase.phrase_class == PhraseClass.block:
-            identifier: str = phrase.keyword.value
+            identifier: str = phrase.get_identifier()
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_subclass)
             else:
@@ -51,7 +51,7 @@ class SemanticAnalyzer:
                                ErrorType.naming_error, line_number, identifier))
 
         elif phrase.phrase_class == PhraseClass.label:
-            identifier: str = phrase.keyword.value
+            identifier: str = phrase.get_identifier()
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_class)
             else:
@@ -65,7 +65,7 @@ class SemanticAnalyzer:
             sig_type = self.lang_dict.get_signature(phrase.signature_id).signature_type
             if sig_type == SignatureType.operator:
                 if len(phrase.params):
-                    identifier: str = phrase.params[0].value
+                    identifier: str = phrase.get_identifier()
                     if operator == "q":
                         if not self.table.is_symbol_presence(identifier):
                             self.table.add_symbol(identifier, phrase.phrase_class)
@@ -84,7 +84,7 @@ class SemanticAnalyzer:
         if phrase.phrase_class == PhraseClass.operator:
             candidates = self.lang_dict.get_candidates(phrase.keyword.value)
             unsuitable_candidates = InterpretationError()
-            temp_params: Union[dict, None] = None
+            temp_params: Optional[dict] = None
             for signature_id in candidates:
                 signature = self.lang_dict.get_signature(signature_id)
                 if self._expr_params is not None:
@@ -104,8 +104,25 @@ class SemanticAnalyzer:
 
             if phrase.signature_id is None:
                 raise unsuitable_candidates
+        elif phrase.phrase_class == PhraseClass.label:
+            if len(phrase.params) > 0:
+                if self._expr_signature is not None:
+                    self._expr_signature.contains_param = True
+        elif phrase.phrase_subclass == PhraseSubclass.device:
+            if len(phrase.params) > 0:
+                if self._expr_signature is not None:
+                    self._expr_signature.contains_param = True
 
-    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: Union[dict, None], line_number: int):
+    def _signature_check(self, candidate: Signature, phrase: Phrase, expr_params: Optional[dict], line_number: int):
+        """
+        Checking is signature candidate parameters are equal to parameters in phrase.
+
+        :param candidate: signature to compare with
+        :param phrase: phrase to check
+        :param expr_params: current expression parameters list
+        :param line_number: line number used to generate exception
+        :rtype: None
+        """
         keyword = phrase.keyword.value
         context = self.tree.get_context()
         params_num = len(phrase.params)
@@ -157,6 +174,12 @@ class SemanticAnalyzer:
                                  ErrorType.parameter_error, line_number, keyword)
 
     def _signature_recorder(self, phrase: Phrase):
+        """
+        Handle new expression. Add expression signature to dictionary.
+
+        :param phrase: input phrase to handle
+        """
+
         # Check if parameter names are consistent
         def is_params_consistent(params: dict):
             for i in range(1, len(params)):

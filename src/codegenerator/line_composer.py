@@ -97,7 +97,7 @@ class LineComposer:
             self.keyword = "END"
         elif phrase.phrase_subclass == PhraseSubclass.device:
             self.keyword = "SEIZE"
-            if phrase.params is not None:
+            if len(phrase.params) > 0:
                 self.parameters = phrase.keyword.value + str(self.expr_uses)
             else:
                 self.parameters = phrase.keyword.value

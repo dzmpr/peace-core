@@ -5,7 +5,7 @@ from typing import List
 
 
 def phrase_builder(context: Phrase, phrase_class: PhraseClass, temp_phrase: List[Token], phrase_line: int) -> Phrase:
-    phrase = Phrase(phrase_class)
+    phrase = Phrase(phrase_class, params=list())
     if phrase_class == PhraseClass.block:
         build_block(phrase, context, temp_phrase, phrase_line)
     elif phrase_class == PhraseClass.operator:
