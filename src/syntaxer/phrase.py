@@ -1,6 +1,6 @@
 from enum import Enum
-from typing import List, Union
-from lexer.token import Token
+from typing import List, Optional
+from lexer.token import Token, TokenClass
 
 
 class PhraseClass(Enum):
@@ -27,10 +27,10 @@ class PhraseSubclass(Enum):
 class Phrase:
     def __init__(self,
                  phrase_class: PhraseClass,
-                 phrase_subclass: Union[PhraseSubclass, None] = None,
-                 signature_id: Union[int, None] = None,
-                 keyword: Union[Token, None] = None,
-                 params: Union[List[Token], None] = None):
+                 phrase_subclass: Optional[PhraseSubclass] = None,
+                 signature_id: Optional[int] = None,
+                 keyword: Optional[Token] = None,
+                 params: Optional[List[Token]] = None):
         self.phrase_class = phrase_class
         self.phrase_subclass = phrase_subclass
         self.signature_id = signature_id
@@ -46,3 +46,14 @@ class Phrase:
         if self.phrase_subclass is not None:
             return f"{self.phrase_class.name} ({self.phrase_subclass.name}), val: {self.params}"
         return f"{self.phrase_class.name}, val: {self.params}"
+
+    def get_identifier(self) -> str:
+        phrase_id = str()
+        if self.phrase_class == PhraseClass.label or self.phrase_class == PhraseClass.block:
+            phrase_id = self.keyword.value
+            if len(self.params) > 0 and self.params[0].token_class == TokenClass.parameter:
+                phrase_id += self.params[0].value
+        elif self.phrase_class == PhraseClass.operator:
+            if len(self.params) > 0:
+                phrase_id = self.params[0].value
+        return phrase_id

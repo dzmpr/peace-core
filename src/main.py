@@ -116,8 +116,6 @@ lang_dict.add_signature("ret", SignatureType.operator, "RETURN", 1, [
 token_list = []
 pce_source: TextIO = open(path, "r", encoding="utf8")
 for row in pce_source:
-    if not row.endswith("\n"):
-        row += "\n"
     token_list.extend(lexer.process_line(row))
 pce_source.close()
 
