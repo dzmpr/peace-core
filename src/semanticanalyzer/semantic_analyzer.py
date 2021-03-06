@@ -41,7 +41,7 @@ class SemanticAnalyzer:
     # TODO: First version (without scope-dependent check), to be refactored
     def _name_processing(self, phrase: Phrase, line_number: int):
         if phrase.phrase_class == PhraseClass.block:
-            identifier: str = phrase.keyword.value
+            identifier: str = phrase.get_identifier()
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_subclass)
             else:
@@ -51,7 +51,7 @@ class SemanticAnalyzer:
                                ErrorType.naming_error, line_number, identifier))
 
         elif phrase.phrase_class == PhraseClass.label:
-            identifier: str = phrase.keyword.value
+            identifier: str = phrase.get_identifier()
             if not self.table.is_symbol_presence(identifier):
                 self.table.add_symbol(identifier, phrase.phrase_class)
             else:
@@ -65,7 +65,7 @@ class SemanticAnalyzer:
             sig_type = self.lang_dict.get_signature(phrase.signature_id).signature_type
             if sig_type == SignatureType.operator:
                 if len(phrase.params):
-                    identifier: str = phrase.params[0].value
+                    identifier: str = phrase.get_identifier()
                     if operator == "q":
                         if not self.table.is_symbol_presence(identifier):
                             self.table.add_symbol(identifier, phrase.phrase_class)
