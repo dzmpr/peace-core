@@ -1,4 +1,4 @@
-from lr_parser.Token import Token
+from lexer.token import TokenClass
 
 
 class Rule:
@@ -8,6 +8,13 @@ class Rule:
 
     def __repr__(self):
         return f"{self.production} -> {self.chain}"
+
+    def __str__(self):
+        string = f"{self.production} -> "
+        for item in self.chain:
+            string += item.name
+            string += " "
+        return string
 
 
 class RuleTable:

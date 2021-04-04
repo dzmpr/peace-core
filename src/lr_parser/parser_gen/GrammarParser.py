@@ -38,7 +38,8 @@ class GrammarParser:
             for line in file:
                 line = line.strip()
                 if line:
-                    self._parse_rule(line)
+                    self._parse_complex_rule(line)
+
         print(self.terminals_list)
         print(self.nonterminals_list)
         self.print_rules()
@@ -47,41 +48,55 @@ class GrammarParser:
         for line in grammar.splitlines():
             line = line.strip()
             if line:
-                self._parse_rule(line)
+                self._parse_complex_rule(line)
+
         print(self.terminals_list)
         print(self.nonterminals_list)
         self.print_rules()
 
-    def _parse_rule(self, line: str):
+    def _parse_complex_rule(self, line: str):
+        # Split left and right parts of production
         production = line.split("->")
+        # Check is production input correct
         if len(production) != 2:
             raise Exception("Unsupported production.")
-        production[0] = production[0].strip()
-        production[1] = production[1].strip()
 
-        if not production[0].isupper():
+        production_head = production[0].strip()
+        production_trail = production[1].strip()
+
+        # Check that production head represented by non terminal
+        if not production_head.isupper():
             raise Exception("Right hand of production should contain non-terminal.")
-        self.nonterminals_list.add(production[0])
+        self.nonterminals_list.add(production_head)
 
-        forms = production[1].split("|")
-        for form in forms:
-            raw_terminals = form.split(" ")
-            production_body = list()
-            for body_item in raw_terminals:
-                if not body_item:
-                    continue
+        # Split production trail to process each form
+        production_forms = production_trail.split("|")
+        for production_form in production_forms:
+            self._parse_rule(production_head, production_form)
 
-                body_item = body_item.strip()
-                if body_item.islower():
-                    term = TokenClass.from_str(body_item)
-                    if term not in self.grammar_terminals:
-                        raise Exception(f"Unknown terminal {body_item}.")
+    def _parse_rule(self, production_head: str, production_body: str):
+        raw_body = production_body.split(" ")
+        production_body = list()
+        for body_item in raw_body:
+            # Skip empty strings
+            if not body_item:
+                continue
 
-                    production_body.append(term)
-                    self.terminals_list.add(term)
-                else:
-                    production_body.append(self.get_non_terminal(body_item))
-            self.rules.append(self.get_rule(production[0], production_body))
+            # Remove unnecessary chars in item
+            body_item = body_item.strip()
+            # If item is terminal (all lower letters)
+            if body_item.islower():
+                term = TokenClass.from_str(body_item)
+                # Check that terminal is in out grammar
+                if term not in self.grammar_terminals:
+                    raise Exception(f"Unknown terminal {body_item}.")
+
+                production_body.append(term)
+                self.terminals_list.add(term)
+            else:
+                production_body.append(self.get_non_terminal(body_item))
+        rule = self.get_rule(production_head, production_body)
+        self.rules.append(rule)
 
     def get_rule(self, production_head: str, production_body: list[TokenClass]) -> Rule:
         return Rule(production_head, production_body)
