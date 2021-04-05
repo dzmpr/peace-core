@@ -2,20 +2,29 @@ from lr_parser.RuleTable import Rule
 from lr_parser.parser_gen.MarkedRule import MarkedRule
 
 
-class LRSet:
-    def __init__(self, init_items: list[MarkedRule]):
+class LRState:
+    def __init__(self, init_items: list[MarkedRule], state_id: int = None, parent_id: int = None):
         self.init_items: list[MarkedRule] = init_items
         self.state: set[MarkedRule] = set()  # Set of rules
         self.processed_nt: set[str] = set()  # Set of non terminals which productions already added to set
+
+        self.state_id: int = state_id
+        self.parents_id: set[int] = {parent_id}
 
     def __repr__(self):
         return f"Set size: {len(self.state)}"
 
     def __str__(self):
-        res = "State\n"
+        res = f"State {self.state_id} {self.parents_id}\n"
         for item in self.state:
             res += str(item) + "\n"
         return res
+
+    def set_id(self, state_id: int):
+        self.state_id = state_id
+
+    def add_parent_id(self, parent_id: int):
+        self.parents_id.add(parent_id)
 
     def get_unfolding(self, item: MarkedRule, rules: dict[str, list[Rule]]) -> list[MarkedRule]:
         unfolding = list()
@@ -34,7 +43,7 @@ class LRSet:
                 res.append(MarkedRule(rule))
         return res
 
-    def generate_closure(self, rules: dict[str, list[Rule]]) -> list['LRSet']:
+    def generate_closure(self, rules: dict[str, list[Rule]]) -> list['LRState']:
         """
         Generate closure for given start rules. Algorithm: 1. Recursively add rules to closure with production head
         equal to marked non terminal in rules that already in closure. 2. Group rules by marked non terminal. Generate
@@ -58,7 +67,7 @@ class LRSet:
 
         groups = self.generate_groups()
         for group in groups:
-            successors_list.append(LRSet(group))
+            successors_list.append(LRState(group, parent_id=self.state_id))
 
         return successors_list
 
