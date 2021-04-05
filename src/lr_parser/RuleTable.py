@@ -2,15 +2,21 @@ from lexer.token import TokenClass
 
 
 class Rule:
-    def __init__(self, result, chain: list):
-        self.production = result
-        self.chain: list = chain
+    def __init__(self, production_head: str, body: list, rule_id: int):
+        self.head: str = production_head
+        self.chain: list = body
+        if rule_id <= 0:
+            raise Exception("Rule identifier should be greater than 0.")
+        self.rule_id: int = rule_id
 
     def __repr__(self):
-        return f"{self.production} -> {self.chain}"
+        return f"{self.head} -> {self.chain}"
 
     def __str__(self):
-        string = f"{self.production} -> "
+        """
+        Pretty print rule in form: HEAD -> I T E M S
+        """
+        string = f"{self.head} -> "
         for item in self.chain:
             string += item.name
             string += " "
