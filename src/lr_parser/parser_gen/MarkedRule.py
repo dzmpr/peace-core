@@ -56,7 +56,9 @@ class MarkedRule:
 
         :return: true if marked item is NonTerminal
         """
-        return isinstance(self.rule.chain[self.marker_position], NonTerminal)
+        if len(self.rule.chain) != self.marker_position:
+            return isinstance(self.rule.chain[self.marker_position], NonTerminal)
+        return False
 
     def is_next_terminal(self) -> bool:
         """
@@ -64,7 +66,9 @@ class MarkedRule:
 
         :return: true if marked item is terminal
         """
-        return isinstance(self.rule.chain[self.marker_position], TokenClass)
+        if len(self.rule.chain) != self.marker_position:
+            return isinstance(self.rule.chain[self.marker_position], TokenClass)
+        return False
 
     def get_marked_item(self) -> Union[TokenClass, NonTerminal]:
         """

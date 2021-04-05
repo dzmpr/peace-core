@@ -1,15 +1,10 @@
 from pathlib import Path
 from lr_parser.RuleTable import Rule
+from lr_parser.parser_gen.StatesSet import StatesSet
+from lr_parser.parser_gen.MarkedRule import MarkedRule
+from lr_parser.parser_gen.NonTerminal import NonTerminal
 from lexer.token import TokenClass
 import sys
-
-
-class NonTerminal:
-    def __init__(self, name: str):
-        self.name: str = name
-
-    def __repr__(self):
-        return self.name
 
 
 class GrammarParser:
@@ -17,6 +12,8 @@ class GrammarParser:
         self.terminals_list = set()
         self.nonterminals_list = set()
         self.rules: list[Rule] = list()
+
+        self.rule_count: int = 1
 
         self.grammar_terminals = [
             TokenClass.word,
@@ -29,6 +26,8 @@ class GrammarParser:
             TokenClass.newline
         ]
 
+        self.closures = StatesSet()
+
     def generate_from_file(self, path: Path):
         if not path.exists():
             print(f"File {path} not exists.", file=sys.stderr)
@@ -40,9 +39,7 @@ class GrammarParser:
                 if line:
                     self._parse_complex_rule(line)
 
-        print(self.terminals_list)
-        print(self.nonterminals_list)
-        self.print_rules()
+        self._process_grammar()
 
     def generate_from_str(self, grammar: str):
         for line in grammar.splitlines():
@@ -50,6 +47,12 @@ class GrammarParser:
             if line:
                 self._parse_complex_rule(line)
 
+        self._process_grammar()
+
+    def _process_grammar(self):
+        self.closures.set_rules(self.rules)
+        self._build_closures()
+        print(self.closures)
         print(self.terminals_list)
         print(self.nonterminals_list)
         self.print_rules()
@@ -98,8 +101,15 @@ class GrammarParser:
         rule = self.get_rule(production_head, production_body)
         self.rules.append(rule)
 
+    def _build_closures(self):
+        init_rule = self.rules[0]
+        init_rule = MarkedRule(init_rule)
+        self.closures.generate_closures(init_rule)
+
     def get_rule(self, production_head: str, production_body: list[TokenClass]) -> Rule:
-        return Rule(production_head, production_body)
+        rule = Rule(production_head, production_body, self.rule_count)
+        self.rule_count += 1
+        return rule
 
     def get_non_terminal(self, name: str) -> NonTerminal:
         return NonTerminal(name)

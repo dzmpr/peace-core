@@ -2,11 +2,20 @@ from lr_parser.RuleTable import Rule
 from lr_parser.parser_gen.MarkedRule import MarkedRule
 
 
-class StateSet:
+class LRSet:
     def __init__(self, init_items: list[MarkedRule]):
         self.init_items: list[MarkedRule] = init_items
-        self.state = set()  # Set of rules
-        self.processed_nt = set()  # Set of non terminals which productions already added to set
+        self.state: set[MarkedRule] = set()  # Set of rules
+        self.processed_nt: set[str] = set()  # Set of non terminals which productions already added to set
+
+    def __repr__(self):
+        return f"Set size: {len(self.state)}"
+
+    def __str__(self):
+        res = "State\n"
+        for item in self.state:
+            res += str(item) + "\n"
+        return res
 
     def get_unfolding(self, item: MarkedRule, rules: dict[str, list[Rule]]) -> list[MarkedRule]:
         unfolding = list()
@@ -25,7 +34,7 @@ class StateSet:
                 res.append(MarkedRule(rule))
         return res
 
-    def generate_closure(self, rules: dict[str, list[Rule]]) -> list['StateSet']:
+    def generate_closure(self, rules: dict[str, list[Rule]]) -> list['LRSet']:
         """
         Generate closure for given start rules. Algorithm: 1. Recursively add rules to closure with production head
         equal to marked non terminal in rules that already in closure. 2. Group rules by marked non terminal. Generate
@@ -34,6 +43,8 @@ class StateSet:
         :param rules: list if grammar rules
         :return: list of
         """
+        successors_list = list()
+
         new_items = self.init_items
         while True:
             temp = list()
@@ -45,4 +56,19 @@ class StateSet:
             else:
                 break
 
-        return list()
+        groups = self.generate_groups()
+        for group in groups:
+            successors_list.append(LRSet(group))
+
+        return successors_list
+
+    def generate_groups(self) -> list[list[MarkedRule]]:
+        groups = dict()
+        for item in self.state:
+            if not item.is_end_form():
+                marker = item.get_marked_item()
+                if marker.name in groups:
+                    groups[marker.name].append(item.get_moved_marker())
+                else:
+                    groups[marker.name] = [item.get_moved_marker()]
+        return list(groups.values())
