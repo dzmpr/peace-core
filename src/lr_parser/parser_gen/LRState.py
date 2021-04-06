@@ -1,12 +1,18 @@
 from lr_parser.RuleTable import Rule
 from lr_parser.parser_gen.MarkedRule import MarkedRule
+from lr_parser.parser_gen.RawAction import RawAction
 
 
 class LRState:
     def __init__(self, init_items: list[MarkedRule], state_id: int = None, parent_id: int = None):
+        # Set of state rules
+        self.state: set[MarkedRule] = set()
+        # Start items list
         self.init_items: list[MarkedRule] = init_items
-        self.state: set[MarkedRule] = set()  # Set of rules
-        self.processed_nt: set[str] = set()  # Set of non terminals which productions already added to set
+        # Set of non terminals which productions already added to state set
+        self.processed_nt: set[str] = set()
+        # List of raw actions for this state
+        self.raw_actions: list[RawAction] = list()
 
         self.state_id: int = state_id
         self.parents_id: set[int] = {parent_id}
