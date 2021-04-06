@@ -41,7 +41,8 @@ class StatesSet:
             temp: list[LRState] = list()
             for state in new_states:
                 state.set_id(next_state_id)
-                successors = state.generate_closure(self.rules_dict)
+                state.generate_closure(self.rules_dict)
+                successors = state.generate_successors(self.rules_dict)
                 if not self.is_state_in_set(state):
                     next_state_id += 1
                     self.states.append(state)

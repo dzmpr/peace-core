@@ -20,6 +20,11 @@ class LRState:
             res += str(item) + "\n"
         return res
 
+    def __hash__(self):
+        items = [hash(item) for item in self.state]
+        items.sort()
+        return hash(tuple(items))
+
     def set_id(self, state_id: int):
         self.state_id = state_id
 
@@ -43,7 +48,7 @@ class LRState:
                 res.append(MarkedRule(rule))
         return res
 
-    def generate_closure(self, rules: dict[str, list[Rule]]) -> list['LRState']:
+    def generate_closure(self, rules: dict[str, list[Rule]]):
         """
         Generate closure for given start rules. Algorithm: 1. Recursively add rules to closure with production head
         equal to marked non terminal in rules that already in closure. 2. Group rules by marked non terminal. Generate
@@ -52,8 +57,6 @@ class LRState:
         :param rules: list if grammar rules
         :return: list of
         """
-        successors_list = list()
-
         new_items = self.init_items
         while True:
             temp = list()
@@ -65,9 +68,14 @@ class LRState:
             else:
                 break
 
+    def generate_successors(self, rules: dict[str, list[Rule]]) -> list['LRState']:
+        successors_list = list()
         groups = self.generate_groups()
         for group in groups:
-            successors_list.append(LRState(group, parent_id=self.state_id))
+            new_set = LRState(group, parent_id=self.state_id)
+            new_set.generate_closure(rules)
+            print(hash(new_set))
+            successors_list.append(new_set)
 
         return successors_list
 

@@ -14,12 +14,19 @@ class MarkedRule:
         :param marker_position: specify marker position (default - start)
         """
         self.rule: Rule = rule
-        if marker_position > len(rule.chain):
+        if len(rule.chain) < marker_position or marker_position < 0:
             raise Exception(f"Bad position ({marker_position}) for rule {rule}.")
         self.marker_position: int = marker_position
 
     def __repr__(self):
-        return f"{self.rule}, m:{self.marker_position}"
+        desc = f"{self.rule.head} -> "
+        for index, item in enumerate(self.rule.chain):
+            if index == self.marker_position:
+                desc += " *"
+            desc += f" {item.name}"
+        if self.marker_position == len(self.rule.chain):
+            desc += " *"
+        return desc
 
     def __hash__(self):
         """
