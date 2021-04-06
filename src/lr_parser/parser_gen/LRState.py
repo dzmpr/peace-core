@@ -1,6 +1,7 @@
 from lr_parser.RuleTable import Rule
 from lr_parser.parser_gen.MarkedRule import MarkedRule
 from lr_parser.parser_gen.RawAction import RawAction
+from lr_parser.parser_gen.NonTerminal import NonTerminal
 
 
 class LRState:
@@ -10,7 +11,7 @@ class LRState:
         # Start items list
         self.init_items: list[MarkedRule] = init_items
         # Set of non terminals which productions already added to state set
-        self.processed_nt: set[str] = set()
+        self.processed_nt: set[NonTerminal] = set()
         # List of raw actions for this state
         self.raw_actions: list[RawAction] = list()
 
@@ -37,24 +38,25 @@ class LRState:
     def add_parent_id(self, parent_id: int):
         self.parents_id.add(parent_id)
 
-    def get_unfolding(self, item: MarkedRule, rules: dict[str, list[Rule]]) -> list[MarkedRule]:
+    def get_unfolding(self, item: MarkedRule, rules: dict[NonTerminal, list[Rule]]) -> list[MarkedRule]:
         unfolding = list()
         if not item.is_end_form():
             if item.is_next_non_terminal():
-                non_term = item.get_marked_item().name
+                non_term = item.get_marked_item()
                 if non_term not in self.processed_nt:
                     self.processed_nt.add(non_term)
                     unfolding.extend(self.get_productions_for_nt(non_term, rules))
         return unfolding
 
-    def get_productions_for_nt(self, non_term: str, rules: dict[str, list[Rule]]) -> list[MarkedRule]:
+    @staticmethod
+    def get_productions_for_nt(non_term: NonTerminal, rules: dict[NonTerminal, list[Rule]]) -> list[MarkedRule]:
         res = list()
         if non_term in rules:
             for rule in rules[non_term]:
                 res.append(MarkedRule(rule))
         return res
 
-    def generate_closure(self, rules: dict[str, list[Rule]]):
+    def generate_closure(self, rules: dict[NonTerminal, list[Rule]]):
         """
         Generate closure for given start rules. Algorithm: 1. Recursively add rules to closure with production head
         equal to marked non terminal in rules that already in closure. 2. Group rules by marked non terminal. Generate
@@ -74,13 +76,12 @@ class LRState:
             else:
                 break
 
-    def generate_successors(self, rules: dict[str, list[Rule]]) -> list['LRState']:
+    def generate_successors(self, rules: dict[NonTerminal, list[Rule]]) -> list['LRState']:
         successors_list = list()
         groups = self.generate_groups()
         for group in groups:
             new_set = LRState(group, parent_id=self.state_id)
             new_set.generate_closure(rules)
-            print(hash(new_set))
             successors_list.append(new_set)
 
         return successors_list
@@ -90,8 +91,8 @@ class LRState:
         for item in self.state:
             if not item.is_end_form():
                 marker = item.get_marked_item()
-                if marker.name in groups:
-                    groups[marker.name].append(item.get_moved_marker())
+                if marker.item_name in groups:
+                    groups[marker.item_name].append(item.get_moved_marker())
                 else:
-                    groups[marker.name] = [item.get_moved_marker()]
+                    groups[marker.item_name] = [item.get_moved_marker()]
         return list(groups.values())

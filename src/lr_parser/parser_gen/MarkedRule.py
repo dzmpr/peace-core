@@ -1,6 +1,6 @@
 from lr_parser.RuleTable import Rule
+from lr_parser.parser_gen.Terminal import Terminal
 from lr_parser.parser_gen.NonTerminal import NonTerminal
-from lexer.token import TokenClass
 from typing import Union
 
 
@@ -23,18 +23,20 @@ class MarkedRule:
         for index, item in enumerate(self.rule.chain):
             if index == self.marker_position:
                 desc += " *"
-            desc += f" {item.name}"
+            desc += f" {item.item_name}"
         if self.marker_position == len(self.rule.chain):
             desc += " *"
         return desc
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
-        Fast implementation of 'hash'. Limited to 10_000 rule items.
+        Return rule hash based on hash of rule and marker position.
 
         :return: hash of rule
         """
-        return self.rule.rule_id * 10000 + self.marker_position
+        return hash((self.marker_position, self.rule))
+        # Fast implementation of 'hash'. Limited to 10_000 rule items. Deprecated.
+        # return self.rule.rule_id * 10000 + self.marker_position
 
     def __eq__(self, other):
         if isinstance(other, MarkedRule):
@@ -64,7 +66,7 @@ class MarkedRule:
         :return: true if marked item is NonTerminal
         """
         if len(self.rule.chain) != self.marker_position:
-            return isinstance(self.rule.chain[self.marker_position], NonTerminal)
+            return self.rule.chain[self.marker_position].is_nonterminal()
         return False
 
     def is_next_terminal(self) -> bool:
@@ -74,10 +76,10 @@ class MarkedRule:
         :return: true if marked item is terminal
         """
         if len(self.rule.chain) != self.marker_position:
-            return isinstance(self.rule.chain[self.marker_position], TokenClass)
+            return self.rule.chain[self.marker_position].is_terminal()
         return False
 
-    def get_marked_item(self) -> Union[TokenClass, NonTerminal]:
+    def get_marked_item(self) -> Union[NonTerminal, Terminal]:
         """
         Return marked item. It could be either terminal or non terminal.
         Require to check that rule isn't in final form.

@@ -1,13 +1,14 @@
 from lr_parser.RuleTable import Rule
 from lr_parser.parser_gen.MarkedRule import MarkedRule
 from lr_parser.parser_gen.LRState import LRState
+from lr_parser.parser_gen.NonTerminal import NonTerminal
 
 
 class StatesSet:
     def __init__(self):
         self.states: list[LRState] = list()
         self.rules: list[Rule] = list()
-        self.rules_dict: dict[str, list[Rule]] = dict()
+        self.rules_dict: dict[NonTerminal, list[Rule]] = dict()
         self.expanded_rules: list[MarkedRule] = list()
 
     def __str__(self):

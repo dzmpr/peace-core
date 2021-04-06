@@ -1,10 +1,12 @@
-from lexer.token import TokenClass
+from lr_parser.parser_gen.NonTerminal import NonTerminal
+from lr_parser.parser_gen.Terminal import Terminal
+from typing import Union
 
 
 class Rule:
-    def __init__(self, production_head: str, body: list, rule_id: int):
-        self.head: str = production_head
-        self.chain: list = body
+    def __init__(self, production_head: NonTerminal, body: list[Union[Terminal, NonTerminal]], rule_id: int):
+        self.head: NonTerminal = production_head
+        self.chain: list[Union[Terminal, NonTerminal]] = body
         if rule_id <= 0:
             raise Exception("Rule identifier should be greater than 0.")
         self.rule_id: int = rule_id
@@ -12,13 +14,21 @@ class Rule:
     def __repr__(self):
         return f"{self.head} -> {self.chain}"
 
+    def __hash__(self) -> int:
+        return hash(tuple([self.head, *self.chain]))
+
+    def __eq__(self, other):
+        if isinstance(other, Rule):
+            return self.head == other.head and self.chain == other.chain
+        return False
+
     def __str__(self):
         """
         Pretty print rule in form: HEAD -> I T E M S
         """
         string = f"{self.head} -> "
         for item in self.chain:
-            string += item.name
+            string += item.item_name
             string += " "
         return string
 
