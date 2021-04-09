@@ -2,6 +2,9 @@ from lr_parser.RuleTable import Rule
 from lr_parser.parser_gen.MarkedRule import MarkedRule
 from lr_parser.parser_gen.RawAction import RawAction
 from lr_parser.parser_gen.NonTerminal import NonTerminal
+from lr_parser.parser_gen.Terminal import Terminal
+from lr_parser.ActionTable import ActionType
+from typing import Union, Optional
 
 
 class LRState:
@@ -80,19 +83,44 @@ class LRState:
         successors_list = list()
         groups = self.generate_groups()
         for group in groups:
-            new_set = LRState(group, parent_id=self.state_id)
+            new_set = LRState(groups[group], parent_id=self.state_id)
             new_set.generate_closure(rules)
             successors_list.append(new_set)
-
+            self._generate_shift_transfer(group, hash(new_set))
+        self._generate_accept_reduce()
         return successors_list
 
-    def generate_groups(self) -> list[list[MarkedRule]]:
-        groups = dict()
+    def _generate_shift_transfer(self, group: Union[Terminal, NonTerminal], target_hash: int):
+        action: Optional[RawAction] = None
+        if group.is_terminal():
+            # If marked item is terminal - create shift action
+            action = RawAction(ActionType.ACTION_SHIFT, self.state_id, group, target_hash)
+        elif group.is_nonterminal():
+            # If marked item is nonterminal - create transfer action
+            action = RawAction(ActionType.ACTION_TRANSFER, self.state_id, group, target_hash)
+        self.raw_actions.append(action)
+
+    def _generate_accept_reduce(self):
         for item in self.state:
-            if not item.is_end_form():
-                marker = item.get_marked_item()
-                if marker.item_name in groups:
-                    groups[marker.item_name].append(item.get_moved_marker())
+            if item.is_end_form():
+                if item.rule.rule_id == 1:
+                    # Action for augmented production in grammar
+                    action = RawAction(ActionType.ACTION_ACCEPT, self.state_id, Terminal("$"), 0)
                 else:
-                    groups[marker.item_name] = [item.get_moved_marker()]
-        return list(groups.values())
+                    # Reduce action for other productions
+                    action = RawAction(ActionType.ACTION_REDUCE, self.state_id, Terminal("$"), item.rule.rule_id)
+                self.raw_actions.append(action)
+
+    def generate_groups(self) -> dict[Union[Terminal, NonTerminal], list[MarkedRule]]:
+        groups = dict()
+        # For each item is state set
+        for item in self.state:
+            # If item is not in final form
+            if not item.is_end_form():
+                # Get marked item
+                marker = item.get_marked_item()
+                if marker in groups:
+                    groups[marker].append(item.get_moved_marker())
+                else:
+                    groups[marker] = [item.get_moved_marker()]
+        return groups

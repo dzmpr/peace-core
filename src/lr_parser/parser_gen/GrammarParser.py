@@ -65,7 +65,8 @@ class GrammarParser:
         print(self.closures)
         print(self.terminals_list)
         print(self.nonterminals_list)
-        self.print_rules()
+        self._debug_print_rules()
+        self._debug_print_action()
 
     def _parse_complex_rule(self, line: str):
         # Split left and right parts of production
@@ -124,6 +125,10 @@ class GrammarParser:
         self.rule_count += 1
         return rule
 
-    def print_rules(self):
+    def _debug_print_rules(self):
         for rule in self.rules:
             print(rule)
+
+    def _debug_print_action(self):
+        for action in self.closures.resolve_actions():
+            print(action)

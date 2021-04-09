@@ -2,6 +2,8 @@ from lr_parser.RuleTable import Rule
 from lr_parser.parser_gen.MarkedRule import MarkedRule
 from lr_parser.parser_gen.LRState import LRState
 from lr_parser.parser_gen.NonTerminal import NonTerminal
+from lr_parser.parser_gen.RawAction import RawAction
+from lr_parser.ActionTable import Action
 
 
 class StatesSet:
@@ -55,6 +57,25 @@ class StatesSet:
                 new_states = temp
             else:
                 generated_states = False
+
+    def _get_raw_actions(self) -> list[RawAction]:
+        actions: list[RawAction] = list()
+        for item in self.states:
+            actions.extend(item.raw_actions)
+        return actions
+
+    def resolve_actions(self) -> list[RawAction]:
+        hashmap = self.get_states_hashes()
+        raw_actions = self._get_raw_actions()
+        for raw_action in raw_actions:
+            raw_action.resolve_action(hashmap)
+        return raw_actions
+
+    def get_states_hashes(self) -> dict[int, int]:
+        result: dict[int, int] = dict()
+        for item in self.states:
+            result[hash(item)] = item.state_id
+        return result
 
     def is_state_in_set(self, new_state: LRState) -> bool:
         for state in self.states:
