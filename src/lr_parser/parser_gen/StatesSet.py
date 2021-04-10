@@ -123,7 +123,7 @@ class StatesSet:
                             current_nonterminal = next_nonterminal
                             break
                         else:
-                            first_set |= self._generate_first_for_rule(production)
+                            first_set |= self._generate_first_for_rule(production, False)
                     else:
                         self.first_dict[current_nonterminal] = first_set
                         if stack:
@@ -131,16 +131,33 @@ class StatesSet:
                         else:
                             break
 
-    def _generate_first_for_rule(self, rule: Rule) -> set[Terminal]:
-        epsilon = Terminal.get_epsilon()  # Epsilon terminal
+    def _generate_first_for_rule(self, rule: Rule, has_loop: bool) -> set[Terminal]:
+        epsilon = Terminal.get_epsilon()
+        # FIRST set for production
         first_set: set[Terminal] = set()
+        # Marker that will be True if all symbols have epsilon in their FIRSTs
+        has_epsilon = True
+        # Marker that turns true if production contain it's head
+        loop = False
         for symbol in rule.chain:
+            if symbol == rule.head:
+                if has_loop:
+                    return first_set
+                loop = True
+                continue
+
             symbol_set = self.first_dict[symbol]
             if epsilon not in symbol_set:
+                has_epsilon = False
                 first_set |= symbol_set
                 break
             symbol_set.discard(epsilon)
             first_set |= symbol_set
+
+        if has_epsilon:
+            first_set.add(epsilon)
+        elif loop:
+            return self._generate_first_for_rule(rule, True)
         return first_set
 
     def _get_next_firstable_nonterminal(self, rule: Rule) -> Optional[NonTerminal]:
@@ -152,13 +169,12 @@ class StatesSet:
                 return None
             # If symbol is nonterminal
             elif symbol in self.first_dict:
-                # If nonterminal FIRST contains `epsilon` - go to next iteration
-                if epsilon in self.first_dict[symbol]:
-                    continue
                 # If nonterminal FIRST doesn't contains `epsilon` - we reach end of production
-                else:
+                if epsilon not in self.first_dict[symbol]:
                     return None
             # If there is no calculated first for this nonterminal
+            elif symbol == rule.head:
+                continue
             else:
                 return symbol
         return None
