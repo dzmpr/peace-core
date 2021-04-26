@@ -1,6 +1,7 @@
-from typing import Union, Optional
+from typing import Union
 
 from lr_parser.RuleTable import Rule
+from lr_parser.parser_gen.FFSetGenerator import FFSetGenerator
 from lr_parser.parser_gen.LRState import LRState
 from lr_parser.parser_gen.MarkedRule import MarkedRule
 from lr_parser.parser_gen.NonTerminal import NonTerminal
@@ -24,6 +25,8 @@ class StatesSet:
         self.terminals: set[Terminal] = set()
         self.nonterminals: set[NonTerminal] = set()
 
+        self.ff_generator: FFSetGenerator = FFSetGenerator()
+
     def __str__(self):
         res = str()
         for item in self.states_list:
@@ -43,8 +46,8 @@ class StatesSet:
         self.nonterminals = nonterminals
 
     def generate_support_functions(self):
-        self._generate_first()
-        self._generate_follow()
+        self.ff_generator.set_rules(self.rules_list, self.rules_dict)
+        self.ff_generator.calculate_sets()
 
     def generate_closures(self, init_item: MarkedRule):
         new_states: list[LRState] = [LRState([init_item])]
@@ -98,86 +101,3 @@ class StatesSet:
             if state.state == new_state.state:
                 state.add_parent_id(new_state.parents_id.pop())
                 break
-
-    def _generate_first(self):
-        # FIRST(x) = setOf(x), where x - terminal
-        for item in self.terminals:
-            self.first_dict[item] = {item}
-
-        # Stack to track nonterminals
-        stack = list()
-        # X -> Y1 Y2 Y3 ... Yn
-        # FIRST(X) = setOf(FIRST(Y1) + FIRST(Y2) +...) until each Yi contains epsilon
-        for item in self.nonterminals:
-            current_nonterminal = item
-            # Generate FIRST only if needed
-            if current_nonterminal not in self.first_dict:
-                while True:
-                    productions_list = self.rules_dict[current_nonterminal]
-                    first_set = set()
-                    for production in productions_list:
-                        next_nonterminal = self._get_next_firstable_nonterminal(production)
-                        if next_nonterminal:
-                            # If we have nnt not None it means we should create FIRST for it
-                            stack.append(current_nonterminal)
-                            current_nonterminal = next_nonterminal
-                            break
-                        else:
-                            first_set |= self._generate_first_for_rule(production, False)
-                    else:
-                        self.first_dict[current_nonterminal] = first_set
-                        if stack:
-                            current_nonterminal = stack.pop()
-                        else:
-                            break
-
-    def _generate_first_for_rule(self, rule: Rule, has_loop: bool) -> set[Terminal]:
-        epsilon = Terminal.get_epsilon()
-        # FIRST set for production
-        first_set: set[Terminal] = set()
-        # Marker that will be True if all symbols have epsilon in their FIRSTs
-        has_epsilon = True
-        # Marker that turns true if production contain it's head
-        loop = False
-        for symbol in rule.chain:
-            if symbol == rule.head:
-                if has_loop:
-                    return first_set
-                loop = True
-                continue
-
-            symbol_set = self.first_dict[symbol]
-            if epsilon not in symbol_set:
-                has_epsilon = False
-                first_set |= symbol_set
-                break
-            symbol_set.discard(epsilon)
-            first_set |= symbol_set
-
-        if has_epsilon:
-            first_set.add(epsilon)
-        elif loop:
-            return self._generate_first_for_rule(rule, True)
-        return first_set
-
-    def _get_next_firstable_nonterminal(self, rule: Rule) -> Optional[NonTerminal]:
-        epsilon = Terminal.get_epsilon()
-        # Check every symbol in production
-        for symbol in rule.chain:
-            # If we reach terminal - nonterminal is FIRSTable
-            if symbol.is_terminal():
-                return None
-            # If symbol is nonterminal
-            elif symbol in self.first_dict:
-                # If nonterminal FIRST doesn't contains `epsilon` - we reach end of production
-                if epsilon not in self.first_dict[symbol]:
-                    return None
-            # If there is no calculated first for this nonterminal
-            elif symbol == rule.head:
-                continue
-            else:
-                return symbol
-        return None
-
-    def _generate_follow(self):
-        pass
