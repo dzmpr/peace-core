@@ -70,7 +70,7 @@ class FFSetGenerator:
             self.first_dict[nonterminal] = set()
 
         first_size_before_iteration = 0
-        first_size_after_iteration = self._get_first_size()
+        first_size_after_iteration = self.__get_first_size()
         while first_size_after_iteration != first_size_before_iteration:
             first_size_before_iteration = first_size_after_iteration
             for nonterminal in self.nonterminals_set:
@@ -79,13 +79,7 @@ class FFSetGenerator:
                     first_set |= self._generate_first_for_rule(production)
                 self.first_dict[nonterminal] |= first_set
 
-            first_size_after_iteration = self._get_first_size()
-
-    def _get_first_size(self) -> int:
-        size = 0
-        for symbol, first_set in self.first_dict.items():
-            size += len(first_set)
-        return size
+            first_size_after_iteration = self.__get_first_size()
 
     def _generate_first_for_rule(self, rule: Rule) -> set[Terminal]:
         epsilon = Terminal.get_epsilon()
@@ -103,31 +97,26 @@ class FFSetGenerator:
         return first_set
 
     def _calculate_follow_set(self):
-        # Stack to track nonterminals
-        stack = list()
-
-        # Loop over each nonterminal in grammar
+        # Init FOLLOW(X) as empty set
         for nonterminal in self.nonterminals_set:
-            current_nonterminal = nonterminal
-            # Calculate FOLLOW only if it's needed
-            if nonterminal not in self.follow_dict:
-                while True:
-                    rules_list = self.contains_dict[current_nonterminal]
-                    follow_set: set[Terminal] = set()
-                    for rule in rules_list:
-                        next_nonterminal = self._get_next_followable_nonterminal(current_nonterminal, rule)
-                        if next_nonterminal:
-                            stack.append(current_nonterminal)
-                            current_nonterminal = next_nonterminal
-                            break
-                        else:
-                            follow_set |= self._generate_follow_for_rule(current_nonterminal, rule)
-                    else:
-                        self.follow_dict[current_nonterminal] = follow_set
-                        if stack:
-                            current_nonterminal = stack.pop()
-                        else:
-                            break
+            self.follow_dict[nonterminal] = set()
+        # Start symbol FOLLOW contains $ (EOF)
+        self.follow_dict[self.start_symbol] |= {Terminal.get_eof()}
+
+        follow_size_before_iteration = 0
+        follow_size_after_iteration = self.__get_follow_size()
+        while follow_size_after_iteration != follow_size_before_iteration:
+            follow_size_before_iteration = follow_size_after_iteration
+            for nonterminal in self.nonterminals_set:
+                if nonterminal == self.start_symbol:
+                    continue
+
+                follow_set: set[Terminal] = set()
+                for rule in self.contains_dict[nonterminal]:
+                    follow_set |= self._generate_follow_for_rule(nonterminal, rule)
+                self.follow_dict[nonterminal] |= follow_set
+
+            follow_size_after_iteration = self.__get_follow_size()
 
     def _generate_follow_for_rule(self, followable_nonterminal: NonTerminal, rule: Rule) -> set[Terminal]:
         rule_follow_set: set[Terminal] = set()
@@ -151,47 +140,14 @@ class FFSetGenerator:
                 return rule_follow_set
         return rule_follow_set
 
-    # def _get_follow_for_nonterminal_conserved(self, nonterminal: NonTerminal) -> set[Terminal]:
-    #     epsilon = Terminal.get_epsilon()
-    #
-    #     rules = list()
-    #     for rule in self.rules_list:
-    #         if nonterminal in rule.chain:
-    #             rules.append(rule)
-    #
-    #     follow_set = set()
-    #     for rule in rules:
-    #         if rule.rule_id == 1:
-    #             follow_set.add(Terminal.get_eof())
-    #
-    #         index = rule.chain.index(nonterminal)
-    #         temp = set()
-    #         for i in range(index, len(rule.chain)):
-    #             temp |= self.first_dict[rule.chain[index]]
-    #             follow_set |= temp
-    #             if epsilon not in temp:
-    #                 break
-    #         else:
-    #             follow_set |= self.follow_dict[rule.head]
-    #             return follow_set
-    #         follow_set.discard(epsilon)
-    #     return follow_set
+    def __get_first_size(self) -> int:
+        size = 0
+        for first_set in self.first_dict.values():
+            size += len(first_set)
+        return size
 
-    def _get_next_followable_nonterminal(self, followable_nonterminal: NonTerminal, rule: Rule) -> Optional[NonTerminal]:
-        # Handle situation A -> abB, where B is followable nonterminal
-        if rule.chain[-1] == followable_nonterminal:
-            if rule.head not in self.follow_dict:
-                return rule.head
-            else:
-                return None
-
-        epsilon = Terminal.get_epsilon()
-        rule_chain = reversed(rule.chain)
-        for symbol in rule_chain:
-            if symbol == followable_nonterminal:
-                if rule.head not in self.follow_dict:
-                    return rule.head
-                else:
-                    return None
-            if epsilon not in self.first_dict[symbol]:
-                return None
+    def __get_follow_size(self) -> int:
+        size = 0
+        for follow_set in self.follow_dict.values():
+            size += len(follow_set)
+        return size
