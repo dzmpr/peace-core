@@ -1,42 +1,26 @@
-from pathlib import Path
-from lr_parser.RuleTable import Rule
-from lr_parser.parser_gen.StatesSet import StatesSet
-from lr_parser.parser_gen.MarkedRule import MarkedRule
-from lr_parser.parser_gen.Terminal import Terminal
-from lr_parser.parser_gen.NonTerminal import NonTerminal
-from lr_parser.parser_gen.ProductionItem import ProductionItem
-from typing import Union
 import sys
+from pathlib import Path
+from typing import Union
+
+from lr_parser.RuleTable import Rule
+from lr_parser.parser_gen.MarkedRule import MarkedRule
+from lr_parser.parser_gen.NonTerminal import NonTerminal
+from lr_parser.parser_gen.StatesSet import StatesSet
+from lr_parser.parser_gen.Terminal import Terminal
 
 
 class GrammarParser:
-    def __init__(self):
-        self.terminals_list: set[Terminal] = set()
-        self.nonterminals_list: set[NonTerminal] = set()
-        self.rules: list[Rule] = list()
-
+    def __init__(self, epsilon_name: str = Terminal.EPSILON, eof_output: str = Terminal.EOF):
+        self.terminals_set: set[Terminal] = set()
+        self.nonterminals_set: set[NonTerminal] = set()
+        # Rule index var
         self.rule_count: int = 1
+        # List of parsed rules
+        self.rules: list[Rule] = list()
+        self.parser_states = StatesSet()
 
-        self.grammar_terminals = [
-            Terminal("word"),
-            Terminal("colon"),
-            Terminal("b_op"),
-            Terminal("b_cl"),
-            Terminal("hash"),
-            Terminal("cb_cl"),
-            Terminal("cb_op"),
-            Terminal("newline")
-            # TokenClass.word,
-            # TokenClass.colon,
-            # TokenClass.b_op,
-            # TokenClass.b_cl,
-            # TokenClass.hash,
-            # TokenClass.cb_cl,
-            # TokenClass.cb_op,
-            # TokenClass.newline
-        ]
-
-        self.closures = StatesSet()
+        self.epsilon_name: str = epsilon_name
+        Terminal.set_eof_output(eof_output)
 
     def generate_from_file(self, path: Path):
         if not path.exists():
@@ -60,11 +44,17 @@ class GrammarParser:
         self._process_grammar()
 
     def _process_grammar(self):
-        self.closures.set_rules(self.rules)
+        # Pass parsed rules to states generator
+        self.parser_states.set_rules(self.rules)
+        # Pass sets of terminals and nonterminals to states generator
+        self.parser_states.set_symbols(self.terminals_set, self.nonterminals_set)
+        # Let generate support functions for closures
+        self.parser_states.generate_support_functions()
+
         self._build_closures()
-        print(self.closures)
-        print(self.terminals_list)
-        print(self.nonterminals_list)
+        print(self.parser_states)
+        print(f"Terminals: {self.terminals_set}")
+        print(f"Nonterminals: {self.nonterminals_set}")
         self._debug_print_rules()
         self._debug_print_action()
 
@@ -79,10 +69,10 @@ class GrammarParser:
         production_trail = production[1].strip()
 
         # Check that production head represented by non terminal
-        if not production_head.isupper():
-            raise Exception("Right hand of production should contain non-terminal.")
+        if not production_head[0].isupper():
+            raise Exception("Left hand of production should contain non-terminal.")
         production_head = NonTerminal(production_head)
-        self.nonterminals_list.add(production_head)
+        self.nonterminals_set.add(production_head)
 
         # Split production trail to process each form
         production_forms = production_trail.split("|")
@@ -99,16 +89,15 @@ class GrammarParser:
 
             # Remove unnecessary chars in item
             body_item = body_item.strip()
-            # If item is terminal (all lower letters)
-            if body_item.islower():
-                term = Terminal(body_item)
-                # term = TokenClass.from_str(body_item)
-                # Check that terminal is in out grammar
-                if term not in self.grammar_terminals:
-                    raise Exception(f"Unknown terminal {body_item}.")
+            # If item is terminal
+            if body_item[0].islower():
+                if body_item == self.epsilon_name:
+                    terminal = Terminal.get_epsilon()
+                else:
+                    terminal = Terminal(body_item)
 
-                production_body.append(term)
-                self.terminals_list.add(term)
+                production_body.append(terminal)
+                self.terminals_set.add(terminal)
             else:
                 production_body.append(NonTerminal(body_item))
 
@@ -118,7 +107,7 @@ class GrammarParser:
     def _build_closures(self):
         init_rule = self.rules[0]
         init_rule = MarkedRule(init_rule)
-        self.closures.generate_closures(init_rule)
+        self.parser_states.generate_closures(init_rule)
 
     def get_rule(self, production_head: NonTerminal, production_body: list[Union[Terminal, NonTerminal]]) -> Rule:
         rule = Rule(production_head, production_body, self.rule_count)
@@ -126,9 +115,11 @@ class GrammarParser:
         return rule
 
     def _debug_print_rules(self):
+        print("\nParsed rules:")
         for rule in self.rules:
             print(rule)
 
     def _debug_print_action(self):
-        for action in self.closures.resolve_actions():
+        print("\nGenerated actions:")
+        for action in self.parser_states.resolve_actions():
             print(action)

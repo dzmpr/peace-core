@@ -25,7 +25,7 @@ class LRState:
         return f"Set size: {len(self.state)}"
 
     def __str__(self):
-        res = f"State {self.state_id} {self.parents_id}\n"
+        res = f"State id - {self.state_id}. State parents: {self.parents_id}.\n"
         for item in self.state:
             res += str(item) + "\n"
         return res
