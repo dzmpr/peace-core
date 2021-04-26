@@ -62,83 +62,45 @@ class FFSetGenerator:
 
     def _calculate_first_set(self):
         # FIRST(x) = setOf(x), where x - terminal
-        for item in self.terminals_set:
-            self.first_dict[item] = {item}
+        for terminal in self.terminals_set:
+            self.first_dict[terminal] = {terminal}
 
-        # Stack to track nonterminals
-        stack = list()
-        # X -> Y1 Y2 Y3 ... Yn
-        # FIRST(X) = setOf(FIRST(Y1) + FIRST(Y2) +...) until each Yi contains epsilon
-        for item in self.nonterminals_set:
-            current_nonterminal = item
-            # Generate FIRST only if needed
-            if current_nonterminal not in self.first_dict:
-                while True:
-                    productions_list = self.rules_dict[current_nonterminal]
-                    first_set = set()
-                    for production in productions_list:
-                        next_nonterminal = self._get_next_firstable_nonterminal(production)
-                        if next_nonterminal:
-                            # If we have nnt not None it means we should create FIRST for it
-                            stack.append(current_nonterminal)
-                            current_nonterminal = next_nonterminal
-                            break
-                        else:
-                            first_set |= self._generate_first_for_rule(production, False)
-                    else:
-                        self.first_dict[current_nonterminal] = first_set
-                        if stack:
-                            current_nonterminal = stack.pop()
-                        else:
-                            break
+        # Init FIRST(X) of nonterminal as empty set
+        for nonterminal in self.nonterminals_set:
+            self.first_dict[nonterminal] = set()
 
-    def _generate_first_for_rule(self, rule: Rule, has_loop: bool) -> set[Terminal]:
+        first_size_before_iteration = 0
+        first_size_after_iteration = self._get_first_size()
+        while first_size_after_iteration != first_size_before_iteration:
+            first_size_before_iteration = first_size_after_iteration
+            for nonterminal in self.nonterminals_set:
+                first_set = set()
+                for production in self.rules_dict[nonterminal]:
+                    first_set |= self._generate_first_for_rule(production)
+                self.first_dict[nonterminal] |= first_set
+
+            first_size_after_iteration = self._get_first_size()
+
+    def _get_first_size(self) -> int:
+        size = 0
+        for symbol, first_set in self.first_dict.items():
+            size += len(first_set)
+        return size
+
+    def _generate_first_for_rule(self, rule: Rule) -> set[Terminal]:
         epsilon = Terminal.get_epsilon()
         # FIRST set for production
         first_set: set[Terminal] = set()
-        # Marker that will be True if all symbols have epsilon in their FIRSTs
-        has_epsilon = True
-        # Marker that turns true if production contain it's head
-        loop = False
-        for symbol in rule.chain:
-            if symbol == rule.head:
-                if has_loop:
-                    return first_set
-                loop = True
-                continue
 
-            symbol_set = self.first_dict[symbol]
-            if epsilon not in symbol_set:
-                has_epsilon = False
-                first_set |= symbol_set
+        for symbol in rule.chain:
+            symbol_first_set = self.first_dict[symbol]
+            if epsilon not in symbol_first_set:
+                first_set |= symbol_first_set
                 break
-            symbol_set.discard(epsilon)
-            first_set |= symbol_set
+            symbol_first_set.discard(epsilon)
+            first_set |= symbol_first_set
 
-        if has_epsilon:
-            first_set.add(epsilon)
-        elif loop:
-            return self._generate_first_for_rule(rule, True)
         return first_set
-
-    def _get_next_firstable_nonterminal(self, rule: Rule) -> Optional[NonTerminal]:
-        epsilon = Terminal.get_epsilon()
-        # Check every symbol in production
-        for symbol in rule.chain:
-            # If we reach terminal - nonterminal is FIRSTable
-            if symbol.is_terminal():
-                return None
-            # If symbol is nonterminal
-            elif symbol in self.first_dict:
-                # If nonterminal FIRST doesn't contains `epsilon` - we reach end of production
-                if epsilon not in self.first_dict[symbol]:
-                    return None
-            # If there is no calculated first for this nonterminal
-            elif symbol == rule.head:
-                continue
-            else:
-                return symbol
-        return None
 
     def _calculate_follow_set(self):
         # Stack to track nonterminals
