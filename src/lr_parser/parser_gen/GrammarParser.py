@@ -52,11 +52,7 @@ class GrammarParser:
         self.parser_states.generate_support_functions()
 
         self._build_closures()
-        print(self.parser_states)
-        print(f"Terminals: {self.terminals_set}")
-        print(f"Nonterminals: {self.nonterminals_set}")
-        self._debug_print_rules()
-        self._debug_print_action()
+        self._debug_output()
 
     def _parse_complex_rule(self, line: str):
         # Split left and right parts of production
@@ -90,7 +86,7 @@ class GrammarParser:
             # Remove unnecessary chars in item
             body_item = body_item.strip()
             # If item is terminal
-            if body_item[0].islower():
+            if body_item.islower():
                 if body_item == self.epsilon_name:
                     terminal = Terminal.get_epsilon()
                 else:
@@ -114,6 +110,14 @@ class GrammarParser:
         self.rule_count += 1
         return rule
 
+    def _debug_output(self):
+        print(self.parser_states)
+        print(f"Terminals: {self.terminals_set}")
+        print(f"Nonterminals: {self.nonterminals_set}")
+        self._debug_print_rules()
+        self._debug_print_action()
+        self._debug_print_support_functions()
+
     def _debug_print_rules(self):
         print("\nParsed rules:")
         for rule in self.rules:
@@ -123,3 +127,13 @@ class GrammarParser:
         print("\nGenerated actions:")
         for action in self.parser_states.resolve_actions():
             print(action)
+
+    def _debug_print_support_functions(self):
+        (first, follow) = self.parser_states.get_support_functions()
+        print("\nFirst sets:")
+        for symbol, first_set in first.items():
+            print(f"{symbol} : {first_set}")
+
+        print("\nFollow sets:")
+        for nonterminal, follow_set in follow.items():
+            print(f"{nonterminal} : {follow_set}")

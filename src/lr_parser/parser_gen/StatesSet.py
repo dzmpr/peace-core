@@ -49,6 +49,9 @@ class StatesSet:
         self.ff_generator.set_rules(self.rules_list, self.rules_dict)
         self.ff_generator.calculate_sets()
 
+    def get_support_functions(self) -> tuple[dict, dict]:
+        return self.ff_generator.get_support_functions()
+
     def generate_closures(self, init_item: MarkedRule):
         new_states: list[LRState] = [LRState([init_item])]
         generated_states = True

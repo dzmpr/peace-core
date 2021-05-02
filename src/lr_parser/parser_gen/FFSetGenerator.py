@@ -86,8 +86,11 @@ class FFSetGenerator:
         # FIRST set for production
         first_set: set[Terminal] = set()
 
+        if len(rule.chain) == 1 and rule.chain[0] == epsilon:
+            return {epsilon}
+
         for symbol in rule.chain:
-            symbol_first_set = self.first_dict[symbol]
+            symbol_first_set = self.first_dict[symbol].copy()
             if epsilon not in symbol_first_set:
                 first_set |= symbol_first_set
                 break
@@ -131,7 +134,7 @@ class FFSetGenerator:
                 rule_follow_set |= self.follow_dict[rule.head]
                 return rule_follow_set
 
-            first_set = self.first_dict[symbol]
+            first_set = self.first_dict[symbol].copy()
             if epsilon in first_set:
                 first_set.discard(epsilon)
                 rule_follow_set |= first_set
@@ -139,6 +142,9 @@ class FFSetGenerator:
                 rule_follow_set |= first_set
                 return rule_follow_set
         return rule_follow_set
+
+    def get_support_functions(self) -> tuple[dict, dict]:
+        return self.first_dict, self.follow_dict
 
     def __get_first_size(self) -> int:
         size = 0
