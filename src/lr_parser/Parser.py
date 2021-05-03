@@ -17,9 +17,11 @@ class Parser:
         token = token_list[0]
         accepted = False
         self.stack.push(0)
+
         # TODO:  remove
         res = list()
         #
+
         while not accepted:
             stack_top: int = self.stack.top()
             action = self.action_table.get_action(stack_top, token.token_value)
@@ -37,10 +39,11 @@ class Parser:
                 rule = self.rule_table.get_rule(action.value)
                 chain = self.stack.pop_num(len(rule.chain) * 2)
                 state = self.stack.top()
-                self.stack.push(rule.production)
-                self.stack.push(self.transfer_table.get_state(state, rule.production))
+                self.stack.push(rule.head)
+                self.stack.push(self.transfer_table.get_state(state, rule.head))
+
                 # TODO: remove
-                res.append(rule.production)
+                res.append(rule.head)
                 #
             else:
                 raise Exception(f"Unsupported action type {action.action_type}.")

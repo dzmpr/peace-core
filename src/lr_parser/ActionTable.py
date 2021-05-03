@@ -7,6 +7,7 @@ class ActionType(Enum):
     ACTION_SHIFT = 1
     ACTION_REDUCE = 2
     ACTION_ERROR = 3
+    ACTION_TRANSFER = 4
 
 
 class Action:

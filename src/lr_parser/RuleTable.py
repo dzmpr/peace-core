@@ -1,13 +1,36 @@
-from lr_parser.Token import Token
+from lr_parser.parser_gen.NonTerminal import NonTerminal
+from lr_parser.parser_gen.Terminal import Terminal
+from typing import Union
 
 
 class Rule:
-    def __init__(self, result, chain: list):
-        self.production = result
-        self.chain: list = chain
+    def __init__(self, production_head: NonTerminal, body: list[Union[Terminal, NonTerminal]], rule_id: int):
+        self.head: NonTerminal = production_head
+        self.chain: list[Union[Terminal, NonTerminal]] = body
+        if rule_id <= 0:
+            raise Exception("Rule identifier should be greater than 0.")
+        self.rule_id: int = rule_id
 
     def __repr__(self):
-        return f"{self.production} -> {self.chain}"
+        return f"{self.head} -> {self.chain}"
+
+    def __hash__(self) -> int:
+        return hash(tuple([self.head, *self.chain]))
+
+    def __eq__(self, other):
+        if isinstance(other, Rule):
+            return self.head == other.head and self.chain == other.chain
+        return False
+
+    def __str__(self):
+        """
+        Pretty print rule in form: HEAD -> I T E M S
+        """
+        string = f"{self.head} -> "
+        for item in self.chain:
+            string += item.item_name
+            string += " "
+        return string
 
 
 class RuleTable:
