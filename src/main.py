@@ -17,7 +17,12 @@ from slr_parser.Token import Token, TokenType
 
 inp = [
     Token(TokenType.TOKEN_STR, "a"),
+    Token(TokenType.TOKEN_STR, "a"),
     Token(TokenType.TOKEN_STR, "b"),
+    Token(TokenType.TOKEN_STR, "a"),
+    Token(TokenType.TOKEN_STR, "b"),
+    Token(TokenType.TOKEN_STR, "b"),
+    Token(TokenType.TOKEN_STR, "a"),
     Token(TokenType.TOKEN_STR, "b"),
     Token(TokenType.TOKEN_EOF, "$")
 ]

@@ -26,16 +26,21 @@ class Rule:
 
 
 class RuleTable:
-    def __init__(self, raw_rules: dict):
+    def __init__(self, raw_rules: dict, epsilon_terminal: str):
         self.table: dict[int, Rule] = dict()
-        self._fill_rules(raw_rules)
+        self._fill_rules(raw_rules, epsilon_terminal)
 
     def __repr__(self):
         return f"Rules: {len(self.table)}"
 
-    def _fill_rules(self, raw_rules: dict):
+    def _fill_rules(self, raw_rules: dict, epsilon_terminal: str):
         for raw_rule in raw_rules:
-            rule = Rule(raw_rule["head"], raw_rule["body"], raw_rule["rule_id"])
+            # If rule have epsilon body - set empty list
+            body = raw_rule["body"]
+            if len(body) == 1 and body[0] == epsilon_terminal:
+                body = list()
+
+            rule = Rule(raw_rule["head"], body, raw_rule["rule_id"])
             if rule.rule_id not in self.table:
                 self.table[rule.rule_id] = rule
             else:

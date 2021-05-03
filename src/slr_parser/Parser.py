@@ -14,7 +14,7 @@ class Parser:
         if fields - grammar.keys():
             raise Exception("Wrong grammar representation.")
         self.parser_table = ParserTable(grammar["actions"])
-        self.rule_table: RuleTable = RuleTable(grammar["rules"])
+        self.rule_table: RuleTable = RuleTable(grammar["rules"], grammar["epsilon_terminal"])
 
     def __repr__(self):
         return f"State: {self.stack.top()}"
@@ -50,7 +50,7 @@ class Parser:
                 self.stack.push(self.parser_table.get_transfer_action((state, rule.head)).value)
 
                 # TODO: remove
-                res.append(rule.head)
+                res.append(f"{rule.head} {rule.rule_id}")
                 #
             else:
                 raise Exception(f"Unsupported action type {action.action_type}.")
