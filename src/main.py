@@ -11,6 +11,27 @@ from codegenerator.code_generator import CodeGenerator
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
 
+from lr_parser.Parser import Parser
+from lr_parser.ActionTable import ActionTable
+from lr_parser.RuleTable import RuleTable, Rule
+from lr_parser.TransferTable import TransferTable
+from lr_parser.Token import Token, TokenType
+
+inp = [
+    Token(TokenType.TOKEN_STR, "a"),
+    Token(TokenType.TOKEN_STR, "b"),
+    Token(TokenType.TOKEN_STR, "b"),
+]
+
+at = ActionTable()
+st = TransferTable()
+rt = RuleTable()
+rt.add_rule(1, Rule("S", 1))
+rt.add_rule(2, Rule("S", 2))
+print(Parser(at, st, rt).parse_input(inp))
+
+exit()
+
 parser = argparse.ArgumentParser(description="Interpreter for converting .pce files into .gpss.")
 parser.add_argument(
     'input',
