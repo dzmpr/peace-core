@@ -1,16 +1,23 @@
-from lr_parser.ActionTable import ActionTable, ActionType
-from lr_parser.TransferTable import TransferTable
-from lr_parser.RuleTable import RuleTable
-from lr_parser.Token import Token
-from lr_parser.Stack import Stack
+from slr_parser.Action import ActionType
+from slr_parser.ParserTable import ParserTable
+from slr_parser.RuleTable import RuleTable
+from slr_parser.Token import Token
+from slr_parser.Stack import Stack
 
 
 class Parser:
-    def __init__(self, action_table: ActionTable, transfer_table: TransferTable, rule_table: RuleTable):
+    def __init__(self, grammar: dict):
         self.stack: Stack = Stack()
-        self.action_table: ActionTable = action_table
-        self.transfer_table: TransferTable = transfer_table
-        self.rule_table: RuleTable = rule_table
+        # Check is grammar in expected representation
+        fields = {"actions", "rules", "terminals", "nonterminals", "start_nonterminal",
+                  "augmented_nonterminal", "epsilon_terminal", "eof_terminal"}
+        if fields - grammar.keys():
+            raise Exception("Wrong grammar representation.")
+        self.parser_table = ParserTable(grammar["actions"])
+        self.rule_table: RuleTable = RuleTable(grammar["rules"])
+
+    def __repr__(self):
+        return f"State: {self.stack.top()}"
 
     def parse_input(self, token_list: list[Token]) -> list:
         current_token = 0
@@ -24,7 +31,7 @@ class Parser:
 
         while not accepted:
             stack_top: int = self.stack.top()
-            action = self.action_table.get_action(stack_top, token.token_value)
+            action = self.parser_table.get_action((stack_top, token.token_value))
             if action.action_type == ActionType.ACTION_ACCEPT:
                 accepted = True
             elif action.action_type == ActionType.ACTION_ERROR:
@@ -40,7 +47,7 @@ class Parser:
                 chain = self.stack.pop_num(len(rule.chain) * 2)
                 state = self.stack.top()
                 self.stack.push(rule.head)
-                self.stack.push(self.transfer_table.get_state(state, rule.head))
+                self.stack.push(self.parser_table.get_transfer_action((state, rule.head)).value)
 
                 # TODO: remove
                 res.append(rule.head)

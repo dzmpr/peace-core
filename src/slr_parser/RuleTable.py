@@ -1,12 +1,7 @@
-from lr_parser.parser_gen.NonTerminal import NonTerminal
-from lr_parser.parser_gen.Terminal import Terminal
-from typing import Union
-
-
 class Rule:
-    def __init__(self, production_head: NonTerminal, body: list[Union[Terminal, NonTerminal]], rule_id: int):
-        self.head: NonTerminal = production_head
-        self.chain: list[Union[Terminal, NonTerminal]] = body
+    def __init__(self, head: str, body: list[str], rule_id: int):
+        self.head: str = head
+        self.chain: list[str] = body
         if rule_id <= 0:
             raise Exception("Rule identifier should be greater than 0.")
         self.rule_id: int = rule_id
@@ -26,22 +21,25 @@ class Rule:
         """
         Pretty print rule in form: HEAD -> I T E M S
         """
-        string = f"{self.head} -> "
-        for item in self.chain:
-            string += item.item_name
-            string += " "
+        string = f"{self.head} -> {self.chain}"
         return string
 
 
 class RuleTable:
-    def __init__(self):
+    def __init__(self, raw_rules: dict):
         self.table: dict[int, Rule] = dict()
+        self._fill_rules(raw_rules)
 
-    def add_rule(self, rule_key: int, rule: Rule):
-        if rule_key not in self.table:
-            self.table[rule_key] = rule
-        else:
-            raise Exception("Rule already exists.")
+    def __repr__(self):
+        return f"Rules: {len(self.table)}"
+
+    def _fill_rules(self, raw_rules: dict):
+        for raw_rule in raw_rules:
+            rule = Rule(raw_rule["head"], raw_rule["body"], raw_rule["rule_id"])
+            if rule.rule_id not in self.table:
+                self.table[rule.rule_id] = rule
+            else:
+                raise Exception(f"Rule conflict, id:{rule.rule_id}. R1: {self.table[rule.rule_id]}, R2: {rule}")
 
     def get_rule(self, rule_key: int) -> Rule:
         if rule_key in self.table:

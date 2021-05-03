@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import sys
 from typing import TextIO
@@ -11,24 +12,19 @@ from codegenerator.code_generator import CodeGenerator
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
 
-from lr_parser.Parser import Parser
-from lr_parser.ActionTable import ActionTable
-from lr_parser.RuleTable import RuleTable, Rule
-from lr_parser.TransferTable import TransferTable
-from lr_parser.Token import Token, TokenType
+from slr_parser.Parser import Parser
+from slr_parser.Token import Token, TokenType
 
 inp = [
     Token(TokenType.TOKEN_STR, "a"),
     Token(TokenType.TOKEN_STR, "b"),
     Token(TokenType.TOKEN_STR, "b"),
+    Token(TokenType.TOKEN_EOF, "$")
 ]
 
-at = ActionTable()
-st = TransferTable()
-rt = RuleTable()
-rt.add_rule(1, Rule("S", 1))
-rt.add_rule(2, Rule("S", 2))
-print(Parser(at, st, rt).parse_input(inp))
+grammar = json.load(open("slr_parser/grammar.json", "r"))
+slr = Parser(grammar)
+print(slr.parse_input(inp))
 
 exit()
 
