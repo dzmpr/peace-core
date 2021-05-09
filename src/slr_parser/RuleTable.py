@@ -5,6 +5,7 @@ class Rule:
         if rule_id <= 0:
             raise Exception("Rule identifier should be greater than 0.")
         self.rule_id: int = rule_id
+        self.body_len = len(self.chain)
 
     def __repr__(self):
         return f"{self.head} -> {self.chain}"

@@ -16,15 +16,43 @@ from slr_parser.Parser import Parser
 from slr_parser.Token import Token, TokenType
 
 inp = [
-    Token(TokenType.TOKEN_STR, "a"),
-    Token(TokenType.TOKEN_STR, "a"),
-    Token(TokenType.TOKEN_STR, "b"),
-    Token(TokenType.TOKEN_STR, "a"),
-    Token(TokenType.TOKEN_STR, "b"),
-    Token(TokenType.TOKEN_STR, "b"),
-    Token(TokenType.TOKEN_STR, "a"),
-    Token(TokenType.TOKEN_STR, "b"),
-    Token(TokenType.TOKEN_EOF, "$")
+    # block {
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "lcbrace"),
+    # bloc {
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "lcbrace"),
+    # lab@1:
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "atsym"),
+    Token(TokenType.TOKEN_STR, "num"),
+    Token(TokenType.TOKEN_STR, "colon"),
+    # delay(10)
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "lbrace"),
+    Token(TokenType.TOKEN_STR, "num"),
+    Token(TokenType.TOKEN_STR, "rbrace"),
+    # bloc { }
+    Token(TokenType.TOKEN_STR, "rcbrace"),
+    # block { }
+    Token(TokenType.TOKEN_STR, "rcbrace"),
+    # main {
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "lcbrace"),
+    # block()
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "lbrace"),
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "comma"),
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "rbrace"),
+    # block()
+    Token(TokenType.TOKEN_STR, "word"),
+    Token(TokenType.TOKEN_STR, "lbrace"),
+    Token(TokenType.TOKEN_STR, "rbrace"),
+    # main { }
+    Token(TokenType.TOKEN_STR, "rcbrace"),
+    Token(TokenType.TOKEN_STR, "$"),
 ]
 
 grammar = json.load(open("slr_parser/grammar.json", "r"))
