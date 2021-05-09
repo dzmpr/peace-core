@@ -1,1 +1,770 @@
-{"actions": [{"state": 0, "action_symbol": "Block", "action": "ACTION_TRANSFER", "value": 1}, {"state": 0, "action_symbol": "word", "action": "ACTION_SHIFT", "value": 2}, {"state": 0, "action_symbol": "Block_0+", "action": "ACTION_TRANSFER", "value": 3}, {"state": 0, "action_symbol": "Program", "action": "ACTION_TRANSFER", "value": 4}, {"state": 0, "action_symbol": "$", "action": "ACTION_REDUCE", "value": 3}, {"state": 1, "action_symbol": "Block", "action": "ACTION_TRANSFER", "value": 1}, {"state": 1, "action_symbol": "Block_0+", "action": "ACTION_TRANSFER", "value": 5}, {"state": 1, "action_symbol": "word", "action": "ACTION_SHIFT", "value": 2}, {"state": 1, "action_symbol": "$", "action": "ACTION_REDUCE", "value": 3}, {"state": 2, "action_symbol": "lcbrace", "action": "ACTION_SHIFT", "value": 6}, {"state": 3, "action_symbol": "$", "action": "ACTION_REDUCE", "value": 1}, {"state": 4, "action_symbol": "$", "action": "ACTION_ACCEPT", "value": 0}, {"state": 5, "action_symbol": "$", "action": "ACTION_REDUCE", "value": 2}, {"state": 6, "action_symbol": "word", "action": "ACTION_SHIFT", "value": 7}, {"state": 6, "action_symbol": "BlockEntry", "action": "ACTION_TRANSFER", "value": 8}, {"state": 6, "action_symbol": "Label", "action": "ACTION_TRANSFER", "value": 9}, {"state": 6, "action_symbol": "BlockEntry_0+", "action": "ACTION_TRANSFER", "value": 10}, {"state": 6, "action_symbol": "Block", "action": "ACTION_TRANSFER", "value": 11}, {"state": 6, "action_symbol": "Statement", "action": "ACTION_TRANSFER", "value": 12}, {"state": 6, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 6}, {"state": 7, "action_symbol": "atsym", "action": "ACTION_SHIFT", "value": 13}, {"state": 7, "action_symbol": "lcbrace", "action": "ACTION_SHIFT", "value": 6}, {"state": 7, "action_symbol": "lbrace", "action": "ACTION_SHIFT", "value": 14}, {"state": 7, "action_symbol": "LabelTag", "action": "ACTION_TRANSFER", "value": 15}, {"state": 7, "action_symbol": "colon", "action": "ACTION_REDUCE", "value": 12}, {"state": 8, "action_symbol": "BlockEntry_0+", "action": "ACTION_TRANSFER", "value": 16}, {"state": 8, "action_symbol": "word", "action": "ACTION_SHIFT", "value": 7}, {"state": 8, "action_symbol": "BlockEntry", "action": "ACTION_TRANSFER", "value": 8}, {"state": 8, "action_symbol": "Label", "action": "ACTION_TRANSFER", "value": 9}, {"state": 8, "action_symbol": "Block", "action": "ACTION_TRANSFER", "value": 11}, {"state": 8, "action_symbol": "Statement", "action": "ACTION_TRANSFER", "value": 12}, {"state": 8, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 6}, {"state": 9, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 9}, {"state": 9, "action_symbol": "word", "action": "ACTION_REDUCE", "value": 9}, {"state": 10, "action_symbol": "rcbrace", "action": "ACTION_SHIFT", "value": 17}, {"state": 11, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 8}, {"state": 11, "action_symbol": "word", "action": "ACTION_REDUCE", "value": 8}, {"state": 12, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 7}, {"state": 12, "action_symbol": "word", "action": "ACTION_REDUCE", "value": 7}, {"state": 13, "action_symbol": "num", "action": "ACTION_SHIFT", "value": 18}, {"state": 13, "action_symbol": "LabelNum", "action": "ACTION_TRANSFER", "value": 19}, {"state": 13, "action_symbol": "colon", "action": "ACTION_REDUCE", "value": 14}, {"state": 14, "action_symbol": "str", "action": "ACTION_SHIFT", "value": 20}, {"state": 14, "action_symbol": "StatementParams", "action": "ACTION_TRANSFER", "value": 21}, {"state": 14, "action_symbol": "Param", "action": "ACTION_TRANSFER", "value": 22}, {"state": 14, "action_symbol": "word", "action": "ACTION_SHIFT", "value": 23}, {"state": 14, "action_symbol": "num", "action": "ACTION_SHIFT", "value": 24}, {"state": 14, "action_symbol": "rbrace", "action": "ACTION_REDUCE", "value": 17}, {"state": 15, "action_symbol": "colon", "action": "ACTION_SHIFT", "value": 25}, {"state": 16, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 5}, {"state": 17, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 4}, {"state": 17, "action_symbol": "word", "action": "ACTION_REDUCE", "value": 4}, {"state": 17, "action_symbol": "$", "action": "ACTION_REDUCE", "value": 4}, {"state": 18, "action_symbol": "colon", "action": "ACTION_REDUCE", "value": 13}, {"state": 19, "action_symbol": "colon", "action": "ACTION_REDUCE", "value": 11}, {"state": 20, "action_symbol": "comma", "action": "ACTION_REDUCE", "value": 22}, {"state": 20, "action_symbol": "rbrace", "action": "ACTION_REDUCE", "value": 22}, {"state": 21, "action_symbol": "rbrace", "action": "ACTION_SHIFT", "value": 26}, {"state": 22, "action_symbol": "StatementParamContinuation", "action": "ACTION_TRANSFER", "value": 27}, {"state": 22, "action_symbol": "comma", "action": "ACTION_SHIFT", "value": 28}, {"state": 22, "action_symbol": "rbrace", "action": "ACTION_REDUCE", "value": 19}, {"state": 23, "action_symbol": "comma", "action": "ACTION_REDUCE", "value": 20}, {"state": 23, "action_symbol": "rbrace", "action": "ACTION_REDUCE", "value": 20}, {"state": 24, "action_symbol": "comma", "action": "ACTION_REDUCE", "value": 21}, {"state": 24, "action_symbol": "rbrace", "action": "ACTION_REDUCE", "value": 21}, {"state": 25, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 10}, {"state": 25, "action_symbol": "word", "action": "ACTION_REDUCE", "value": 10}, {"state": 26, "action_symbol": "rcbrace", "action": "ACTION_REDUCE", "value": 15}, {"state": 26, "action_symbol": "word", "action": "ACTION_REDUCE", "value": 15}, {"state": 27, "action_symbol": "rbrace", "action": "ACTION_REDUCE", "value": 16}, {"state": 28, "action_symbol": "word", "action": "ACTION_SHIFT", "value": 23}, {"state": 28, "action_symbol": "str", "action": "ACTION_SHIFT", "value": 20}, {"state": 28, "action_symbol": "Param", "action": "ACTION_TRANSFER", "value": 29}, {"state": 28, "action_symbol": "num", "action": "ACTION_SHIFT", "value": 24}, {"state": 29, "action_symbol": "StatementParamContinuation", "action": "ACTION_TRANSFER", "value": 30}, {"state": 29, "action_symbol": "comma", "action": "ACTION_SHIFT", "value": 28}, {"state": 29, "action_symbol": "rbrace", "action": "ACTION_REDUCE", "value": 19}, {"state": 30, "action_symbol": "rbrace", "action": "ACTION_REDUCE", "value": 18}], "rules": [{"rule_id": 23, "head": "Program_au", "body": ["Program"]}, {"rule_id": 1, "head": "Program", "body": ["Block_0+"]}, {"rule_id": 2, "head": "Block_0+", "body": ["Block", "Block_0+"]}, {"rule_id": 3, "head": "Block_0+", "body": ["eps"]}, {"rule_id": 4, "head": "Block", "body": ["word", "lcbrace", "BlockEntry_0+", "rcbrace"]}, {"rule_id": 5, "head": "BlockEntry_0+", "body": ["BlockEntry", "BlockEntry_0+"]}, {"rule_id": 6, "head": "BlockEntry_0+", "body": ["eps"]}, {"rule_id": 7, "head": "BlockEntry", "body": ["Statement"]}, {"rule_id": 8, "head": "BlockEntry", "body": ["Block"]}, {"rule_id": 9, "head": "BlockEntry", "body": ["Label"]}, {"rule_id": 10, "head": "Label", "body": ["word", "LabelTag", "colon"]}, {"rule_id": 11, "head": "LabelTag", "body": ["atsym", "LabelNum"]}, {"rule_id": 12, "head": "LabelTag", "body": ["eps"]}, {"rule_id": 13, "head": "LabelNum", "body": ["num"]}, {"rule_id": 14, "head": "LabelNum", "body": ["eps"]}, {"rule_id": 15, "head": "Statement", "body": ["word", "lbrace", "StatementParams", "rbrace"]}, {"rule_id": 16, "head": "StatementParams", "body": ["Param", "StatementParamContinuation"]}, {"rule_id": 17, "head": "StatementParams", "body": ["eps"]}, {"rule_id": 18, "head": "StatementParamContinuation", "body": ["comma", "Param", "StatementParamContinuation"]}, {"rule_id": 19, "head": "StatementParamContinuation", "body": ["eps"]}, {"rule_id": 20, "head": "Param", "body": ["word"]}, {"rule_id": 21, "head": "Param", "body": ["num"]}, {"rule_id": 22, "head": "Param", "body": ["str"]}], "terminals": ["str", "lcbrace", "eps", "atsym", "num", "comma", "lbrace", "rcbrace", "word", "rbrace", "colon"], "nonterminals": ["BlockEntry", "BlockEntry_0+", "Statement", "StatementParamContinuation", "Program", "LabelTag", "Param", "Block", "StatementParams", "LabelNum", "Block_0+", "Label"], "start_nonterminal": "Program", "augmented_nonterminal": "Program_au", "epsilon_terminal": "eps", "eof_terminal": "$"}
+{
+  "actions": [
+    {
+      "state": 0,
+      "action_symbol": "word",
+      "action": "ACTION_SHIFT",
+      "value": 1
+    },
+    {
+      "state": 0,
+      "action_symbol": "Block",
+      "action": "ACTION_TRANSFER",
+      "value": 2
+    },
+    {
+      "state": 0,
+      "action_symbol": "Program",
+      "action": "ACTION_TRANSFER",
+      "value": 3
+    },
+    {
+      "state": 0,
+      "action_symbol": "Block_0+",
+      "action": "ACTION_TRANSFER",
+      "value": 4
+    },
+    {
+      "state": 0,
+      "action_symbol": "eof",
+      "action": "ACTION_REDUCE",
+      "value": 3
+    },
+    {
+      "state": 1,
+      "action_symbol": "atsym",
+      "action": "ACTION_SHIFT",
+      "value": 5
+    },
+    {
+      "state": 1,
+      "action_symbol": "BlockTag",
+      "action": "ACTION_TRANSFER",
+      "value": 6
+    },
+    {
+      "state": 1,
+      "action_symbol": "lcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 6
+    },
+    {
+      "state": 2,
+      "action_symbol": "word",
+      "action": "ACTION_SHIFT",
+      "value": 1
+    },
+    {
+      "state": 2,
+      "action_symbol": "Block",
+      "action": "ACTION_TRANSFER",
+      "value": 2
+    },
+    {
+      "state": 2,
+      "action_symbol": "Block_0+",
+      "action": "ACTION_TRANSFER",
+      "value": 7
+    },
+    {
+      "state": 2,
+      "action_symbol": "eof",
+      "action": "ACTION_REDUCE",
+      "value": 3
+    },
+    {
+      "state": 3,
+      "action_symbol": "eof",
+      "action": "ACTION_ACCEPT",
+      "value": 0
+    },
+    {
+      "state": 4,
+      "action_symbol": "eof",
+      "action": "ACTION_REDUCE",
+      "value": 1
+    },
+    {
+      "state": 5,
+      "action_symbol": "lcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 5
+    },
+    {
+      "state": 6,
+      "action_symbol": "lcbrace",
+      "action": "ACTION_SHIFT",
+      "value": 8
+    },
+    {
+      "state": 7,
+      "action_symbol": "eof",
+      "action": "ACTION_REDUCE",
+      "value": 2
+    },
+    {
+      "state": 8,
+      "action_symbol": "word",
+      "action": "ACTION_SHIFT",
+      "value": 9
+    },
+    {
+      "state": 8,
+      "action_symbol": "Statement",
+      "action": "ACTION_TRANSFER",
+      "value": 10
+    },
+    {
+      "state": 8,
+      "action_symbol": "BlockEntry_0+",
+      "action": "ACTION_TRANSFER",
+      "value": 11
+    },
+    {
+      "state": 8,
+      "action_symbol": "BlockEntry",
+      "action": "ACTION_TRANSFER",
+      "value": 12
+    },
+    {
+      "state": 8,
+      "action_symbol": "Label",
+      "action": "ACTION_TRANSFER",
+      "value": 13
+    },
+    {
+      "state": 8,
+      "action_symbol": "Block",
+      "action": "ACTION_TRANSFER",
+      "value": 14
+    },
+    {
+      "state": 8,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 8
+    },
+    {
+      "state": 9,
+      "action_symbol": "atsym",
+      "action": "ACTION_SHIFT",
+      "value": 15
+    },
+    {
+      "state": 9,
+      "action_symbol": "LabelTag",
+      "action": "ACTION_TRANSFER",
+      "value": 16
+    },
+    {
+      "state": 9,
+      "action_symbol": "lbrace",
+      "action": "ACTION_SHIFT",
+      "value": 17
+    },
+    {
+      "state": 9,
+      "action_symbol": "BlockTag",
+      "action": "ACTION_TRANSFER",
+      "value": 6
+    },
+    {
+      "state": 9,
+      "action_symbol": "colon",
+      "action": "ACTION_REDUCE",
+      "value": 14
+    },
+    {
+      "state": 9,
+      "action_symbol": "lcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 6
+    },
+    {
+      "state": 10,
+      "action_symbol": "word",
+      "action": "ACTION_REDUCE",
+      "value": 9
+    },
+    {
+      "state": 10,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 9
+    },
+    {
+      "state": 11,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_SHIFT",
+      "value": 18
+    },
+    {
+      "state": 12,
+      "action_symbol": "BlockEntry_0+",
+      "action": "ACTION_TRANSFER",
+      "value": 19
+    },
+    {
+      "state": 12,
+      "action_symbol": "word",
+      "action": "ACTION_SHIFT",
+      "value": 9
+    },
+    {
+      "state": 12,
+      "action_symbol": "Statement",
+      "action": "ACTION_TRANSFER",
+      "value": 10
+    },
+    {
+      "state": 12,
+      "action_symbol": "Label",
+      "action": "ACTION_TRANSFER",
+      "value": 13
+    },
+    {
+      "state": 12,
+      "action_symbol": "BlockEntry",
+      "action": "ACTION_TRANSFER",
+      "value": 12
+    },
+    {
+      "state": 12,
+      "action_symbol": "Block",
+      "action": "ACTION_TRANSFER",
+      "value": 14
+    },
+    {
+      "state": 12,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 8
+    },
+    {
+      "state": 13,
+      "action_symbol": "word",
+      "action": "ACTION_REDUCE",
+      "value": 11
+    },
+    {
+      "state": 13,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 11
+    },
+    {
+      "state": 14,
+      "action_symbol": "word",
+      "action": "ACTION_REDUCE",
+      "value": 10
+    },
+    {
+      "state": 14,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 10
+    },
+    {
+      "state": 15,
+      "action_symbol": "LabelNum",
+      "action": "ACTION_TRANSFER",
+      "value": 20
+    },
+    {
+      "state": 15,
+      "action_symbol": "num",
+      "action": "ACTION_SHIFT",
+      "value": 21
+    },
+    {
+      "state": 15,
+      "action_symbol": "colon",
+      "action": "ACTION_REDUCE",
+      "value": 16
+    },
+    {
+      "state": 15,
+      "action_symbol": "lcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 5
+    },
+    {
+      "state": 16,
+      "action_symbol": "colon",
+      "action": "ACTION_SHIFT",
+      "value": 22
+    },
+    {
+      "state": 17,
+      "action_symbol": "word",
+      "action": "ACTION_SHIFT",
+      "value": 23
+    },
+    {
+      "state": 17,
+      "action_symbol": "StatementParams",
+      "action": "ACTION_TRANSFER",
+      "value": 24
+    },
+    {
+      "state": 17,
+      "action_symbol": "atsym",
+      "action": "ACTION_SHIFT",
+      "value": 25
+    },
+    {
+      "state": 17,
+      "action_symbol": "string",
+      "action": "ACTION_SHIFT",
+      "value": 26
+    },
+    {
+      "state": 17,
+      "action_symbol": "num",
+      "action": "ACTION_SHIFT",
+      "value": 27
+    },
+    {
+      "state": 17,
+      "action_symbol": "Param",
+      "action": "ACTION_TRANSFER",
+      "value": 28
+    },
+    {
+      "state": 17,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 19
+    },
+    {
+      "state": 18,
+      "action_symbol": "word",
+      "action": "ACTION_REDUCE",
+      "value": 4
+    },
+    {
+      "state": 18,
+      "action_symbol": "eof",
+      "action": "ACTION_REDUCE",
+      "value": 4
+    },
+    {
+      "state": 18,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 4
+    },
+    {
+      "state": 19,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 7
+    },
+    {
+      "state": 20,
+      "action_symbol": "colon",
+      "action": "ACTION_REDUCE",
+      "value": 13
+    },
+    {
+      "state": 21,
+      "action_symbol": "colon",
+      "action": "ACTION_REDUCE",
+      "value": 15
+    },
+    {
+      "state": 22,
+      "action_symbol": "word",
+      "action": "ACTION_REDUCE",
+      "value": 12
+    },
+    {
+      "state": 22,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 12
+    },
+    {
+      "state": 23,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 22
+    },
+    {
+      "state": 23,
+      "action_symbol": "comma",
+      "action": "ACTION_REDUCE",
+      "value": 22
+    },
+    {
+      "state": 24,
+      "action_symbol": "rbrace",
+      "action": "ACTION_SHIFT",
+      "value": 29
+    },
+    {
+      "state": 25,
+      "action_symbol": "num",
+      "action": "ACTION_SHIFT",
+      "value": 30
+    },
+    {
+      "state": 26,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 24
+    },
+    {
+      "state": 26,
+      "action_symbol": "comma",
+      "action": "ACTION_REDUCE",
+      "value": 24
+    },
+    {
+      "state": 27,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 23
+    },
+    {
+      "state": 27,
+      "action_symbol": "comma",
+      "action": "ACTION_REDUCE",
+      "value": 23
+    },
+    {
+      "state": 28,
+      "action_symbol": "StatementParamContinuation",
+      "action": "ACTION_TRANSFER",
+      "value": 31
+    },
+    {
+      "state": 28,
+      "action_symbol": "comma",
+      "action": "ACTION_SHIFT",
+      "value": 32
+    },
+    {
+      "state": 28,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 21
+    },
+    {
+      "state": 29,
+      "action_symbol": "word",
+      "action": "ACTION_REDUCE",
+      "value": 17
+    },
+    {
+      "state": 29,
+      "action_symbol": "rcbrace",
+      "action": "ACTION_REDUCE",
+      "value": 17
+    },
+    {
+      "state": 30,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 25
+    },
+    {
+      "state": 30,
+      "action_symbol": "comma",
+      "action": "ACTION_REDUCE",
+      "value": 25
+    },
+    {
+      "state": 31,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 18
+    },
+    {
+      "state": 32,
+      "action_symbol": "word",
+      "action": "ACTION_SHIFT",
+      "value": 23
+    },
+    {
+      "state": 32,
+      "action_symbol": "atsym",
+      "action": "ACTION_SHIFT",
+      "value": 25
+    },
+    {
+      "state": 32,
+      "action_symbol": "string",
+      "action": "ACTION_SHIFT",
+      "value": 26
+    },
+    {
+      "state": 32,
+      "action_symbol": "num",
+      "action": "ACTION_SHIFT",
+      "value": 27
+    },
+    {
+      "state": 32,
+      "action_symbol": "Param",
+      "action": "ACTION_TRANSFER",
+      "value": 33
+    },
+    {
+      "state": 33,
+      "action_symbol": "StatementParamContinuation",
+      "action": "ACTION_TRANSFER",
+      "value": 34
+    },
+    {
+      "state": 33,
+      "action_symbol": "comma",
+      "action": "ACTION_SHIFT",
+      "value": 32
+    },
+    {
+      "state": 33,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 21
+    },
+    {
+      "state": 34,
+      "action_symbol": "rbrace",
+      "action": "ACTION_REDUCE",
+      "value": 20
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": 26,
+      "head": "Program_au",
+      "body": [
+        "Program"
+      ]
+    },
+    {
+      "rule_id": 1,
+      "head": "Program",
+      "body": [
+        "Block_0+"
+      ]
+    },
+    {
+      "rule_id": 2,
+      "head": "Block_0+",
+      "body": [
+        "Block",
+        "Block_0+"
+      ]
+    },
+    {
+      "rule_id": 3,
+      "head": "Block_0+",
+      "body": [
+        "eps"
+      ]
+    },
+    {
+      "rule_id": 4,
+      "head": "Block",
+      "body": [
+        "word",
+        "BlockTag",
+        "lcbrace",
+        "BlockEntry_0+",
+        "rcbrace"
+      ]
+    },
+    {
+      "rule_id": 5,
+      "head": "BlockTag",
+      "body": [
+        "atsym"
+      ]
+    },
+    {
+      "rule_id": 6,
+      "head": "BlockTag",
+      "body": [
+        "eps"
+      ]
+    },
+    {
+      "rule_id": 7,
+      "head": "BlockEntry_0+",
+      "body": [
+        "BlockEntry",
+        "BlockEntry_0+"
+      ]
+    },
+    {
+      "rule_id": 8,
+      "head": "BlockEntry_0+",
+      "body": [
+        "eps"
+      ]
+    },
+    {
+      "rule_id": 9,
+      "head": "BlockEntry",
+      "body": [
+        "Statement"
+      ]
+    },
+    {
+      "rule_id": 10,
+      "head": "BlockEntry",
+      "body": [
+        "Block"
+      ]
+    },
+    {
+      "rule_id": 11,
+      "head": "BlockEntry",
+      "body": [
+        "Label"
+      ]
+    },
+    {
+      "rule_id": 12,
+      "head": "Label",
+      "body": [
+        "word",
+        "LabelTag",
+        "colon"
+      ]
+    },
+    {
+      "rule_id": 13,
+      "head": "LabelTag",
+      "body": [
+        "atsym",
+        "LabelNum"
+      ]
+    },
+    {
+      "rule_id": 14,
+      "head": "LabelTag",
+      "body": [
+        "eps"
+      ]
+    },
+    {
+      "rule_id": 15,
+      "head": "LabelNum",
+      "body": [
+        "num"
+      ]
+    },
+    {
+      "rule_id": 16,
+      "head": "LabelNum",
+      "body": [
+        "eps"
+      ]
+    },
+    {
+      "rule_id": 17,
+      "head": "Statement",
+      "body": [
+        "word",
+        "lbrace",
+        "StatementParams",
+        "rbrace"
+      ]
+    },
+    {
+      "rule_id": 18,
+      "head": "StatementParams",
+      "body": [
+        "Param",
+        "StatementParamContinuation"
+      ]
+    },
+    {
+      "rule_id": 19,
+      "head": "StatementParams",
+      "body": [
+        "eps"
+      ]
+    },
+    {
+      "rule_id": 20,
+      "head": "StatementParamContinuation",
+      "body": [
+        "comma",
+        "Param",
+        "StatementParamContinuation"
+      ]
+    },
+    {
+      "rule_id": 21,
+      "head": "StatementParamContinuation",
+      "body": [
+        "eps"
+      ]
+    },
+    {
+      "rule_id": 22,
+      "head": "Param",
+      "body": [
+        "word"
+      ]
+    },
+    {
+      "rule_id": 23,
+      "head": "Param",
+      "body": [
+        "num"
+      ]
+    },
+    {
+      "rule_id": 24,
+      "head": "Param",
+      "body": [
+        "string"
+      ]
+    },
+    {
+      "rule_id": 25,
+      "head": "Param",
+      "body": [
+        "atsym",
+        "num"
+      ]
+    }
+  ],
+  "terminals": [
+    "eps",
+    "colon",
+    "rbrace",
+    "num",
+    "lbrace",
+    "lcbrace",
+    "string",
+    "word",
+    "atsym",
+    "comma",
+    "rcbrace"
+  ],
+  "nonterminals": [
+    "LabelNum",
+    "Statement",
+    "StatementParamContinuation",
+    "StatementParams",
+    "BlockTag",
+    "BlockEntry",
+    "LabelTag",
+    "BlockEntry_0+",
+    "Label",
+    "Block_0+",
+    "Program",
+    "Block",
+    "Param"
+  ],
+  "start_nonterminal": "Program",
+  "augmented_nonterminal": "Program_au",
+  "epsilon_terminal": "eps",
+  "eof_terminal": "eof"
+}

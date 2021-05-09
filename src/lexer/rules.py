@@ -1,7 +1,7 @@
 from lexer.state_machine import State
 
 signList = ["+", "-", "/", "*", "=", "#", "$", "[", "]",
-            "{", "}", ":", ",", "(", ")", "."]
+            "{", "}", ":", ",", "(", ")", ".", "@"]
 
 
 def char(symbol):
@@ -61,16 +61,4 @@ def str_body(symbol):
         return State.str_start
     elif symbol == "\"":
         return State.str_end
-    return State.undefined
-
-
-def parameter_start(symbol):
-    if symbol == "@":
-        return State.parameter
-    return State.undefined
-
-
-def parameter(symbol):
-    if symbol.isdigit():
-        return State.parameter
     return State.undefined

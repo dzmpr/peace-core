@@ -3,7 +3,8 @@ from lexer.token import Token, TokenClass
 from lexer import rules
 from typing import List
 
-
+# Added - num, string, word
+# colon, rbrace, comma, rcbrace, lbrace, atsym, lcbrace
 wordMachine = StateMachine(TokenClass.word, {
     State.begin: rules.char_start,
     State.char: rules.char
@@ -40,11 +41,6 @@ newlineMachine = StateMachine(TokenClass.newline, {
     State.newline: rules.newline
 })
 
-parameterMachine = StateMachine(TokenClass.parameter, {
-    State.begin: rules.parameter_start,
-    State.parameter: rules.parameter
-})
-
 machines = {
     wordMachine,
     spaceMachine,
@@ -52,9 +48,27 @@ machines = {
     numberMachine,
     signMachine,
     newlineMachine,
-    stringMachine,
-    parameterMachine
+    stringMachine
 }
+
+
+def get_sign_token(token_value: str) -> Token:
+    if token_value == "(":
+        return Token(TokenClass.lbrace, token_value)
+    elif token_value == ")":
+        return Token(TokenClass.rbrace, token_value)
+    elif token_value == "{":
+        return Token(TokenClass.lcbrace, token_value)
+    elif token_value == "}":
+        return Token(TokenClass.rcbrace, token_value)
+    elif token_value == ":":
+        return Token(TokenClass.colon, token_value)
+    elif token_value == ",":
+        return Token(TokenClass.comma, token_value)
+    elif token_value == "@":
+        return Token(TokenClass.atsym, token_value)
+    else:
+        return Token(TokenClass.sign, token_value)
 
 
 # lexer
@@ -85,8 +99,14 @@ def process_line(string: str) -> List[Token]:
                 for machine in machines:
                     # Find machine with not undefined state
                     if machine.prevState != State.undefined and machine.prevState != State.begin and not machine_found:
-                        token = Token(machine.name, string[index:i])
-                        tokens.append(token)
+                        if machine.name == TokenClass.sign:
+                            token = get_sign_token(string[index:i])
+                        else:
+                            token = Token(machine.name, string[index:i])
+
+                        if machine.name != TokenClass.space and machine.name != TokenClass.newline:
+                            tokens.append(token)
+
                         machine_found = True
                     machine.reset_state()
                 index = i
@@ -105,8 +125,13 @@ def process_line(string: str) -> List[Token]:
     # Recognize final token
     for machine in machines:
         if machine.state != State.undefined and machine.state != State.begin and not machine_found:
-            token = Token(machine.name, string[index:i])
-            tokens.append(token)
+            if machine.name == TokenClass.sign:
+                token = get_sign_token(string[index:i])
+            else:
+                token = Token(machine.name, string[index:i])
+
+            if machine.name != TokenClass.space and machine.name != TokenClass.newline:
+                tokens.append(token)
             machine_found = True
         machine.reset_state()
 

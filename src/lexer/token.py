@@ -16,21 +16,21 @@ class TokenClass(Enum):
                 return item
         return None
 
-    undefined = (0, "undef")    # ?
-    word = (1, "word")          # +
-    parameter = (2, "param")    # -
-    space = (3, "space")        # ?
-    num = (4, "num")            # +
-    sign = (5, "sign")          # ?
-    newline = (6, "newline")    # +
-    string = (7, "str")         # +
-
-    colon = (100, "colon")
-    b_op = (101, "b_op")
-    cb_op = (102, "cb_op")
-    cb_cl = (103, "cb_cl")
-    hash = (104, "hash")
-    b_cl = (105, "b_cl")
+    undefined = (0, "undefined")    # Service
+    eof = (1, "eof")                # Service
+    space = (2, "space")            # Service
+    sign = (3, "sign")              # Service
+    newline = (4, "newline")        # Service
+    word = (5, "word")
+    num = (6, "num")
+    string = (7, "string")
+    colon = (8, "colon")
+    lbrace = (9, "lbrace")
+    rbrace = (10, "rbrace")
+    lcbrace = (11, "lcbrace")
+    rcbrace = (12, "rcbrace")
+    comma = (13, "comma")
+    atsym = (14, "atsym")
 
 
 class Token:
