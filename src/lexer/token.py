@@ -33,6 +33,7 @@ class TokenClass(Enum):
     atsym = (14, "atsym")
 
     parameter = (100, "parameter_deprecated")
+    comment = (101, "comment_deprecated")
 
 
 class Token:

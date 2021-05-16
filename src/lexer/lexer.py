@@ -1,10 +1,10 @@
-from lexer.state_machine import State, StateMachine
-from lexer.token import Token, TokenClass
-from lexer import rules
 from typing import List
 
-# Added - num, string, word
-# colon, rbrace, comma, rcbrace, lbrace, atsym, lcbrace
+from lexer import rules
+from lexer.state_machine import State, StateMachine
+from lexer.token import Token, TokenClass
+
+
 wordMachine = StateMachine(TokenClass.word, {
     State.begin: rules.char_start,
     State.char: rules.char
@@ -41,6 +41,12 @@ newlineMachine = StateMachine(TokenClass.newline, {
     State.newline: rules.newline
 })
 
+commentMachine = StateMachine(TokenClass.comment, {
+    State.begin: rules.comment_start,
+    State.body: rules.comment_body,
+    State.comment: rules.undefined
+})
+
 machines = {
     wordMachine,
     spaceMachine,
@@ -48,7 +54,8 @@ machines = {
     numberMachine,
     signMachine,
     newlineMachine,
-    stringMachine
+    stringMachine,
+    commentMachine
 }
 
 
@@ -104,7 +111,9 @@ def process_line(string: str) -> List[Token]:
                         else:
                             token = Token(machine.name, string[index:i])
 
-                        if machine.name != TokenClass.space and machine.name != TokenClass.newline:
+                        if (machine.name != TokenClass.space and
+                                machine.name != TokenClass.newline and
+                                machine.name != TokenClass.comment):
                             tokens.append(token)
 
                         machine_found = True
@@ -130,7 +139,9 @@ def process_line(string: str) -> List[Token]:
             else:
                 token = Token(machine.name, string[index:i])
 
-            if machine.name != TokenClass.space and machine.name != TokenClass.newline:
+            if (machine.name != TokenClass.space and
+                    machine.name != TokenClass.newline and
+                    machine.name != TokenClass.comment):
                 tokens.append(token)
             machine_found = True
         machine.reset_state()

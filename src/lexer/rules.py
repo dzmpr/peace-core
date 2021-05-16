@@ -62,3 +62,17 @@ def str_body(symbol):
     elif symbol == "\"":
         return State.str_end
     return State.undefined
+
+
+def comment_start(symbol: str):
+    if symbol == "#":
+        return State.body
+    elif symbol == " " or symbol == "\t" or symbol == "\n":
+        return State.begin
+    return State.undefined
+
+
+def comment_body(symbol: str):
+    if symbol == "\n":
+        return State.comment
+    return State.body
