@@ -1,10 +1,10 @@
 import sys
 
-from slr_parser.AbstractSyntaxTree import ASTNode
+from lexer.token import Token
+from slr_parser.ParseTreeNode import ParseTreeNode
 from slr_parser.Action import ActionType
 from slr_parser.ParserTable import ParserTable
 from slr_parser.RuleTable import RuleTable
-from slr_parser.Token import Token
 from slr_parser.Stack import Stack
 
 
@@ -23,7 +23,7 @@ class Parser:
     def __repr__(self):
         return f"State: {self.states_stack.top()}"
 
-    def parse_input(self, token_list: list[Token]) -> ASTNode:
+    def parse_input(self, token_list: list[Token]) -> ParseTreeNode:
         current_token = 0
         token = token_list[0]
         accepted = False
@@ -31,7 +31,7 @@ class Parser:
 
         while not accepted:
             stack_top: int = self.states_stack.top()
-            action = self.parser_table.get_action((stack_top, token.token_value))
+            action = self.parser_table.get_action((stack_top, token.token_class.name))
             if action.action_type == ActionType.ACTION_ACCEPT:
                 accepted = True
             elif action.action_type == ActionType.ACTION_ERROR:
@@ -47,9 +47,17 @@ class Parser:
                 self.states_stack.pop_num(rule.body_len)
                 chain = self.prefix_stack.pop_num(rule.body_len)
                 state = self.states_stack.top()
-                node = ASTNode(rule.head, chain)
+                node = self._get_parse_tree_node(rule.head, chain)
                 self.prefix_stack.push(node)
                 self.states_stack.push(self.parser_table.get_transfer_action((state, rule.head)).value)
             else:
                 raise Exception(f"Unsupported action type {action.action_type}.")
         return self.prefix_stack.top()
+
+    @staticmethod
+    def _get_parse_tree_node(lhs: str, body: list):
+        # Check is rule has a service type, and unwrap it if it's true
+        # FIXME: mb unwrapping not needed
+        if lhs.endswith("_x") and body:
+            return ParseTreeNode(lhs, [body[0], *body[1].child_nodes])
+        return ParseTreeNode(lhs, body)
