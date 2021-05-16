@@ -25,7 +25,7 @@ class PeaceError(Exception):
         self.highlight = highlight
 
     def get_exception(self):
-        if self.line is not None:
+        if self.line is not None and self.line >= 0:
             return f"{self.type.get_error_name()} at line {self.line}.\n{self.msg}"
         return f"{self.type.get_error_name()}.\n{self.msg}"
 
@@ -74,7 +74,7 @@ def print_error_info(exception: InterpretationError, source_path: str):
 
 def print_error(error: PeaceError, source_path: str):
     print(error.get_exception(), file=sys.stderr)
-    if error.line is not None:
+    if error.line is not None and error.line >= 0:
         line = get_n_line(error.line, source_path)
         highlight_line(line, error.highlight)
     print("", file=sys.stderr)

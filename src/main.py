@@ -3,63 +3,17 @@ import json
 import os
 import sys
 from typing import TextIO
-from lexer import lexer
-from lexer.token import TokenClass
-from syntaxer import syntaxer
-from syntaxer.lang_dict import LangDict, SignatureType
-from syntaxer.interpretation_error import InterpretationError, print_error_info
+
+from abstract_syntax_tree.PTConverter import PTConverter
 from codegenerator.code_generator import CodeGenerator
+from lexer import lexer
+from lexer.token import TokenClass, Token
 from parsetree.parse_tree import ParseTree
 from semanticanalyzer.symbol_table import SymbolTable
-
 from slr_parser.Parser import Parser
-from slr_parser.Token import Token, TokenType
-
-inp = [
-    # block {
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "lcbrace"),
-    # bloc {
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "lcbrace"),
-    # lab@1:
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "atsym"),
-    Token(TokenType.TOKEN_STR, "num"),
-    Token(TokenType.TOKEN_STR, "colon"),
-    # delay(10)
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "lbrace"),
-    Token(TokenType.TOKEN_STR, "num"),
-    Token(TokenType.TOKEN_STR, "rbrace"),
-    # bloc { }
-    Token(TokenType.TOKEN_STR, "rcbrace"),
-    # block { }
-    Token(TokenType.TOKEN_STR, "rcbrace"),
-    # main {
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "lcbrace"),
-    # block()
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "lbrace"),
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "comma"),
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "rbrace"),
-    # block()
-    Token(TokenType.TOKEN_STR, "word"),
-    Token(TokenType.TOKEN_STR, "lbrace"),
-    Token(TokenType.TOKEN_STR, "rbrace"),
-    # main { }
-    Token(TokenType.TOKEN_STR, "rcbrace"),
-    Token(TokenType.TOKEN_STR, "$"),
-]
-
-grammar = json.load(open("slr_parser/grammar.json", "r"))
-slr = Parser(grammar)
-print(slr.parse_input(inp))
-
-exit()
+from syntaxer import syntaxer
+from syntaxer.interpretation_error import InterpretationError, print_error_info
+from syntaxer.lang_dict import LangDict, SignatureType
 
 parser = argparse.ArgumentParser(description="Interpreter for converting .pce files into .gpss.")
 parser.add_argument(
@@ -167,6 +121,8 @@ token_list = []
 pce_source: TextIO = open(path, "r", encoding="utf8")
 for row in pce_source:
     token_list.extend(lexer.process_line(row))
+# Add token that indicates end of file
+token_list.append(Token(TokenClass.eof, ""))
 pce_source.close()
 
 # Print processed tokens to file
@@ -176,18 +132,31 @@ if arguments.lo:
         lexer_output.write(str(token) + "\n")
     lexer_output.close()
 
+grammar = json.load(open("slr_parser/grammar.json", "r"))
+slr = Parser(grammar)
+tree = slr.parse_input(token_list)
+
 # Parse tree
 parse_tree = ParseTree()
 # Symbol table
 symbol_table = SymbolTable()
 
-# Process tokens with syntax analyzer
+# PTConverter
+ptc = PTConverter(parse_tree, symbol_table, lang_dict)
 try:
-    syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, token_list)
-    token_list.clear()
+    ptc.convert_pt(tree)
 except InterpretationError as error:
     print_error_info(error, path)
     sys.exit(2)
+# exit()
+
+# Process tokens with syntax analyzer
+# try:
+#     syntaxer.process_tokens(parse_tree, symbol_table, lang_dict, token_list)
+#     token_list.clear()
+# except InterpretationError as error:
+#     print_error_info(error, path)
+#     sys.exit(2)
 
 # Print processed phrases to file FIXME: TreePrint
 if arguments.so:

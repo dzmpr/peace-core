@@ -56,8 +56,16 @@ class Parser:
 
     @staticmethod
     def _get_parse_tree_node(lhs: str, body: list):
+        attributes: list = list()
+        childs: list = list()
+        for item in body:
+            if isinstance(item, Token):
+                attributes.append(item)
+            else:
+                childs.append(item)
+
         # Check is rule has a service type, and unwrap it if it's true
         # FIXME: mb unwrapping not needed
         if lhs.endswith("_x") and body:
-            return ParseTreeNode(lhs, [body[0], *body[1].child_nodes])
-        return ParseTreeNode(lhs, body)
+            return ParseTreeNode(lhs, attributes, [childs[0], *childs[1].child_nodes])
+        return ParseTreeNode(lhs, attributes, childs)

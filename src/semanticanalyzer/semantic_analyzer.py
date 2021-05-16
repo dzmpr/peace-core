@@ -38,6 +38,9 @@ class SemanticAnalyzer:
         self._name_processing(phrase, line_number)
         self.composer.add_phrase(phrase, line_number)
 
+    def ascend(self):
+        self.composer.add_phrase(Phrase(PhraseClass.blockClose), 0)
+
     # TODO: First version (without scope-dependent check), to be refactored
     def _name_processing(self, phrase: Phrase, line_number: int):
         if phrase.phrase_class == PhraseClass.block:

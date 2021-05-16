@@ -32,6 +32,8 @@ class TokenClass(Enum):
     comma = (13, "comma")
     atsym = (14, "atsym")
 
+    parameter = (100, "parameter_deprecated")
+
 
 class Token:
     def __init__(self, token_class: TokenClass, value: str):
